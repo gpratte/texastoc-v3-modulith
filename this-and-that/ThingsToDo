@@ -1,0 +1,12 @@
+
+Separate running the server from the integration tests.
+Be able to run a cucumber test from the feature file.
+
+Roles
+    Only admin can finalize/unfinalized a season
+    Shore up RestControllerAdvise - 400 when json date not correct has no info
+
+CICD
+    Test environment (http)
+    Database versioning
+
