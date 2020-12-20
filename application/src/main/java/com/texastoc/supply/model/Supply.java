@@ -1,4 +1,4 @@
-package com.texastoc.model.supply;
+package com.texastoc.supply.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

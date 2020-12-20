@@ -1,7 +1,6 @@
-package com.texastoc.controller;
+package com.texastoc.supply;
 
-import com.texastoc.model.supply.Supply;
-import com.texastoc.service.SupplyService;
+import com.texastoc.supply.model.Supply;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
