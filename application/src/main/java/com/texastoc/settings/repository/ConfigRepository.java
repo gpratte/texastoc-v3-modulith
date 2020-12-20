@@ -1,6 +1,6 @@
-package com.texastoc.repository;
+package com.texastoc.settings.repository;
 
-import com.texastoc.model.config.TocConfig;
+import com.texastoc.settings.model.TocConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

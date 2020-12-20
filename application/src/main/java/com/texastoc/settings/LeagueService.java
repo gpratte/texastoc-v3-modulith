@@ -1,4 +1,4 @@
-package com.texastoc.service;
+package com.texastoc.settings;
 
 import com.texastoc.game.calculator.PointsCalculator;
 import org.springframework.cache.annotation.Cacheable;

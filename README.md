@@ -162,5 +162,5 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 04-player-package
-Created the com.texastoc.player package and moved the player related packages there.
+## Current Branch: 05-settings-package
+Created the com.texastoc.settings package and moved the system/settings related packages there.

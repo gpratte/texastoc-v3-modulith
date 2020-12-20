@@ -6,7 +6,7 @@ import com.texastoc.game.model.Game;
 import com.texastoc.game.model.GamePayout;
 import com.texastoc.game.model.GamePlayer;
 import com.texastoc.game.repository.GamePayoutRepository;
-import com.texastoc.repository.PayoutRepository;
+import com.texastoc.settings.repository.PayoutRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

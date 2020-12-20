@@ -4,7 +4,7 @@ import com.texastoc.TestConstants;
 import com.texastoc.game.calculator.GameCalculator;
 import com.texastoc.game.model.Game;
 import com.texastoc.game.model.GamePlayer;
-import com.texastoc.repository.ConfigRepository;
+import com.texastoc.settings.repository.ConfigRepository;
 import com.texastoc.game.repository.GameRepository;
 import org.junit.Assert;
 import org.junit.Before;

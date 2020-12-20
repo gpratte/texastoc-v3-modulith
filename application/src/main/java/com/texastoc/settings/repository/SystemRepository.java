@@ -1,8 +1,8 @@
-package com.texastoc.repository;
+package com.texastoc.settings.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.texastoc.model.system.Settings;
+import com.texastoc.settings.model.Settings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

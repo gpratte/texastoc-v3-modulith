@@ -1,4 +1,4 @@
-package com.texastoc.model.system;
+package com.texastoc.settings.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
