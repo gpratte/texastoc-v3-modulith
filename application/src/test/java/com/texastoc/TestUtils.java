@@ -1,7 +1,7 @@
 package com.texastoc;
 
-import com.texastoc.season.model.QuarterlySeason;
-import com.texastoc.season.model.Season;
+import com.texastoc.module.season.model.QuarterlySeason;
+import com.texastoc.module.season.model.Season;
 import org.junit.Assert;
 
 import java.time.LocalDate;

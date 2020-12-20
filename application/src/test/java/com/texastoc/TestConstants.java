@@ -1,7 +1,7 @@
 package com.texastoc;
 
 import com.texastoc.model.common.Payout;
-import com.texastoc.settings.model.TocConfig;
+import com.texastoc.module.settings.model.TocConfig;
 
 import java.util.ArrayList;
 import java.util.List;

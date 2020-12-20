@@ -163,4 +163,4 @@ Choose the branch from the github list of branches to see the readme for that br
 To see the code for a branch compare the branch to the previous branch.
 
 ## Current Branch: 65-supply-package
-Created the com.texastoc.supply package and moved the supplies related packages there.
+Created the com.texastoc.module.supply package and moved the supplies related packages there.
