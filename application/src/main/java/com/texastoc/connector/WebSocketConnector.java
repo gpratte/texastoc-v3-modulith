@@ -1,7 +1,7 @@
 package com.texastoc.connector;
 
-import com.texastoc.model.game.Game;
-import com.texastoc.model.game.clock.Clock;
+import com.texastoc.game.model.Game;
+import com.texastoc.game.model.clock.Clock;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 

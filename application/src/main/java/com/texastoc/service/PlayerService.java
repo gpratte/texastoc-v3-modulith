@@ -4,7 +4,7 @@ import com.texastoc.connector.EmailConnector;
 import com.texastoc.exception.CannotDeletePlayerException;
 import com.texastoc.exception.NotFoundException;
 import com.texastoc.model.user.Player;
-import com.texastoc.repository.GamePlayerRepository;
+import com.texastoc.game.repository.GamePlayerRepository;
 import com.texastoc.repository.PlayerRepository;
 import com.texastoc.repository.RoleRepository;
 import lombok.extern.slf4j.Slf4j;

@@ -1,14 +1,14 @@
-package com.texastoc.service;
+package com.texastoc.game;
 
-import com.texastoc.config.RoundsConfig;
+import com.texastoc.game.config.RoundsConfig;
 import com.texastoc.connector.SMSConnector;
 import com.texastoc.connector.WebSocketConnector;
-import com.texastoc.model.game.GamePlayer;
-import com.texastoc.model.game.clock.Clock;
-import com.texastoc.model.game.clock.Round;
+import com.texastoc.game.model.GamePlayer;
+import com.texastoc.game.model.clock.Clock;
+import com.texastoc.game.model.clock.Round;
 import com.texastoc.model.user.Player;
-import com.texastoc.repository.GamePlayerRepository;
-import com.texastoc.repository.GameRepository;
+import com.texastoc.game.repository.GamePlayerRepository;
+import com.texastoc.game.repository.GameRepository;
 import com.texastoc.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
 

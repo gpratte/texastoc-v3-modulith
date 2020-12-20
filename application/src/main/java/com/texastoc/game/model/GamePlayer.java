@@ -1,4 +1,4 @@
-package com.texastoc.model.game;
+package com.texastoc.game.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

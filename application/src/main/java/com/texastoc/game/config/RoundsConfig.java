@@ -1,6 +1,6 @@
-package com.texastoc.config;
+package com.texastoc.game.config;
 
-import com.texastoc.model.game.clock.Round;
+import com.texastoc.game.model.clock.Round;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

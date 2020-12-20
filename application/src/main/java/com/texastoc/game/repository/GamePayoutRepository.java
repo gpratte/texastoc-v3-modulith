@@ -1,6 +1,6 @@
-package com.texastoc.repository;
+package com.texastoc.game.repository;
 
-import com.texastoc.model.game.GamePayout;
+import com.texastoc.game.model.GamePayout;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

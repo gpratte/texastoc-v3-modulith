@@ -1,4 +1,4 @@
-package com.texastoc.service;
+package com.texastoc.game;
 
 import com.texastoc.connector.EmailConnector;
 import com.texastoc.connector.SMSConnector;
@@ -7,13 +7,17 @@ import com.texastoc.controller.request.CreateGamePlayerRequest;
 import com.texastoc.controller.request.UpdateGamePlayerRequest;
 import com.texastoc.exception.GameInProgressException;
 import com.texastoc.exception.GameIsFinalizedException;
+import com.texastoc.game.model.*;
+import com.texastoc.game.repository.GamePayoutRepository;
+import com.texastoc.game.repository.GamePlayerRepository;
+import com.texastoc.game.repository.GameRepository;
 import com.texastoc.model.config.TocConfig;
-import com.texastoc.model.game.*;
 import com.texastoc.model.season.QuarterlySeason;
 import com.texastoc.model.season.Season;
 import com.texastoc.model.user.Player;
 import com.texastoc.model.user.Role;
 import com.texastoc.repository.*;
+import com.texastoc.service.SeasonService;
 import com.texastoc.service.calculator.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

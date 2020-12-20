@@ -2,12 +2,12 @@ package com.texastoc.job;
 
 import com.texastoc.controller.request.CreateGamePlayerRequest;
 import com.texastoc.controller.request.UpdateGamePlayerRequest;
-import com.texastoc.model.game.FirstTimeGamePlayer;
-import com.texastoc.model.game.Game;
-import com.texastoc.model.game.GamePlayer;
+import com.texastoc.game.model.FirstTimeGamePlayer;
+import com.texastoc.game.model.Game;
+import com.texastoc.game.model.GamePlayer;
 import com.texastoc.model.season.Season;
 import com.texastoc.model.user.Player;
-import com.texastoc.service.GameService;
+import com.texastoc.game.GameService;
 import com.texastoc.service.PlayerService;
 import com.texastoc.service.SeasonService;
 import lombok.extern.slf4j.Slf4j;

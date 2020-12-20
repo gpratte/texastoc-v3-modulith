@@ -1,10 +1,10 @@
 package com.texastoc.service.calculator;
 
 import com.texastoc.model.config.TocConfig;
-import com.texastoc.model.game.Game;
-import com.texastoc.model.game.GamePlayer;
+import com.texastoc.game.model.Game;
+import com.texastoc.game.model.GamePlayer;
 import com.texastoc.repository.ConfigRepository;
-import com.texastoc.repository.GameRepository;
+import com.texastoc.game.repository.GameRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

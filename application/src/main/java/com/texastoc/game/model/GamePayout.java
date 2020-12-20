@@ -1,4 +1,4 @@
-package com.texastoc.model.game;
+package com.texastoc.game.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;

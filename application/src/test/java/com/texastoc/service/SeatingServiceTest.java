@@ -1,8 +1,8 @@
 package com.texastoc.service;
 
 import com.texastoc.TestConstants;
-import com.texastoc.model.game.*;
-import com.texastoc.repository.GamePlayerRepository;
+import com.texastoc.game.model.*;
+import com.texastoc.game.repository.GamePlayerRepository;
 import com.texastoc.repository.SeatingRepository;
 import org.junit.Assert;
 import org.junit.Before;

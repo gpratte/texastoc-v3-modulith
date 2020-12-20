@@ -1,6 +1,6 @@
 package com.texastoc.controller.request;
 
-import com.texastoc.model.game.TableRequest;
+import com.texastoc.game.model.TableRequest;
 import lombok.Builder;
 import lombok.Data;
 
