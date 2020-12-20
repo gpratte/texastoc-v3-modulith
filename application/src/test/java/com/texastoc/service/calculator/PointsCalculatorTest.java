@@ -1,6 +1,7 @@
 package com.texastoc.service.calculator;
 
 import com.texastoc.TestConstants;
+import com.texastoc.game.calculator.PointsCalculator;
 import com.texastoc.game.model.Game;
 import com.texastoc.game.model.GamePlayer;
 import com.texastoc.game.repository.GamePlayerRepository;

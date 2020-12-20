@@ -1,15 +1,15 @@
 package com.texastoc.job;
 
-import com.texastoc.controller.request.CreateGamePlayerRequest;
-import com.texastoc.controller.request.UpdateGamePlayerRequest;
+import com.texastoc.game.request.CreateGamePlayerRequest;
+import com.texastoc.game.request.UpdateGamePlayerRequest;
 import com.texastoc.game.model.FirstTimeGamePlayer;
 import com.texastoc.game.model.Game;
 import com.texastoc.game.model.GamePlayer;
-import com.texastoc.model.season.Season;
+import com.texastoc.season.model.Season;
 import com.texastoc.model.user.Player;
 import com.texastoc.game.GameService;
 import com.texastoc.service.PlayerService;
-import com.texastoc.service.SeasonService;
+import com.texastoc.season.SeasonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
