@@ -1,6 +1,5 @@
-package com.texastoc.controller;
+package com.texastoc.settings;
 
-import com.texastoc.service.LeagueService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

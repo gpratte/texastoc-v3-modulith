@@ -1,8 +1,8 @@
-package com.texastoc.controller;
+package com.texastoc.settings;
 
 import com.texastoc.exception.NotFoundException;
-import com.texastoc.model.system.Settings;
-import com.texastoc.repository.SystemRepository;
+import com.texastoc.settings.model.Settings;
+import com.texastoc.settings.repository.SystemRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;

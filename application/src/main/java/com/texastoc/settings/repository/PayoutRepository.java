@@ -1,4 +1,4 @@
-package com.texastoc.repository;
+package com.texastoc.settings.repository;
 
 import com.texastoc.model.common.Payout;
 import lombok.extern.slf4j.Slf4j;

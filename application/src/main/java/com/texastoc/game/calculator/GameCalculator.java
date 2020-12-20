@@ -1,9 +1,9 @@
 package com.texastoc.game.calculator;
 
-import com.texastoc.model.config.TocConfig;
+import com.texastoc.settings.model.TocConfig;
 import com.texastoc.game.model.Game;
 import com.texastoc.game.model.GamePlayer;
-import com.texastoc.repository.ConfigRepository;
+import com.texastoc.settings.repository.ConfigRepository;
 import com.texastoc.game.repository.GameRepository;
 import org.springframework.stereotype.Component;
 
