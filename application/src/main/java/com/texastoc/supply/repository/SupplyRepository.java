@@ -1,7 +1,7 @@
-package com.texastoc.repository;
+package com.texastoc.supply.repository;
 
-import com.texastoc.model.supply.Supply;
-import com.texastoc.model.supply.SupplyType;
+import com.texastoc.supply.model.Supply;
+import com.texastoc.supply.model.SupplyType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

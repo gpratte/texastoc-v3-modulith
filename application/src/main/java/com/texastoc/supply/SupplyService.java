@@ -1,7 +1,7 @@
-package com.texastoc.service;
+package com.texastoc.supply;
 
-import com.texastoc.model.supply.Supply;
-import com.texastoc.repository.SupplyRepository;
+import com.texastoc.supply.model.Supply;
+import com.texastoc.supply.repository.SupplyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
