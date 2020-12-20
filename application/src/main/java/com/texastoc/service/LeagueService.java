@@ -1,6 +1,6 @@
 package com.texastoc.service;
 
-import com.texastoc.service.calculator.PointsCalculator;
+import com.texastoc.game.calculator.PointsCalculator;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 

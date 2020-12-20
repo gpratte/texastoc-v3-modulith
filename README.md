@@ -162,5 +162,5 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 02-game-package
-Created the com.texastoc.game package and moved the game related packages there.
+## Current Branch: 03-season-package
+Created the com.texastoc.season package and moved the season related packages there.

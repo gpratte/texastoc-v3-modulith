@@ -1,7 +1,7 @@
 package com.texastoc.game.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.texastoc.model.season.Quarter;
+import com.texastoc.season.model.Quarter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

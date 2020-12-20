@@ -1,13 +1,19 @@
 package com.texastoc.service.calculator;
 
 import com.texastoc.TestConstants;
+import com.texastoc.game.calculator.GameCalculator;
 import com.texastoc.game.model.Game;
 import com.texastoc.game.model.GamePlayer;
 import com.texastoc.game.repository.GamePlayerRepository;
 import com.texastoc.game.repository.GameRepository;
-import com.texastoc.model.season.Season;
-import com.texastoc.model.season.SeasonPlayer;
+import com.texastoc.season.calculator.SeasonCalculator;
+import com.texastoc.season.model.Season;
+import com.texastoc.season.model.SeasonPlayer;
 import com.texastoc.repository.*;
+import com.texastoc.season.repository.SeasonPayoutRepository;
+import com.texastoc.season.repository.SeasonPayoutSettingsRepository;
+import com.texastoc.season.repository.SeasonPlayerRepository;
+import com.texastoc.season.repository.SeasonRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;

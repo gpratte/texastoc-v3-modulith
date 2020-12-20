@@ -1,13 +1,12 @@
 package com.texastoc.game;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.texastoc.controller.request.*;
 import com.texastoc.exception.NotFoundException;
 import com.texastoc.game.model.FirstTimeGamePlayer;
 import com.texastoc.game.model.Game;
 import com.texastoc.game.model.GamePlayer;
 import com.texastoc.game.model.Seating;
-import com.texastoc.service.SeatingService;
+import com.texastoc.game.request.*;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

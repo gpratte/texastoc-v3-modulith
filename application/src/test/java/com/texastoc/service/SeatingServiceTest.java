@@ -1,9 +1,10 @@
 package com.texastoc.service;
 
 import com.texastoc.TestConstants;
+import com.texastoc.game.SeatingService;
 import com.texastoc.game.model.*;
 import com.texastoc.game.repository.GamePlayerRepository;
-import com.texastoc.repository.SeatingRepository;
+import com.texastoc.game.repository.SeatingRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,7 +1,7 @@
 package com.texastoc.game.repository;
 
 import com.texastoc.game.model.Game;
-import com.texastoc.model.season.Quarter;
+import com.texastoc.season.model.Quarter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.jdbc.core.RowMapper;
