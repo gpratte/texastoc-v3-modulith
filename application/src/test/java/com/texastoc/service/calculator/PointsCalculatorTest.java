@@ -1,10 +1,10 @@
 package com.texastoc.service.calculator;
 
 import com.texastoc.TestConstants;
-import com.texastoc.game.calculator.PointsCalculator;
-import com.texastoc.game.model.Game;
-import com.texastoc.game.model.GamePlayer;
-import com.texastoc.game.repository.GamePlayerRepository;
+import com.texastoc.module.game.calculator.PointsCalculator;
+import com.texastoc.module.game.model.Game;
+import com.texastoc.module.game.model.GamePlayer;
+import com.texastoc.module.game.repository.GamePlayerRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

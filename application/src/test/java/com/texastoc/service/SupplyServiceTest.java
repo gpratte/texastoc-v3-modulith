@@ -1,10 +1,10 @@
 package com.texastoc.service;
 
 import com.texastoc.TestConstants;
-import com.texastoc.supply.SupplyService;
-import com.texastoc.supply.model.Supply;
-import com.texastoc.supply.model.SupplyType;
-import com.texastoc.supply.repository.SupplyRepository;
+import com.texastoc.module.supply.SupplyService;
+import com.texastoc.module.supply.model.Supply;
+import com.texastoc.module.supply.model.SupplyType;
+import com.texastoc.module.supply.repository.SupplyRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
