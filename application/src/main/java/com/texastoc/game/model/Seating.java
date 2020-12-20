@@ -1,4 +1,4 @@
-package com.texastoc.model.game;
+package com.texastoc.game.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -14,16 +13,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Table {
-
+public class Seating {
   private int gameId;
-  private int number;
-  private List<Seat> seats;
-
-  public void addSeat(Seat seat) {
-    if (seats == null) {
-      seats = new ArrayList<>();
-    }
-    seats.add(seat);
-  }
+  private List<Integer> numSeatsPerTable;
+  private List<TableRequest> tableRequests;
+  private List<Table> tables;
 }

@@ -4,16 +4,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.texastoc</groupId>
-    <artifactId>texastoc-v2-application</artifactId>
+    <artifactId>texastoc-v3-application</artifactId>
     <version>1.0</version>
     <packaging>war</packaging>
 
-    <name>texastoc v2 application</name>
+    <name>texastoc v3 application</name>
     <description>Texas Tournament Of Champions</description>
 
     <parent>
         <groupId>com.texastoc</groupId>
-        <artifactId>texastoc-v2</artifactId>
+        <artifactId>texastoc-v3</artifactId>
         <version>1.0</version>
     </parent>
 

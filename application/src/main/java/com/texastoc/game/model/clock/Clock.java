@@ -1,4 +1,4 @@
-package com.texastoc.model.game.clock;
+package com.texastoc.game.model.clock;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

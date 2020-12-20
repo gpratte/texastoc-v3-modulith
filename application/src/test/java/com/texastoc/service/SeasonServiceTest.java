@@ -2,7 +2,10 @@ package com.texastoc.service;
 
 import com.texastoc.TestConstants;
 import com.texastoc.TestUtils;
-import com.texastoc.model.game.Game;
+import com.texastoc.game.model.Game;
+import com.texastoc.game.repository.GamePayoutRepository;
+import com.texastoc.game.repository.GamePlayerRepository;
+import com.texastoc.game.repository.GameRepository;
 import com.texastoc.model.season.Quarter;
 import com.texastoc.model.season.QuarterlySeason;
 import com.texastoc.model.season.Season;

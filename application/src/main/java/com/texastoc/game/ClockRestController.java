@@ -1,8 +1,7 @@
-package com.texastoc.controller;
+package com.texastoc.game;
 
-import com.texastoc.model.game.clock.Clock;
-import com.texastoc.model.game.clock.Round;
-import com.texastoc.service.ClockService;
+import com.texastoc.game.model.clock.Clock;
+import com.texastoc.game.model.clock.Round;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

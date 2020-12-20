@@ -1,6 +1,6 @@
 package com.texastoc.model.season;
 
-import com.texastoc.model.game.Game;
+import com.texastoc.game.model.Game;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
