@@ -1,7 +1,7 @@
-package com.texastoc.repository;
+package com.texastoc.player.repository;
 
-import com.texastoc.model.user.Player;
-import com.texastoc.model.user.Role;
+import com.texastoc.player.model.Player;
+import com.texastoc.player.model.Role;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;

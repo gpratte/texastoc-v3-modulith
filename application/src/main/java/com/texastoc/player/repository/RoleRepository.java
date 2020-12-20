@@ -1,4 +1,4 @@
-package com.texastoc.repository;
+package com.texastoc.player.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

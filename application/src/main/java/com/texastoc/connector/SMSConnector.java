@@ -1,6 +1,6 @@
 package com.texastoc.connector;
 
-import com.texastoc.repository.PlayerRepository;
+import com.texastoc.player.repository.PlayerRepository;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;

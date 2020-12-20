@@ -6,10 +6,10 @@ import com.texastoc.connector.WebSocketConnector;
 import com.texastoc.game.model.GamePlayer;
 import com.texastoc.game.model.clock.Clock;
 import com.texastoc.game.model.clock.Round;
-import com.texastoc.model.user.Player;
+import com.texastoc.player.model.Player;
 import com.texastoc.game.repository.GamePlayerRepository;
 import com.texastoc.game.repository.GameRepository;
-import com.texastoc.repository.PlayerRepository;
+import com.texastoc.player.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
