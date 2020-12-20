@@ -1,7 +1,7 @@
 package com.texastoc.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.texastoc.model.user.Player;
+import com.texastoc.player.model.Player;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

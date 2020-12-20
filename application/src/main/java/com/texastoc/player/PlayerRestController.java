@@ -1,8 +1,7 @@
-package com.texastoc.controller;
+package com.texastoc.player;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.texastoc.model.user.Player;
-import com.texastoc.service.PlayerService;
+import com.texastoc.player.model.Player;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

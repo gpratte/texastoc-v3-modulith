@@ -1,6 +1,6 @@
 package com.texastoc.security;
 
-import com.texastoc.service.UserDetailsServiceImpl;
+import com.texastoc.player.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;

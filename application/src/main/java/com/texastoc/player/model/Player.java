@@ -1,4 +1,4 @@
-package com.texastoc.model.user;
+package com.texastoc.player.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

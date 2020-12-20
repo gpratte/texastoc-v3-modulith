@@ -2,10 +2,11 @@ package com.texastoc.service;
 
 import com.texastoc.TestConstants;
 import com.texastoc.connector.EmailConnector;
-import com.texastoc.model.user.Player;
+import com.texastoc.player.PlayerService;
+import com.texastoc.player.model.Player;
 import com.texastoc.game.repository.GamePlayerRepository;
-import com.texastoc.repository.PlayerRepository;
-import com.texastoc.repository.RoleRepository;
+import com.texastoc.player.repository.PlayerRepository;
+import com.texastoc.player.repository.RoleRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
