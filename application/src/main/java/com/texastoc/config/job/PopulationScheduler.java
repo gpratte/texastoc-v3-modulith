@@ -1,4 +1,4 @@
-package com.texastoc.job;
+package com.texastoc.config.job;
 
 import com.texastoc.module.game.request.CreateGamePlayerRequest;
 import com.texastoc.module.game.request.UpdateGamePlayerRequest;

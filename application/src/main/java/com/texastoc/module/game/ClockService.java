@@ -1,7 +1,7 @@
 package com.texastoc.module.game;
 
 import com.texastoc.module.game.config.RoundsConfig;
-import com.texastoc.connector.SMSConnector;
+import com.texastoc.module.notification.connector.SMSConnector;
 import com.texastoc.module.game.connector.WebSocketConnector;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.model.clock.Clock;

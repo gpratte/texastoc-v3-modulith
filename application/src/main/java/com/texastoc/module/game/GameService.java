@@ -1,7 +1,7 @@
 package com.texastoc.module.game;
 
-import com.texastoc.connector.EmailConnector;
-import com.texastoc.connector.SMSConnector;
+import com.texastoc.module.notification.connector.EmailConnector;
+import com.texastoc.module.notification.connector.SMSConnector;
 import com.texastoc.module.game.connector.WebSocketConnector;
 import com.texastoc.module.game.calculator.GameCalculator;
 import com.texastoc.module.game.calculator.PayoutCalculator;
