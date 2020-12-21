@@ -162,5 +162,5 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 09-move-common-to-module
-Move more classes from the common packages to the appropriate modules (i.e. Payout to Settings and WebSocketConnector to game).
+## Current Branch: 10-notification-package
+Move the notification related classes into the com.texastoc.module.notification package.
