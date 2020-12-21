@@ -1,4 +1,4 @@
-package com.texastoc.connector;
+package com.texastoc.module.notification.connector;
 
 import com.texastoc.module.player.repository.PlayerRepository;
 import com.twilio.Twilio;

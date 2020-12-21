@@ -1,7 +1,7 @@
 package com.texastoc.service;
 
 import com.texastoc.TestConstants;
-import com.texastoc.connector.EmailConnector;
+import com.texastoc.module.notification.connector.EmailConnector;
 import com.texastoc.module.player.PlayerService;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.game.repository.GamePlayerRepository;
