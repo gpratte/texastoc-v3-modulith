@@ -1,7 +1,7 @@
 package com.texastoc.module.player;
 
 import com.texastoc.connector.EmailConnector;
-import com.texastoc.exception.CannotDeletePlayerException;
+import com.texastoc.module.player.exception.CannotDeletePlayerException;
 import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.game.repository.GamePlayerRepository;

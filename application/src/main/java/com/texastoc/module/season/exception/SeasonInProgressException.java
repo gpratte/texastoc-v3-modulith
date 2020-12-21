@@ -1,4 +1,4 @@
-package com.texastoc.exception;
+package com.texastoc.module.season.exception;
 
 public class SeasonInProgressException extends RuntimeException {
   public SeasonInProgressException() {

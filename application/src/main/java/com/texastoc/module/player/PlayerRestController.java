@@ -1,16 +1,20 @@
 package com.texastoc.module.player;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.texastoc.module.player.exception.CannotDeletePlayerException;
 import com.texastoc.module.player.model.Player;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
@@ -66,6 +70,11 @@ public class PlayerRestController {
   @PostMapping(value = "/password/reset", consumes = "application/vnd.texastoc.password-reset+json")
   public void reset(@RequestBody Reset reset) {
     playerService.resetPassword(reset.getCode(), reset.getPassword());
+  }
+
+  @ExceptionHandler(value = {CannotDeletePlayerException.class})
+  protected void handleCannotDeletePlayerException(CannotDeletePlayerException ex, HttpServletResponse response) throws IOException {
+    response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
   }
 
   @Data

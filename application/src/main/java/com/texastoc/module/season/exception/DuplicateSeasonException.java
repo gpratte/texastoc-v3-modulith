@@ -1,4 +1,4 @@
-package com.texastoc.exception;
+package com.texastoc.module.season.exception;
 
 public class DuplicateSeasonException extends RuntimeException {
   public DuplicateSeasonException(int startYear) {
