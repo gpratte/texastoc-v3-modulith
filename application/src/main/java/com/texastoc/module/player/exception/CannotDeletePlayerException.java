@@ -1,4 +1,4 @@
-package com.texastoc.exception;
+package com.texastoc.module.player.exception;
 
 public class CannotDeletePlayerException extends RuntimeException {
 

@@ -1,11 +1,16 @@
 package com.texastoc.module.season;
 
+import com.texastoc.module.season.exception.GameInProgressException;
+import com.texastoc.module.season.exception.SeasonInProgressException;
 import com.texastoc.module.season.model.HistoricalSeason;
 import com.texastoc.module.season.model.Season;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -55,6 +60,16 @@ public class SeasonRestController {
   @GetMapping("/api/v2/seasons/history")
   public List<HistoricalSeason> getPastSeasons() {
     return seasonService.getPastSeasons();
+  }
+
+  @ExceptionHandler(value = {GameInProgressException.class})
+  protected void handleGameInProgressException(GameInProgressException ex, HttpServletResponse response) throws IOException {
+    response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
+  }
+
+  @ExceptionHandler(value = {SeasonInProgressException.class})
+  protected void handleSeasonInProgressException(SeasonInProgressException ex, HttpServletResponse response) throws IOException {
+    response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
   }
 
   private static class SeasonStart {

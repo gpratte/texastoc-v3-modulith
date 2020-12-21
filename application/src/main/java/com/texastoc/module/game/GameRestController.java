@@ -2,16 +2,21 @@ package com.texastoc.module.game;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.texastoc.exception.NotFoundException;
+import com.texastoc.module.game.exception.GameInProgressException;
+import com.texastoc.module.game.exception.GameIsFinalizedException;
 import com.texastoc.module.game.model.FirstTimeGamePlayer;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.model.Seating;
 import com.texastoc.module.game.request.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -126,6 +131,16 @@ public class GameRestController {
   @PostMapping(value = "/api/v2/games/{gameId}/seats", consumes = "application/vnd.texastoc.notify-seats+json")
   public void notifySeating(@PathVariable("gameId") int gameId) throws JsonProcessingException {
     gameService.notifySeating(gameId);
+  }
+
+  @ExceptionHandler(value = {GameInProgressException.class})
+  protected void handleGameInProgressException(GameInProgressException ex, HttpServletResponse response) throws IOException {
+    response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
+  }
+
+  @ExceptionHandler(value = {GameIsFinalizedException.class})
+  protected void handleFinalizedException(GameIsFinalizedException ex, HttpServletResponse response) throws IOException {
+    response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
   }
 
 }

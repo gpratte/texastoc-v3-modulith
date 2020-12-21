@@ -50,26 +50,6 @@ public class RestControllerAdvise extends ResponseEntityExceptionHandler {
     response.sendError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
   }
 
-  @ExceptionHandler(value = {GameIsFinalizedException.class})
-  protected void handleFinalizedException(GameIsFinalizedException ex, HttpServletResponse response) throws IOException {
-    response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
-  }
-
-  @ExceptionHandler(value = {GameInProgressException.class})
-  protected void handleGameInProgressException(GameInProgressException ex, HttpServletResponse response) throws IOException {
-    response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
-  }
-
-  @ExceptionHandler(value = {SeasonInProgressException.class})
-  protected void handleSeasonInProgressException(SeasonInProgressException ex, HttpServletResponse response) throws IOException {
-    response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
-  }
-
-  @ExceptionHandler(value = {CannotDeletePlayerException.class})
-  protected void handleCannotDeletePlayerException(CannotDeletePlayerException ex, HttpServletResponse response) throws IOException {
-    response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
-  }
-
   @ExceptionHandler(value = {JsonProcessingException.class})
   protected void handleJsonProcessingException(JsonProcessingException ex, HttpServletResponse response) throws IOException {
     response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());

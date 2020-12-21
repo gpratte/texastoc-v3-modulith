@@ -1,4 +1,4 @@
-package com.texastoc.exception;
+package com.texastoc.module.game.exception;
 
 public class GameIsFinalizedException extends RuntimeException {
 
