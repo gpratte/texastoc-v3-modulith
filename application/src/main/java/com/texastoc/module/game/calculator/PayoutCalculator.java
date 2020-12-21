@@ -1,6 +1,6 @@
 package com.texastoc.module.game.calculator;
 
-import com.texastoc.model.common.Payout;
+import com.texastoc.module.settings.model.Payout;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePayout;
 import com.texastoc.module.game.model.GamePlayer;

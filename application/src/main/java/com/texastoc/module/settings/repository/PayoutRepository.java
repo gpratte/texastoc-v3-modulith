@@ -1,6 +1,6 @@
 package com.texastoc.module.settings.repository;
 
-import com.texastoc.model.common.Payout;
+import com.texastoc.module.settings.model.Payout;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
