@@ -1,4 +1,4 @@
-package com.texastoc.model.common;
+package com.texastoc.module.settings.model;
 
 import lombok.Builder;
 import lombok.Getter;

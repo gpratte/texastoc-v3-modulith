@@ -1,4 +1,4 @@
-package com.texastoc.connector;
+package com.texastoc.module.game.connector;
 
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.clock.Clock;
