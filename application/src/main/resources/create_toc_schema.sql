@@ -87,8 +87,8 @@ CREATE TABLE quarterlyseasonplayer
 CREATE TABLE player
 (
     id        int NOT NULL AUTO_INCREMENT,
-    firstName varchar(32)  DEFAULT NULL,
-    lastName  varchar(32)  DEFAULT NULL,
+    first_name varchar(32)  DEFAULT NULL,
+    last_name  varchar(32)  DEFAULT NULL,
     phone     varchar(32)  DEFAULT NULL,
     email     varchar(64)  DEFAULT NULL,
     password  varchar(255) DEFAULT NULL,
@@ -100,8 +100,26 @@ VALUES (1, 'Gil', 'Pratte', '5121231235', 'gilpratte@texastoc.com',
         '$2a$10$qXQo4z4oXKPEKyYO7bAQmOQ9PhIcHK4LOo/L1U9j/xkLEmseLWECK'),
        (2, 'Guest', 'User', '5121231235', 'guest@texastoc.com',
         '$2a$10$qXQo4z4oXKPEKyYO7bAQmOQ9PhIcHK4LOo/L1U9j/xkLEmseLWECK'),
-       (3, 'Guest', 'Admin', '5121231235', 'guest-admin@texastoc.com',
+       (3, 'Guest', 'Admin', '5121231235', 'admin@texastoc.com',
         '$2a$10$qXQo4z4oXKPEKyYO7bAQmOQ9PhIcHK4LOo/L1U9j/xkLEmseLWECK');
+
+CREATE TABLE role
+(
+    id          int NOT NULL AUTO_INCREMENT,
+    name        varchar(255) DEFAULT NULL,
+    player      int,
+    PRIMARY KEY (id)
+);
+alter table role
+    add constraint fk_role_id foreign key (player) references player (id);
+
+INSERT INTO role
+VALUES (1, 'ADMIN', 1),
+       (2, 'USER', 1),
+       (3, 'USER', 2),
+       (4, 'ADMIN', 3),
+       (5, 'USER', 3);
+
 
 CREATE TABLE game
 (
@@ -183,30 +201,6 @@ CREATE TABLE quarterlyseasonpayout
     PRIMARY KEY (id),
     UNIQUE KEY QSPayout_Unique (seasonId, qSeasonId, place)
 );
-
-CREATE TABLE role
-(
-    id          int NOT NULL AUTO_INCREMENT,
-    description varchar(255) DEFAULT NULL,
-    name        varchar(255) DEFAULT NULL,
-    PRIMARY KEY (id)
-);
-INSERT INTO role
-VALUES (1, 'Admin role', 'ADMIN'),
-       (2, 'User role', 'USER');
-
-CREATE TABLE player_roles
-(
-    playerId int NOT NULL,
-    roleId   int NOT NULL,
-    PRIMARY KEY (playerId, roleId)
-);
-INSERT INTO player_roles
-VALUES (1, 1),
-       (1, 2),
-       (2, 1),
-       (3, 1),
-       (3, 2);
 
 
 CREATE TABLE seasonpayout
@@ -339,11 +333,6 @@ VALUES (2, 1, 0.65),
        (10, 8, 0.03),
        (10, 9, 0.0225),
        (10, 10, 0.015);
-
-alter table player_roles
-    add constraint fk_role_id foreign key (roleId) references role (id);
-alter table player_roles
-    add constraint fk_player_id foreign key (playerId) references player (id);
 
 CREATE TABLE historicalseasonplayer
 (

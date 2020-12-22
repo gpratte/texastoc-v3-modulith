@@ -1,5 +1,6 @@
 package com.texastoc.module.game;
 
+import com.google.common.collect.ImmutableSet;
 import com.texastoc.module.notification.connector.EmailConnector;
 import com.texastoc.module.notification.connector.SMSConnector;
 import com.texastoc.module.game.connector.WebSocketConnector;
@@ -17,7 +18,6 @@ import com.texastoc.module.game.repository.GamePlayerRepository;
 import com.texastoc.module.game.repository.GameRepository;
 import com.texastoc.module.settings.model.TocConfig;
 import com.texastoc.module.player.repository.PlayerRepository;
-import com.texastoc.module.player.repository.RoleRepository;
 import com.texastoc.module.season.calculator.QuarterlySeasonCalculator;
 import com.texastoc.module.season.calculator.SeasonCalculator;
 import com.texastoc.module.season.model.QuarterlySeason;
@@ -50,7 +50,6 @@ import java.util.concurrent.Executors;
 @Service
 public class GameService {
 
-  private final RoleRepository roleRepository;
   private final GameRepository gameRepository;
   private final SeatingRepository seatingRepository;
   private final PlayerRepository playerRepository;
@@ -73,7 +72,7 @@ public class GameService {
   private TocConfig tocConfig;
   private ExecutorService executorService;
 
-  public GameService(GameRepository gameRepository, PlayerRepository playerRepository, GamePlayerRepository gamePlayerRepository, GamePayoutRepository gamePayoutRepository, QuarterlySeasonRepository qSeasonRepository, SeasonService seasonService, GameCalculator gameCalculator, PayoutCalculator payoutCalculator, PointsCalculator pointsCalculator, ConfigRepository configRepository, SeasonCalculator seasonCalculator, QuarterlySeasonCalculator qSeasonCalculator, SeatingRepository seatingRepository, RoleRepository roleRepository, SMSConnector smsConnector, EmailConnector emailConnector, WebSocketConnector webSocketConnector) {
+  public GameService(GameRepository gameRepository, PlayerRepository playerRepository, GamePlayerRepository gamePlayerRepository, GamePayoutRepository gamePayoutRepository, QuarterlySeasonRepository qSeasonRepository, SeasonService seasonService, GameCalculator gameCalculator, PayoutCalculator payoutCalculator, PointsCalculator pointsCalculator, ConfigRepository configRepository, SeasonCalculator seasonCalculator, QuarterlySeasonCalculator qSeasonCalculator, SeatingRepository seatingRepository, SMSConnector smsConnector, EmailConnector emailConnector, WebSocketConnector webSocketConnector) {
     this.gameRepository = gameRepository;
     this.playerRepository = playerRepository;
     this.gamePlayerRepository = gamePlayerRepository;
@@ -87,7 +86,6 @@ public class GameService {
     this.seasonCalculator = seasonCalculator;
     this.qSeasonCalculator = qSeasonCalculator;
     this.seatingRepository = seatingRepository;
-    this.roleRepository = roleRepository;
     this.smsConnector = smsConnector;
     this.emailConnector = emailConnector;
     this.webSocketConnector = webSocketConnector;
@@ -119,7 +117,7 @@ public class GameService {
     gameToCreate.setQuarter(currentQSeason.getQuarter());
     gameToCreate.setQuarterlyGameNum(currentQSeason.getNumGamesPlayed() + 1);
 
-    Player player = playerRepository.get(game.getHostId());
+    Player player = playerRepository.findById(game.getHostId()).get();
     gameToCreate.setHostId(game.getHostId());
     gameToCreate.setHostName(player.getName());
 
@@ -200,7 +198,7 @@ public class GameService {
           continue;
         }
         GamePlayer gamePlayer = gamePlayerRepository.selectById(seat.getGamePlayerId());
-        Player player = playerRepository.get(gamePlayer.getPlayerId());
+        Player player = playerRepository.findById(gamePlayer.getPlayerId()).get();
         if (player.getPhone() != null) {
           smsConnector.text(player.getPhone(), player.getName() + " table " +
             table.getNumber() + " seat " + seat.getSeatNumber());
@@ -373,9 +371,11 @@ public class GameService {
       .firstName(firstName)
       .lastName(lastName)
       .email(firstTimeGamePlayer.getEmail())
+      .roles(ImmutableSet.of(Role.builder()
+        .name(PlayerRepository.USER)
+        .build()))
       .build();
-    int playerId = playerRepository.save(player);
-    roleRepository.save(playerId);
+    int playerId = playerRepository.save(player).getId();
 
     StringBuilder name = new StringBuilder();
     name.append(!Objects.isNull(firstName) ? firstName : "");
@@ -448,7 +448,7 @@ public class GameService {
   private GamePlayer createGamePlayerWorker(GamePlayer gamePlayer, Game game) {
 
     if (gamePlayer.getName() == null) {
-      Player player = playerRepository.get(gamePlayer.getPlayerId());
+      Player player = playerRepository.findById(gamePlayer.getPlayerId()).get();
       gamePlayer.setName(player.getName());
     }
     gamePlayer.setQSeasonId(game.getQSeasonId());
@@ -580,11 +580,9 @@ public class GameService {
       String body = getGameSummaryFromTemplate(game);
       String subject = "Summary " + game.getDate();
 
-      List<Player> players = playerRepository.get();
-      for (Player player : players) {
-        Player playerWithRoles = playerRepository.get(player.getId());
+      for (Player player : playerRepository.findAll()) {
         boolean isAdmin = false;
-        for (Role role : playerWithRoles.getRoles()) {
+        for (Role role : player.getRoles()) {
           if ("ADMIN".equals(role.getName())) {
             isAdmin = true;
             break;

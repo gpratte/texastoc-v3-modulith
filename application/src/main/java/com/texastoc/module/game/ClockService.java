@@ -177,7 +177,7 @@ public class ClockService {
     List<GamePlayer> gamePlayers = gamePlayerRepository.selectByGameId(gameId);
     gamePlayers.forEach((gp) -> {
       if (gp.getRoundUpdates() != null && gp.getRoundUpdates()) {
-        Player player = playerRepository.get(gp.getPlayerId());
+        Player player = playerRepository.findById(gp.getPlayerId()).get();
         if (player.getPhone() != null)
           smsConnector.text(player.getPhone(), clock.getThisRound().getName());
       }

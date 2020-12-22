@@ -1,5 +1,6 @@
 package com.texastoc.security;
 
+import com.google.common.collect.ImmutableList;
 import com.texastoc.module.player.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -65,6 +66,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     corsConfiguration.addAllowedMethod(HttpMethod.PUT.name());
     corsConfiguration.addAllowedMethod(HttpMethod.DELETE.name());
     corsConfiguration.setAllowCredentials(true);
+    corsConfiguration.setAllowedOriginPatterns(ImmutableList.of("*"));
     source.registerCorsConfiguration("/**", corsConfiguration);
     return source;
   }
