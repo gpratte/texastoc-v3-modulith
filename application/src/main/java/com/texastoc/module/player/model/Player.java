@@ -1,25 +1,28 @@
 package com.texastoc.module.player.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 
 import java.util.Set;
 
 @Builder
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class Player implements Comparable<Player> {
 
+  @Id
   private int id;
   private String firstName;
   private String lastName;
   private String phone;
   private String email;
   private String password;
+  @MappedCollection
   private Set<Role> roles;
 
   public String getName() {

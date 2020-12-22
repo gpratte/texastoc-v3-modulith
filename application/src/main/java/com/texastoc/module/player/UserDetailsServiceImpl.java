@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -22,10 +23,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    Player player = playerRepository.getByEmail(email);
-    if (player == null) {
+    List<Player> players = playerRepository.findByEmail(email);
+    if (players.size() == 0) {
       throw new UsernameNotFoundException(email);
     }
+    Player player = players.get(0);
     return new org.springframework.security.core.userdetails.User(player.getEmail(), player.getPassword(), getAuthority(player));
   }
 

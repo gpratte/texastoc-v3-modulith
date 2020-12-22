@@ -19,7 +19,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
-@SuppressWarnings("unused")
 @RestController
 public class GameRestController {
 
