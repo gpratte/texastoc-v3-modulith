@@ -1,7 +1,7 @@
 package com.texastoc.security;
 
 import com.google.common.collect.ImmutableList;
-import com.texastoc.module.player.UserDetailsServiceImpl;
+import com.texastoc.module.player.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;

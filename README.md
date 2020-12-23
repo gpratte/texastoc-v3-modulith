@@ -162,5 +162,5 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 10-notification-package
-Move the notification related classes into the com.texastoc.module.notification package.
+## Current Branch: 12-player-module-interface
+Expose a PlayerModule interface for other services to use.

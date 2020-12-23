@@ -94,7 +94,7 @@ public class GameServiceTest implements TestConstants {
   @Before
 
   public void before() {
-    gameService = new GameService(gameRepository, playerRepository, gamePlayerRepository, gamePayoutRepository, qSeasonRepository, seasonService, gameCalculator, payoutCalculator, pointsCalculator, configRepository, seasonCalculator, qSeasonCalculator, seatingRepository, smsConnector, emailConnector, webSocketConnector);
+    gameService = new GameService(gameRepository, gamePlayerRepository, gamePayoutRepository, qSeasonRepository, seasonService, gameCalculator, payoutCalculator, pointsCalculator, configRepository, seasonCalculator, qSeasonCalculator, seatingRepository, smsConnector, emailConnector, webSocketConnector);
   }
 
   @Ignore

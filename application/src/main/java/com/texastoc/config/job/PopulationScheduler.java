@@ -1,15 +1,15 @@
 package com.texastoc.config.job;
 
-import com.texastoc.module.game.request.CreateGamePlayerRequest;
-import com.texastoc.module.game.request.UpdateGamePlayerRequest;
+import com.texastoc.module.game.GameService;
 import com.texastoc.module.game.model.FirstTimeGamePlayer;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
-import com.texastoc.module.season.model.Season;
+import com.texastoc.module.game.request.CreateGamePlayerRequest;
+import com.texastoc.module.game.request.UpdateGamePlayerRequest;
 import com.texastoc.module.player.model.Player;
-import com.texastoc.module.game.GameService;
-import com.texastoc.module.player.PlayerService;
+import com.texastoc.module.player.PlayerModuleSingleton;
 import com.texastoc.module.season.SeasonService;
+import com.texastoc.module.season.model.Season;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,14 +31,12 @@ public class PopulationScheduler {
 
   private final SeasonService seasonService;
   private final GameService gameService;
-  private final PlayerService playerService;
 
   private final Random random = new Random(System.currentTimeMillis());
 
-  public PopulationScheduler(SeasonService seasonService, GameService gameService, PlayerService playerService) {
+  public PopulationScheduler(SeasonService seasonService, GameService gameService) {
     this.seasonService = seasonService;
     this.gameService = gameService;
-    this.playerService = playerService;
   }
 
   // delay one minute then run every hour
@@ -84,7 +82,7 @@ public class PopulationScheduler {
 
     while (!gameDate.isAfter(now)) {
       // pick one of the first players to be the host
-      List<Player> players = playerService.get();
+      List<Player> players = PlayerModuleSingleton.getPlayerModule().getAll();
       int numPlayers = players.size();
       Player player = null;
       if (numPlayers > 5) {
@@ -121,7 +119,7 @@ public class PopulationScheduler {
       numPlayersToAddToGame = 2;
     }
 
-    List<Player> existingPlayers = playerService.get();
+    List<Player> existingPlayers = PlayerModuleSingleton.getPlayerModule().getAll();
 
     if (existingPlayers.size() < 30) {
       addNewPlayer(game);

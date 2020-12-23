@@ -3,7 +3,7 @@ package com.texastoc.service;
 import com.texastoc.TestConstants;
 import com.texastoc.module.game.repository.GamePlayerRepository;
 import com.texastoc.module.notification.connector.EmailConnector;
-import com.texastoc.module.player.PlayerService;
+import com.texastoc.module.player.service.PlayerService;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.repository.PlayerRepository;
 import org.junit.Assert;

@@ -1,9 +1,10 @@
-package com.texastoc.module.player;
+package com.texastoc.module.player.service;
 
 import com.google.common.collect.ImmutableSet;
 import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.game.repository.GamePlayerRepository;
 import com.texastoc.module.notification.connector.EmailConnector;
+import com.texastoc.module.player.PlayerModule;
 import com.texastoc.module.player.exception.CannotDeletePlayerException;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
@@ -22,7 +23,7 @@ import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
-public class PlayerService {
+public class PlayerService implements PlayerModule {
 
   private final PlayerRepository playerRepository;
   private final GamePlayerRepository gamePlayerRepository;
@@ -39,6 +40,7 @@ public class PlayerService {
     this.emailConnector = emailConnector;
   }
 
+  @Override
   @Transactional
   public Player create(Player player) {
     Player playerToCreate = Player.builder()
@@ -58,6 +60,7 @@ public class PlayerService {
     return player;
   }
 
+  @Override
   @Transactional
   public void update(Player player) {
     Player playerToUpdate = playerRepository.findById(player.getId()).get();
@@ -73,12 +76,14 @@ public class PlayerService {
     playerRepository.save(playerToUpdate);
   }
 
+  @Override
   @Transactional(readOnly = true)
-  public List<Player> get() {
+  public List<Player> getAll() {
     return StreamSupport.stream(playerRepository.findAll().spliterator(), false)
       .collect(Collectors.toList());
   }
 
+  @Override
   @Transactional(readOnly = true)
   public Player get(int id) {
     Player player = playerRepository.findById(id).get();
@@ -97,7 +102,8 @@ public class PlayerService {
     return player;
   }
 
-  @Transactional(readOnly = true)
+  @Override
+  @Transactional
   public void delete(int id) {
     int numGames = gamePlayerRepository.getNumGamesByPlayerId(id);
     if (numGames > 0) {
@@ -106,13 +112,15 @@ public class PlayerService {
     playerRepository.deleteById(id);
   }
 
-  public void sendCode(String email) {
+  @Override
+  public void forgotPassword(String email) {
     String generatedString = RandomStringUtils.random(5, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
     forgotPasswordCodes.put(email, generatedString);
     log.info("reset code: {}", generatedString);
     emailConnector.send(email, "Reset Code", generatedString);
   }
 
+  @Override
   public void resetPassword(String code, String password) {
     String email = null;
     for (Map.Entry<String, String> forgotCode : forgotPasswordCodes.entrySet()) {
