@@ -1,6 +1,6 @@
 package com.texastoc.security;
 
-import com.texastoc.module.player.UserDetailsServiceImpl;
+import com.texastoc.module.player.service.UserDetailsServiceImpl;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import org.springframework.security.authentication.AuthenticationManager;

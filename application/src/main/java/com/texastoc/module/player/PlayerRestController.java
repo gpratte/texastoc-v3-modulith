@@ -3,6 +3,7 @@ package com.texastoc.module.player;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.texastoc.module.player.exception.CannotDeletePlayerException;
 import com.texastoc.module.player.model.Player;
+import com.texastoc.module.player.service.PlayerService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ import java.util.List;
 
 @SuppressWarnings("unused")
 @RestController
-public class PlayerRestController {
+public class PlayerRestController implements PlayerModule {
 
   private final PlayerService playerService;
 
@@ -28,13 +29,15 @@ public class PlayerRestController {
     this.playerService = playerService;
   }
 
+  @Override
   @PostMapping("/api/v2/players")
-  public Player createPlayer(@RequestBody Player player) {
+  public Player create(@RequestBody Player player) {
     return playerService.create(player);
   }
 
   @PutMapping("/api/v2/players/{id}")
-  public void updatePlayer(@PathVariable("id") int id, @RequestBody @Valid Player player, HttpServletRequest request) {
+  public void update(@PathVariable("id") int id, @RequestBody @Valid Player player, HttpServletRequest request) {
+    // TODO move this check to a service method
     if (!request.isUserInRole("ADMIN")) {
       Principal principal = request.getUserPrincipal();
       Player playerThatIsLoggedIn = playerService.getByEmail(principal.getName());
@@ -43,33 +46,52 @@ public class PlayerRestController {
       }
     }
     player.setId(id);
+    update(player);
+  }
+
+  @Override
+  public void update(Player player) {
     playerService.update(player);
   }
 
+  @Override
   @GetMapping("/api/v2/players")
-  public List<Player> getPlayers() {
-    return playerService.get();
+  public List<Player> getAll() {
+    return playerService.getAll();
   }
 
+  @Override
   @GetMapping("/api/v2/players/{id}")
-  public Player getPlayer(@PathVariable("id") int id) {
+  public Player get(@PathVariable("id") int id) {
     return playerService.get(id);
   }
 
+  @Override
+  // TODO need to check for admin role in service method
   @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/api/v2/players/{id}")
-  public void deletePlayer(@PathVariable("id") int id) {
+  public void delete(@PathVariable("id") int id) {
     playerService.delete(id);
   }
 
   @PostMapping(value = "/password/reset", consumes = "application/vnd.texastoc.password-forgot+json")
   public void forgot(@RequestBody Forgot forgot) {
-    playerService.sendCode(forgot.getEmail());
+    forgotPassword(forgot.getEmail());
+  }
+
+  @Override
+  public void forgotPassword(String email) {
+    playerService.forgotPassword(email);
   }
 
   @PostMapping(value = "/password/reset", consumes = "application/vnd.texastoc.password-reset+json")
   public void reset(@RequestBody Reset reset) {
-    playerService.resetPassword(reset.getCode(), reset.getPassword());
+    resetPassword(reset.getCode(), reset.getPassword());
+  }
+
+  @Override
+  public void resetPassword(String code, String password) {
+    playerService.resetPassword(code, password);
   }
 
   @ExceptionHandler(value = {CannotDeletePlayerException.class})

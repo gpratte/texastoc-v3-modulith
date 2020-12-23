@@ -1,6 +1,5 @@
 package com.texastoc.module.notification.connector;
 
-import com.texastoc.module.player.repository.PlayerRepository;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
@@ -20,14 +19,11 @@ public class SMSConnector {
   private boolean initialzed;
 
   private final String twilioPhone;
-  private final PlayerRepository playerRepository;
 
   public SMSConnector(@Value("${twilio.sid:#{null}}") String sid,
                       @Value("${twilio.token:#{null}}") String token,
-                      @Value("${twilio.phone:#{null}}") String phone,
-                      PlayerRepository playerRepository) {
+                      @Value("${twilio.phone:#{null}}") String phone) {
     twilioPhone = "+1" + phone;
-    this.playerRepository = playerRepository;
     try {
       Twilio.init(sid, token);
       initialzed = true;

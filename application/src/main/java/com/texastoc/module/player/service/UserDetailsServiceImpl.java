@@ -1,4 +1,4 @@
-package com.texastoc.module.player;
+package com.texastoc.module.player.service;
 
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.repository.PlayerRepository;

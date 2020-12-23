@@ -1,15 +1,15 @@
 package com.texastoc.module.game;
 
 import com.texastoc.module.game.config.RoundsConfig;
-import com.texastoc.module.notification.connector.SMSConnector;
 import com.texastoc.module.game.connector.WebSocketConnector;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.model.clock.Clock;
 import com.texastoc.module.game.model.clock.Round;
-import com.texastoc.module.player.model.Player;
 import com.texastoc.module.game.repository.GamePlayerRepository;
 import com.texastoc.module.game.repository.GameRepository;
-import com.texastoc.module.player.repository.PlayerRepository;
+import com.texastoc.module.notification.connector.SMSConnector;
+import com.texastoc.module.player.PlayerModuleSingleton;
+import com.texastoc.module.player.model.Player;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -20,7 +20,6 @@ import java.util.Map;
 public class ClockService {
 
   private final GamePlayerRepository gamePlayerRepository;
-  private final PlayerRepository playerRepository;
   private final SMSConnector smsConnector;
   private final WebSocketConnector webSocketConnector;
   private final Map<Integer, Clock> clocks = new HashMap<>();
@@ -28,9 +27,8 @@ public class ClockService {
   private final RoundsConfig roundsConfig;
   private final GameRepository gameRepository;
 
-  public ClockService(GamePlayerRepository gamePlayerRepository, PlayerRepository playerRepository, SMSConnector smsConnector, WebSocketConnector webSocketConnector, RoundsConfig roundsConfig, GameRepository gameRepository) {
+  public ClockService(GamePlayerRepository gamePlayerRepository, SMSConnector smsConnector, WebSocketConnector webSocketConnector, RoundsConfig roundsConfig, GameRepository gameRepository) {
     this.gamePlayerRepository = gamePlayerRepository;
-    this.playerRepository = playerRepository;
     this.smsConnector = smsConnector;
     this.webSocketConnector = webSocketConnector;
     this.roundsConfig = roundsConfig;
@@ -177,7 +175,7 @@ public class ClockService {
     List<GamePlayer> gamePlayers = gamePlayerRepository.selectByGameId(gameId);
     gamePlayers.forEach((gp) -> {
       if (gp.getRoundUpdates() != null && gp.getRoundUpdates()) {
-        Player player = playerRepository.findById(gp.getPlayerId()).get();
+        Player player = PlayerModuleSingleton.getPlayerModule().get(gp.getPlayerId());
         if (player.getPhone() != null)
           smsConnector.text(player.getPhone(), clock.getThisRound().getName());
       }
