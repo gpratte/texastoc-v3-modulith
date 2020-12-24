@@ -8,7 +8,8 @@ import com.texastoc.module.game.model.clock.Round;
 import com.texastoc.module.game.repository.GamePlayerRepository;
 import com.texastoc.module.game.repository.GameRepository;
 import com.texastoc.module.notification.connector.SMSConnector;
-import com.texastoc.module.player.PlayerModuleSingleton;
+import com.texastoc.module.player.PlayerModule;
+import com.texastoc.module.player.PlayerModuleFactory;
 import com.texastoc.module.player.model.Player;
 import org.springframework.stereotype.Service;
 
@@ -173,9 +174,10 @@ public class ClockService {
   private void notifyRoundChange(int gameId) {
     Clock clock = clocks.get(gameId);
     List<GamePlayer> gamePlayers = gamePlayerRepository.selectByGameId(gameId);
+    PlayerModule playerModule = PlayerModuleFactory.getPlayerModule();
     gamePlayers.forEach((gp) -> {
       if (gp.getRoundUpdates() != null && gp.getRoundUpdates()) {
-        Player player = PlayerModuleSingleton.getPlayerModule().get(gp.getPlayerId());
+        Player player = playerModule.get(gp.getPlayerId());
         if (player.getPhone() != null)
           smsConnector.text(player.getPhone(), clock.getThisRound().getName());
       }

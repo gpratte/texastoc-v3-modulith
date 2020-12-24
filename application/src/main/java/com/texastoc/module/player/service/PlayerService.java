@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,8 +80,9 @@ public class PlayerService implements PlayerModule {
   @Override
   @Transactional(readOnly = true)
   public List<Player> getAll() {
-    return StreamSupport.stream(playerRepository.findAll().spliterator(), false)
-      .collect(Collectors.toList());
+    List<Player> players = StreamSupport.stream(playerRepository.findAll().spliterator(), false).collect(Collectors.toList());
+    Collections.sort(players);
+    return players;
   }
 
   @Override

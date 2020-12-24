@@ -6,8 +6,9 @@ import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.request.CreateGamePlayerRequest;
 import com.texastoc.module.game.request.UpdateGamePlayerRequest;
+import com.texastoc.module.player.PlayerModule;
 import com.texastoc.module.player.model.Player;
-import com.texastoc.module.player.PlayerModuleSingleton;
+import com.texastoc.module.player.PlayerModuleFactory;
 import com.texastoc.module.season.SeasonService;
 import com.texastoc.module.season.model.Season;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +32,8 @@ public class PopulationScheduler {
 
   private final SeasonService seasonService;
   private final GameService gameService;
-
   private final Random random = new Random(System.currentTimeMillis());
+  private PlayerModule playerModule;
 
   public PopulationScheduler(SeasonService seasonService, GameService gameService) {
     this.seasonService = seasonService;
@@ -82,7 +83,7 @@ public class PopulationScheduler {
 
     while (!gameDate.isAfter(now)) {
       // pick one of the first players to be the host
-      List<Player> players = PlayerModuleSingleton.getPlayerModule().getAll();
+      List<Player> players = getPlayerModule().getAll();
       int numPlayers = players.size();
       Player player = null;
       if (numPlayers > 5) {
@@ -119,7 +120,7 @@ public class PopulationScheduler {
       numPlayersToAddToGame = 2;
     }
 
-    List<Player> existingPlayers = PlayerModuleSingleton.getPlayerModule().getAll();
+    List<Player> existingPlayers = getPlayerModule().getAll();
 
     if (existingPlayers.size() < 30) {
       addNewPlayer(game);
@@ -232,6 +233,13 @@ public class PopulationScheduler {
       date = date.plusDays(1);
     }
     return date;
+  }
+
+  private PlayerModule getPlayerModule() {
+    if (playerModule == null) {
+      playerModule = PlayerModuleFactory.getPlayerModule();
+    }
+    return playerModule;
   }
 
   static final String[] firstNames = {"James", "John", "Robert", "Michael", "Mary", "William", "David", "Joseph", "Richard", "Charles", "Thomas", "Christopher", "Daniel", "Elizabeth", "Matthew", "Patricia", "George", "Jennifer", "Linda", "Anthony", "Barbara", "Donald", "Paul", "Mark", "Andrew", "Edward", "Steven", "Kenneth", "Margaret", "Joshua", "Kevin", "Brian", "Susan", "Dorothy", "Ronald", "Sarah", "Timothy", "Jessica", "Jason", "Helen", "Nancy", "Betty", "Karen", "Jeffrey", "Lisa", "Ryan", "Jacob", "Frank", "Gary", "Nicholas", "Anna", "Eric", "Sandra", "Stephen", "Emily", "Ashley", "Jonathan", "Kimberly", "Donna", "Ruth", "Carol", "Michelle", "Larry", "Laura", "Amanda", "Justin", "Raymond", "Scott", "Samuel", "Brandon", "Melissa", "Benjamin", "Rebecca", "Deborah", "Stephanie", "Sharon", "Kathleen", "Cynthia", "Gregory", "Jack", "Amy", "Henry", "Shirley", "Patrick", "Alexander", "Emma", "Angela", "Catherine", "Virginia", "Katherine", "Walter", "Dennis", "Jerry", "Brenda", "Pamela", "Frances", "Tyler", "Nicole", "Christine", "Aaron", "Peter", "Samantha", "Evelyn", "Jose", "Rachel", "Alice", "Douglas", "Janet", "Carolyn", "Adam", "Debra", "Harold", "Nathan", "Martha", "Maria", "Marie", "Zachary", "Arthur", "Heather", "Diane", "Julie", "Joyce", "Carl", "Grace", "Victoria", "Albert", "Rose", "Joan", "Kyle", "Christina", "Kelly", "Ann", "Lauren", "Doris", "Julia", "Jean", "Lawrence", "Judith", "Olivia", "Kathryn", "Joe", "Mildred", "Willie", "Gerald", "Lillian", "Roger", "Cheryl", "Megan", "Jeremy", "Keith", "Hannah", "Andrea", "Ethan", "Sara", "Terry", "Jacqueline", "Christian", "Harry", "Jesse", "Sean", "Teresa", "Ralph", "Austin", "Gloria", "Janice", "Roy", "Theresa", "Louis", "Noah", "Bruce", "Billy", "Judy", "Bryan", "Madison", "Eugene", "Beverly", "Jordan", "Denise", "Jane", "Marilyn", "Amber", "Dylan", "Danielle", "Abigail", "Charlotte", "Diana", "Brittany", "Russell", "Natalie", "Wayne", "Irene", "Ruby", "Annie", "Sophia", "Alan", "Juan", "Gabriel", "Howard", "Fred", "Vincent", "Lori", "Philip", "Kayla", "Alexis", "Tiffany", "Florence", "Isabella", "Kathy", "Louise", "Logan", "Lois", "Tammy", "Crystal", "Randy", "Bonnie", "Phyllis", "Anne", "Taylor", "Victor", "Bobby", "Erin", "Johnny", "Phillip", "Martin", "Josephine", "Alyssa", "Bradley", "Ella", "Shawn", "Clarence", "Travis", "Ernest", "Stanley", "Allison", "Craig", "Shannon", "Elijah", "Edna", "Peggy", "Tina", "Leonard", "Robin", "Dawn", "Carlos", "Earl", "Eleanor", "Jimmy", "Francis", "Cody", "Caleb", "Mason", "Rita", "Danny", "Isaac", "Audrey", "Todd", "Wanda", "Clara", "Ethel", "Paula", "Cameron", "Norma", "Dale", "Ellen", "Luis", "Alex", "Marjorie", "Luke", "Jamie", "Nathaniel", "Allen", "Leslie", "Joel", "Evan", "Edith", "Connie", "Eva", "Gladys", "Carrie", "Ava", "Frederick", "Wendy", "Hazel", "Valerie", "Curtis", "Elaine", "Courtney", "Esther", "Cindy", "Vanessa", "Brianna", "Lucas", "Norman", "Marvin", "Tracy", "Tony", "Monica", "Antonio", "Glenn", "Melanie"};

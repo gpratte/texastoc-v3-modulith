@@ -17,7 +17,8 @@ import com.texastoc.module.game.request.CreateGamePlayerRequest;
 import com.texastoc.module.game.request.UpdateGamePlayerRequest;
 import com.texastoc.module.notification.connector.EmailConnector;
 import com.texastoc.module.notification.connector.SMSConnector;
-import com.texastoc.module.player.PlayerModuleSingleton;
+import com.texastoc.module.player.PlayerModule;
+import com.texastoc.module.player.PlayerModuleFactory;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
 import com.texastoc.module.season.SeasonService;
@@ -71,6 +72,7 @@ public class GameService {
 
   private TocConfig tocConfig;
   private ExecutorService executorService;
+  private PlayerModule playerModule;
 
   public GameService(GameRepository gameRepository, GamePlayerRepository gamePlayerRepository, GamePayoutRepository gamePayoutRepository, QuarterlySeasonRepository qSeasonRepository, SeasonService seasonService, GameCalculator gameCalculator, PayoutCalculator payoutCalculator, PointsCalculator pointsCalculator, ConfigRepository configRepository, SeasonCalculator seasonCalculator, QuarterlySeasonCalculator qSeasonCalculator, SeatingRepository seatingRepository, SMSConnector smsConnector, EmailConnector emailConnector, WebSocketConnector webSocketConnector) {
     this.gameRepository = gameRepository;
@@ -116,7 +118,7 @@ public class GameService {
     gameToCreate.setQuarter(currentQSeason.getQuarter());
     gameToCreate.setQuarterlyGameNum(currentQSeason.getNumGamesPlayed() + 1);
 
-    Player player = PlayerModuleSingleton.getPlayerModule().get(game.getHostId());
+    Player player = getPlayerModule().get(game.getHostId());
     gameToCreate.setHostId(game.getHostId());
     gameToCreate.setHostName(player.getName());
 
@@ -197,7 +199,7 @@ public class GameService {
           continue;
         }
         GamePlayer gamePlayer = gamePlayerRepository.selectById(seat.getGamePlayerId());
-        Player player = PlayerModuleSingleton.getPlayerModule().get(gamePlayer.getPlayerId());
+        Player player = getPlayerModule().get(gamePlayer.getPlayerId());
         if (player.getPhone() != null) {
           smsConnector.text(player.getPhone(), player.getName() + " table " +
             table.getNumber() + " seat " + seat.getSeatNumber());
@@ -374,7 +376,7 @@ public class GameService {
         .name(SecurityRole.USER.name())
         .build()))
       .build();
-    int playerId = PlayerModuleSingleton.getPlayerModule().create(player).getId();
+    int playerId = getPlayerModule().create(player).getId();
 
     StringBuilder name = new StringBuilder();
     name.append(!Objects.isNull(firstName) ? firstName : "");
@@ -447,7 +449,7 @@ public class GameService {
   private GamePlayer createGamePlayerWorker(GamePlayer gamePlayer, Game game) {
 
     if (gamePlayer.getName() == null) {
-      Player player = PlayerModuleSingleton.getPlayerModule().get(gamePlayer.getPlayerId());
+      Player player = getPlayerModule().get(gamePlayer.getPlayerId());
       gamePlayer.setName(player.getName());
     }
     gamePlayer.setQSeasonId(game.getQSeasonId());
@@ -579,7 +581,7 @@ public class GameService {
       String body = getGameSummaryFromTemplate(game);
       String subject = "Summary " + game.getDate();
 
-      for (Player player : PlayerModuleSingleton.getPlayerModule().getAll()) {
+      for (Player player : getPlayerModule().getAll()) {
         boolean isAdmin = false;
         for (Role role : player.getRoles()) {
           if ("ADMIN".equals(role.getName())) {
@@ -597,6 +599,13 @@ public class GameService {
 
   private void sendUpdatedGame() {
     executorService.submit(new GameSender());
+  }
+
+  private PlayerModule getPlayerModule() {
+    if (playerModule == null) {
+      playerModule = PlayerModuleFactory.getPlayerModule();
+    }
+    return playerModule;
   }
 
   private class GameSender implements Callable<Void> {
