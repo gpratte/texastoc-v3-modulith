@@ -4,12 +4,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.texastoc.TestConstants;
 import com.texastoc.common.AuthorizationHelper;
-import com.texastoc.common.SecurityRole;
 import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.notification.connector.EmailConnector;
+import com.texastoc.module.player.exception.CannotRemoveRoleException;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
 import com.texastoc.module.player.repository.PlayerRepository;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -19,9 +20,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -34,7 +35,6 @@ import static org.mockito.Mockito.*;
 public class PlayerServiceTest implements TestConstants {
 
   private PlayerService playerService;
-  private Random random = new Random(System.currentTimeMillis());
 
   private PlayerRepository playerRepository;
   private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -83,25 +83,25 @@ public class PlayerServiceTest implements TestConstants {
     assertEquals("abc@xyz.com", param.getEmail());
     assertEquals("encodedPassword", param.getPassword());
     assertThat(param.getRoles()).containsExactly(Role.builder()
-      .name(PlayerRepository.USER)
+      .type(Role.Type.USER)
       .build());
   }
 
   @Test
   public void testUpdateSelf() {
-    testUpdate(SecurityRole.USER);
+    testUpdate(Role.Type.USER);
   }
 
   @Test
   public void testUpdateAdmin() {
-    testUpdate(SecurityRole.ADMIN);
+    testUpdate(Role.Type.ADMIN);
   }
 
-  private void testUpdate(SecurityRole securityRole) {
+  private void testUpdate(Role.Type roleType) {
     // Arrange
     Role existingRole = Role.builder()
       .id(1)
-      .name("existingRole")
+      .type(Role.Type.USER)
       .build();
     Player existingPlayer = Player.builder()
       .id(1)
@@ -122,16 +122,16 @@ public class PlayerServiceTest implements TestConstants {
       .phone("updatedPhone")
       .password("updatedPassword") // will be ignored
       .roles(ImmutableSet.of(Role.builder() // will be ignored
-        .name("updatedRole")
+        .type(Role.Type.ADMIN)
         .build()))
       .build();
 
     // mock out to pass the authorization check
-    if (securityRole == SecurityRole.USER) {
+    if (roleType == Role.Type.USER) {
       when(authorizationHelper.getLoggedInUserEmail()).thenReturn("existing@xyz.com");
       when(playerRepository.findByEmail("existing@xyz.com")).thenReturn(ImmutableList.of(existingPlayer));
     } else {
-      when(authorizationHelper.isLoggedInUserHaveRole(SecurityRole.ADMIN)).thenReturn(true);
+      when(authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)).thenReturn(true);
     }
 
     // Act
@@ -161,7 +161,7 @@ public class PlayerServiceTest implements TestConstants {
     // Arrange
     Role existingRole = Role.builder()
       .id(1)
-      .name("existingRole")
+      .type(Role.Type.USER)
       .build();
     Player existingPlayer = Player.builder()
       .id(1)
@@ -183,7 +183,7 @@ public class PlayerServiceTest implements TestConstants {
       .phone("updatedPhone")
       .password("updatedPassword") // will be ignored
       .roles(ImmutableSet.of(Role.builder() // will be ignored
-        .name("updatedRole")
+        .type(Role.Type.ADMIN)
         .build()))
       .build();
 
@@ -203,7 +203,7 @@ public class PlayerServiceTest implements TestConstants {
     // Arrange
     Role existingRole = Role.builder()
       .id(1)
-      .name("existingRole")
+      .type(Role.Type.USER)
       .build();
     Player existingPlayer = Player.builder()
       .id(1)
@@ -216,40 +216,28 @@ public class PlayerServiceTest implements TestConstants {
       .build();
     when(playerRepository.findById(ArgumentMatchers.eq(1))).thenReturn(java.util.Optional.ofNullable(existingPlayer));
 
-    Player playersNewValues = Player.builder()
-      .id(1)
-      .firstName("updatedFirstName")
-      .lastName("updatedLastName")
-      .email("updated@xyz.com")
-      .phone("updatedPhone")
-      .password("updatedPassword") // will be ignored
-      .roles(ImmutableSet.of(Role.builder() // will be ignored
-        .name("updatedRole")
-        .build()))
-      .build();
-
     // mock out to pass the authorization check
     when(authorizationHelper.getLoggedInUserEmail()).thenReturn("existing@xyz.com");
     when(playerRepository.findByEmail("existing@xyz.com")).thenReturn(ImmutableList.of(existingPlayer));
 
     // Act
-    playerService.update(playersNewValues);
+    playerService.updatePassword(1, "newPassword");
 
     // Assert
     Mockito.verify(playerRepository, Mockito.times(1)).findById(1);
-    Mockito.verify(bCryptPasswordEncoder, Mockito.times(0)).encode(any());
+    Mockito.verify(bCryptPasswordEncoder, Mockito.times(1)).encode(any());
     Mockito.verify(playerRepository, Mockito.times(1)).save(any(Player.class));
 
     ArgumentCaptor<Player> argument = ArgumentCaptor.forClass(Player.class);
     verify(playerRepository).save(argument.capture());
     Player param = argument.getValue();
-    assertEquals("updatedFirstName", param.getFirstName());
-    assertEquals("updatedLastName", param.getLastName());
-    assertEquals("updatedPhone", param.getPhone());
-    assertEquals("updated@xyz.com", param.getEmail());
+    assertEquals("existingFirstName", param.getFirstName());
+    assertEquals("existingLastName", param.getLastName());
+    assertEquals("existingPhone", param.getPhone());
+    assertEquals("existing@xyz.com", param.getEmail());
 
-    // password should not change
-    assertEquals("existingEncodedPassword", param.getPassword());
+    // password should have change
+    Assert.assertNotEquals("existingEncodedPassword", param.getPassword());
     // roles should not change
     assertThat(param.getRoles()).containsExactly(existingRole);
   }
@@ -344,7 +332,7 @@ public class PlayerServiceTest implements TestConstants {
   public void testDeleteByAdmin() {
     // Arrange
     // mock out to pass the authorization check
-    when(authorizationHelper.isLoggedInUserHaveRole(SecurityRole.ADMIN)).thenReturn(true);
+    when(authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)).thenReturn(true);
 
     // Act
     playerService.delete(1);
@@ -357,7 +345,7 @@ public class PlayerServiceTest implements TestConstants {
   public void testDeleteByNonAdmin() {
     // Arrange
     // mock out to pass the authorization check
-    when(authorizationHelper.isLoggedInUserHaveRole(SecurityRole.ADMIN)).thenReturn(false);
+    when(authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)).thenReturn(false);
 
     // Act
     assertThatThrownBy(() -> {
@@ -436,5 +424,166 @@ public class PlayerServiceTest implements TestConstants {
       playerService.resetPassword(code, password);
     }).isInstanceOf(NotFoundException.class)
       .hasMessageContaining("No code found");
+  }
+
+  @Test
+  public void testAddRole() {
+    // Arrange
+    Role existingRole = Role.builder()
+      .id(1)
+      .type(Role.Type.USER)
+      .build();
+    HashSet<Role> roles = new HashSet<>();
+    roles.add(existingRole);
+    Player existingPlayer = Player.builder()
+      .id(1)
+      .firstName("existingFirstName")
+      .lastName("existingLastName")
+      .email("existing@xyz.com")
+      .phone("existingPhone")
+      .password("existingEncodedPassword")
+      .roles(roles)
+      .build();
+    when(playerRepository.findById(ArgumentMatchers.eq(1))).thenReturn(java.util.Optional.ofNullable(existingPlayer));
+
+    // mock out to pass the authorization check
+    when(authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)).thenReturn(true);
+
+    Role newRole = Role.builder()
+      .id(1)
+      .type(Role.Type.ADMIN)
+      .build();
+
+    // Act
+    playerService.addRole(1, newRole);
+
+    // Assert
+    Mockito.verify(playerRepository, Mockito.times(1)).findById(1);
+    Mockito.verify(playerRepository, Mockito.times(1)).save(any(Player.class));
+
+    ArgumentCaptor<Player> argument = ArgumentCaptor.forClass(Player.class);
+    verify(playerRepository).save(argument.capture());
+    Player param = argument.getValue();
+    assertEquals("existingFirstName", param.getFirstName());
+    assertEquals("existingLastName", param.getLastName());
+    assertEquals("existingPhone", param.getPhone());
+    assertEquals("existing@xyz.com", param.getEmail());
+
+    // password should have change
+    Assert.assertNotEquals("existingEncodedPassword", param.getPassword());
+    // roles should have change
+    assertThat(param.getRoles()).containsExactly(existingRole, newRole);
+  }
+
+  @Test
+  public void testRemoveRole() {
+    // Arrange
+    Role existingUserRole = Role.builder()
+      .id(1)
+      .type(Role.Type.USER)
+      .build();
+    Role existingAdminRole = Role.builder()
+      .id(2)
+      .type(Role.Type.ADMIN)
+      .build();
+    HashSet<Role> roles = new HashSet<>();
+    roles.add(existingUserRole);
+    roles.add(existingAdminRole);
+
+    Player existingPlayer = Player.builder()
+      .id(1)
+      .firstName("existingFirstName")
+      .lastName("existingLastName")
+      .email("existing@xyz.com")
+      .phone("existingPhone")
+      .password("existingEncodedPassword")
+      .roles(roles)
+      .build();
+    when(playerRepository.findById(ArgumentMatchers.eq(1))).thenReturn(java.util.Optional.ofNullable(existingPlayer));
+
+    // mock out to pass the authorization check
+    when(authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)).thenReturn(true);
+
+    // Act, remove the admin role
+    playerService.removeRole(1, 2);
+
+    // Assert
+    Mockito.verify(playerRepository, Mockito.times(1)).findById(1);
+    Mockito.verify(playerRepository, Mockito.times(1)).save(any(Player.class));
+
+    ArgumentCaptor<Player> argument = ArgumentCaptor.forClass(Player.class);
+    verify(playerRepository).save(argument.capture());
+    Player param = argument.getValue();
+    assertEquals("existingFirstName", param.getFirstName());
+    assertEquals("existingLastName", param.getLastName());
+    assertEquals("existingPhone", param.getPhone());
+    assertEquals("existing@xyz.com", param.getEmail());
+
+    // password should have change
+    Assert.assertNotEquals("existingEncodedPassword", param.getPassword());
+    // roles should have change
+    assertThat(param.getRoles()).containsExactly(existingUserRole);
+  }
+
+  @Test
+  public void testRemoveUnknownRole() {
+    // Arrange
+    Role existingUserRole = Role.builder()
+      .id(1)
+      .type(Role.Type.USER)
+      .build();
+    HashSet<Role> roles = new HashSet<>();
+    roles.add(existingUserRole);
+
+    Player existingPlayer = Player.builder()
+      .id(1)
+      .firstName("existingFirstName")
+      .lastName("existingLastName")
+      .email("existing@xyz.com")
+      .phone("existingPhone")
+      .password("existingEncodedPassword")
+      .roles(roles)
+      .build();
+    when(playerRepository.findById(ArgumentMatchers.eq(1))).thenReturn(java.util.Optional.ofNullable(existingPlayer));
+
+    // mock out to pass the authorization check
+    when(authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)).thenReturn(true);
+
+    // Act, remove the admin role
+    assertThatThrownBy(() -> {
+      playerService.removeRole(1, 2);
+    }).isInstanceOf(NotFoundException.class)
+      .hasMessageContaining("Role with id 2 not found");
+  }
+
+  @Test
+  public void testRemoveLastRole() {
+    // Arrange
+    Role existingUserRole = Role.builder()
+      .id(1)
+      .type(Role.Type.USER)
+      .build();
+    HashSet<Role> roles = new HashSet<>();
+    roles.add(existingUserRole);
+
+    Player existingPlayer = Player.builder()
+      .id(1)
+      .firstName("existingFirstName")
+      .lastName("existingLastName")
+      .email("existing@xyz.com")
+      .phone("existingPhone")
+      .password("existingEncodedPassword")
+      .roles(roles)
+      .build();
+    when(playerRepository.findById(ArgumentMatchers.eq(1))).thenReturn(java.util.Optional.ofNullable(existingPlayer));
+
+    // mock out to pass the authorization check
+    when(authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)).thenReturn(true);
+
+    // Act, remove the admin role
+    assertThatThrownBy(() -> {
+      playerService.removeRole(1, 1);
+    }).isInstanceOf(CannotRemoveRoleException.class)
+      .hasMessageContaining("Cannot remove role last role");
   }
 }

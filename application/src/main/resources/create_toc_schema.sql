@@ -106,7 +106,7 @@ VALUES (1, 'Gil', 'Pratte', '5121231235', 'gilpratte@texastoc.com',
 CREATE TABLE role
 (
     id          int NOT NULL AUTO_INCREMENT,
-    name        varchar(255) DEFAULT NULL,
+    type        varchar(255) DEFAULT NULL,
     player      int,
     PRIMARY KEY (id)
 );

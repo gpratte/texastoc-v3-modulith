@@ -2,17 +2,16 @@ package com.texastoc.module.player.service;
 
 import com.google.common.collect.ImmutableSet;
 import com.texastoc.common.AuthorizationHelper;
-import com.texastoc.common.SecurityRole;
 import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.notification.connector.EmailConnector;
 import com.texastoc.module.player.PlayerModule;
+import com.texastoc.module.player.exception.CannotRemoveRoleException;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
 import com.texastoc.module.player.repository.PlayerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +49,7 @@ public class PlayerService implements PlayerModule {
       .phone(player.getPhone())
       .password(player.getPassword() == null ? null : bCryptPasswordEncoder.encode(player.getPassword()))
       .roles(ImmutableSet.of(Role.builder()
-        .name(PlayerRepository.USER)
+        .type(Role.Type.USER)
         .build()))
       .build();
 
@@ -69,6 +68,16 @@ public class PlayerService implements PlayerModule {
     player.setRoles((existingPlayer.getRoles()));
     playerRepository.save(player);
   }
+
+  @Override
+  @Transactional
+  public void updatePassword(int id, String newPassword) {
+    Player existingPlayer = playerRepository.findById(id).get();
+    verifyLoggedInUserIsAdminOrSelf(existingPlayer);
+    existingPlayer.setPassword(bCryptPasswordEncoder.encode(newPassword));
+    playerRepository.save(existingPlayer);
+  }
+
 
   @Override
   @Transactional(readOnly = true)
@@ -102,7 +111,6 @@ public class PlayerService implements PlayerModule {
   }
 
   @Override
-  @Secured("ROLE_ADMIN")
   @Transactional
   public void delete(int id) {
     verifyLoggedInUserIsAdmin();
@@ -144,32 +152,63 @@ public class PlayerService implements PlayerModule {
   }
 
   @Override
-  public void updatePassword(int id, String oldPassword, String newPassword) {
-    // TODO
-  }
-
-  @Override
-  @Secured("ROLE_ADMIN")
   public void addRole(int id, Role role) {
-    // TODO
+    verifyLoggedInUserIsAdmin();
+    Player existingPlayer = get(id);
+    // Check that role is not already set
+    for (Role existingRole : existingPlayer.getRoles()) {
+      if (existingRole.getType() == role.getType()) {
+        return;
+      }
+    }
+    existingPlayer.getRoles().add(role);
+    playerRepository.save(existingPlayer);
   }
 
   @Override
-  @Secured("ROLE_ADMIN")
   public void removeRole(int id, int roleId) {
-    // TODO
+    verifyLoggedInUserIsAdmin();
+    Player existingPlayer = get(id);
+    // Check that role is set
+    boolean found = false;
+    Set<Role> existingRoles = existingPlayer.getRoles();
+    for (Role existingRole : existingRoles) {
+      if (existingRole.getId() == roleId) {
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      throw new NotFoundException("Role with id " + roleId + " not found");
+    }
+
+    // found the role, now make sure it is not the only role
+    if (existingRoles.size() < 2) {
+      throw new CannotRemoveRoleException("Cannot remove role last role");
+    }
+
+    Set<Role> newRoles = new HashSet<>();
+    for (Role existingRole : existingRoles) {
+      if (existingRole.getId() != roleId) {
+        newRoles.add(existingRole);
+      }
+    }
+
+    existingPlayer.setRoles(newRoles);
+    playerRepository.save(existingPlayer);
   }
 
   // verify the user is an admin
   private void verifyLoggedInUserIsAdmin() {
-    if (!authorizationHelper.isLoggedInUserHaveRole(SecurityRole.ADMIN)) {
+    if (!authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)) {
       throw new AccessDeniedException("A player that is not an admin cannot update another player");
     }
   }
 
   // verify the user is either admin or acting upon itself
   private void verifyLoggedInUserIsAdminOrSelf(Player player) {
-    if (!authorizationHelper.isLoggedInUserHaveRole(SecurityRole.ADMIN)) {
+    if (!authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)) {
       String email = authorizationHelper.getLoggedInUserEmail();
       List<Player> players = playerRepository.findByEmail(email);
       if (players.size() != 1) {

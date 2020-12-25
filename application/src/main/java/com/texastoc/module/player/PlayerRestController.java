@@ -89,7 +89,7 @@ public class PlayerRestController implements PlayerModule {
   }
 
   @Override
-  public void updatePassword(int id, String oldPassword, String newPassword) {
+  public void updatePassword(int id, String newPassword) {
     // TODO
   }
 

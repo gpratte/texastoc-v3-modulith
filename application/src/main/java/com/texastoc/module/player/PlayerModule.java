@@ -30,10 +30,9 @@ public interface PlayerModule {
    * Update a player's password. A player can update his/her own password.
    * An admin can update any player's password.
    * @param id the player's Id
-   * @param oldPassword old password
    * @param newPassword new password
    */
-  void updatePassword(int id, String oldPassword, String newPassword);
+  void updatePassword(int id, String newPassword);
 
   /**
    * Add a role to a player. Restricted to admins only.
