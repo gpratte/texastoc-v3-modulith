@@ -3,6 +3,8 @@ package com.texastoc.module.player.service;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.texastoc.TestConstants;
+import com.texastoc.common.AuthorizationHelper;
+import com.texastoc.common.SecurityRole;
 import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.notification.connector.EmailConnector;
 import com.texastoc.module.player.model.Player;
@@ -13,6 +15,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Collections;
@@ -36,13 +39,15 @@ public class PlayerServiceTest implements TestConstants {
   private PlayerRepository playerRepository;
   private BCryptPasswordEncoder bCryptPasswordEncoder;
   private EmailConnector emailConnector;
+  private AuthorizationHelper authorizationHelper;
 
   @Before
   public void before() {
     bCryptPasswordEncoder = mock(BCryptPasswordEncoder.class);
     playerRepository = mock(PlayerRepository.class);
     emailConnector = mock(EmailConnector.class);
-    playerService = new PlayerService(playerRepository, bCryptPasswordEncoder, emailConnector);
+    authorizationHelper = mock(AuthorizationHelper.class);
+    playerService = new PlayerService(playerRepository, bCryptPasswordEncoder, emailConnector, authorizationHelper);
   }
 
   @Test
@@ -83,7 +88,16 @@ public class PlayerServiceTest implements TestConstants {
   }
 
   @Test
-  public void testUpdatePlayer() {
+  public void testUpdateSelf() {
+    testUpdate(SecurityRole.USER);
+  }
+
+  @Test
+  public void testUpdateAdmin() {
+    testUpdate(SecurityRole.ADMIN);
+  }
+
+  private void testUpdate(SecurityRole securityRole) {
     // Arrange
     Role existingRole = Role.builder()
       .id(1)
@@ -111,6 +125,112 @@ public class PlayerServiceTest implements TestConstants {
         .name("updatedRole")
         .build()))
       .build();
+
+    // mock out to pass the authorization check
+    if (securityRole == SecurityRole.USER) {
+      when(authorizationHelper.getLoggedInUserEmail()).thenReturn("existing@xyz.com");
+      when(playerRepository.findByEmail("existing@xyz.com")).thenReturn(ImmutableList.of(existingPlayer));
+    } else {
+      when(authorizationHelper.isLoggedInUserHaveRole(SecurityRole.ADMIN)).thenReturn(true);
+    }
+
+    // Act
+    playerService.update(playersNewValues);
+
+    // Assert
+    Mockito.verify(playerRepository, Mockito.times(1)).findById(1);
+    Mockito.verify(bCryptPasswordEncoder, Mockito.times(0)).encode(any());
+    Mockito.verify(playerRepository, Mockito.times(1)).save(any(Player.class));
+
+    ArgumentCaptor<Player> argument = ArgumentCaptor.forClass(Player.class);
+    verify(playerRepository).save(argument.capture());
+    Player param = argument.getValue();
+    assertEquals("updatedFirstName", param.getFirstName());
+    assertEquals("updatedLastName", param.getLastName());
+    assertEquals("updatedPhone", param.getPhone());
+    assertEquals("updated@xyz.com", param.getEmail());
+
+    // password should not change
+    assertEquals("existingEncodedPassword", param.getPassword());
+    // roles should not change
+    assertThat(param.getRoles()).containsExactly(existingRole);
+  }
+
+  @Test
+  public void testUpdateNotAllowed() {
+    // Arrange
+    Role existingRole = Role.builder()
+      .id(1)
+      .name("existingRole")
+      .build();
+    Player existingPlayer = Player.builder()
+      .id(1)
+      .firstName("existingFirstName")
+      .lastName("existingLastName")
+      .email("existing@xyz.com")
+      .phone("existingPhone")
+      .password("existingEncodedPassword")
+      .roles(ImmutableSet.of(existingRole))
+      .build();
+    when(playerRepository.findById(ArgumentMatchers.eq(1))).thenReturn(java.util.Optional.ofNullable(existingPlayer));
+
+    // different user
+    Player playersNewValues = Player.builder()
+      .id(2)
+      .firstName("updatedFirstName")
+      .lastName("updatedLastName")
+      .email("updated@xyz.com")
+      .phone("updatedPhone")
+      .password("updatedPassword") // will be ignored
+      .roles(ImmutableSet.of(Role.builder() // will be ignored
+        .name("updatedRole")
+        .build()))
+      .build();
+
+    // mock out authorization check
+    when(authorizationHelper.getLoggedInUserEmail()).thenReturn("existing@xyz.com");
+    when(playerRepository.findByEmail("existing@xyz.com")).thenReturn(ImmutableList.of(existingPlayer));
+
+    // Act
+    assertThatThrownBy(() -> {
+      playerService.update(playersNewValues);
+    }).isInstanceOf(AccessDeniedException.class)
+      .hasMessageContaining("A player that is not an admin cannot update another player");
+  }
+
+  @Test
+  public void testUpdateSelfPassword() {
+    // Arrange
+    Role existingRole = Role.builder()
+      .id(1)
+      .name("existingRole")
+      .build();
+    Player existingPlayer = Player.builder()
+      .id(1)
+      .firstName("existingFirstName")
+      .lastName("existingLastName")
+      .email("existing@xyz.com")
+      .phone("existingPhone")
+      .password("existingEncodedPassword")
+      .roles(ImmutableSet.of(existingRole))
+      .build();
+    when(playerRepository.findById(ArgumentMatchers.eq(1))).thenReturn(java.util.Optional.ofNullable(existingPlayer));
+
+    Player playersNewValues = Player.builder()
+      .id(1)
+      .firstName("updatedFirstName")
+      .lastName("updatedLastName")
+      .email("updated@xyz.com")
+      .phone("updatedPhone")
+      .password("updatedPassword") // will be ignored
+      .roles(ImmutableSet.of(Role.builder() // will be ignored
+        .name("updatedRole")
+        .build()))
+      .build();
+
+    // mock out to pass the authorization check
+    when(authorizationHelper.getLoggedInUserEmail()).thenReturn("existing@xyz.com");
+    when(playerRepository.findByEmail("existing@xyz.com")).thenReturn(ImmutableList.of(existingPlayer));
 
     // Act
     playerService.update(playersNewValues);

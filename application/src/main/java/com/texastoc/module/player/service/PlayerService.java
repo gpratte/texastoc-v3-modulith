@@ -1,6 +1,8 @@
 package com.texastoc.module.player.service;
 
 import com.google.common.collect.ImmutableSet;
+import com.texastoc.common.AuthorizationHelper;
+import com.texastoc.common.SecurityRole;
 import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.notification.connector.EmailConnector;
 import com.texastoc.module.player.PlayerModule;
@@ -9,6 +11,8 @@ import com.texastoc.module.player.model.Role;
 import com.texastoc.module.player.repository.PlayerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,14 +28,16 @@ public class PlayerService implements PlayerModule {
   private final PlayerRepository playerRepository;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final EmailConnector emailConnector;
+  private final AuthorizationHelper authorizationHelper;
 
   // Only one server so cache the forgot password codes here
   private Map<String, String> forgotPasswordCodes = new HashMap<>();
 
-  public PlayerService(PlayerRepository playerRepository, BCryptPasswordEncoder bCryptPasswordEncoder, EmailConnector emailConnector) {
+  public PlayerService(PlayerRepository playerRepository, BCryptPasswordEncoder bCryptPasswordEncoder, EmailConnector emailConnector, AuthorizationHelper authorizationHelper) {
     this.playerRepository = playerRepository;
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     this.emailConnector = emailConnector;
+    this.authorizationHelper = authorizationHelper;
   }
 
   @Override
@@ -57,6 +63,7 @@ public class PlayerService implements PlayerModule {
   @Override
   @Transactional
   public void update(Player player) {
+    checkUserAuthorization(player);
     Player existingPlayer = playerRepository.findById(player.getId()).get();
     player.setPassword(existingPlayer.getPassword());
     player.setRoles((existingPlayer.getRoles()));
@@ -95,8 +102,10 @@ public class PlayerService implements PlayerModule {
   }
 
   @Override
+  @Secured("ROLE_ADMIN")
   @Transactional
   public void delete(int id) {
+    // TODO security check
     // TODO call game service to see if player has any games
 //    if (player has any games) {
 //      throw new CannotDeletePlayerException("Player with ID " + id + " cannot be deleted");
@@ -132,5 +141,36 @@ public class PlayerService implements PlayerModule {
     playerToUpdate.setPassword(bCryptPasswordEncoder.encode(password));
 
     playerRepository.save(playerToUpdate);
+  }
+
+  @Override
+  public void updatePassword(int id, String oldPassword, String newPassword) {
+    // TODO
+  }
+
+  @Override
+  @Secured("ROLE_ADMIN")
+  public void addRole(int id, Role role) {
+    // TODO
+  }
+
+  @Override
+  @Secured("ROLE_ADMIN")
+  public void removeRole(int id, int roleId) {
+    // TODO
+  }
+
+  private void checkUserAuthorization(Player player) {
+    if (!authorizationHelper.isLoggedInUserHaveRole(SecurityRole.ADMIN)) {
+      String email = authorizationHelper.getLoggedInUserEmail();
+      List<Player> players = playerRepository.findByEmail(email);
+      if (players.size() != 1) {
+        throw new NotFoundException("Could not find player with email " + email);
+      }
+      Player loggedInPlayer = players.get(0);
+      if (loggedInPlayer.getId() != player.getId()) {
+        throw new AccessDeniedException("A player that is not an admin cannot update another player");
+      }
+    }
   }
 }
