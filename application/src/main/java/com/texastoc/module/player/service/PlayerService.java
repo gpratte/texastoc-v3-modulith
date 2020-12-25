@@ -2,10 +2,8 @@ package com.texastoc.module.player.service;
 
 import com.google.common.collect.ImmutableSet;
 import com.texastoc.exception.NotFoundException;
-import com.texastoc.module.game.repository.GamePlayerRepository;
 import com.texastoc.module.notification.connector.EmailConnector;
 import com.texastoc.module.player.PlayerModule;
-import com.texastoc.module.player.exception.CannotDeletePlayerException;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
 import com.texastoc.module.player.repository.PlayerRepository;
@@ -27,16 +25,14 @@ import java.util.stream.StreamSupport;
 public class PlayerService implements PlayerModule {
 
   private final PlayerRepository playerRepository;
-  private final GamePlayerRepository gamePlayerRepository;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final EmailConnector emailConnector;
 
   // Only one server so cache the forgot password codes here
   private Map<String, String> forgotPasswordCodes = new HashMap<>();
 
-  public PlayerService(PlayerRepository playerRepository, GamePlayerRepository gamePlayerRepository, BCryptPasswordEncoder bCryptPasswordEncoder, EmailConnector emailConnector) {
+  public PlayerService(PlayerRepository playerRepository, BCryptPasswordEncoder bCryptPasswordEncoder, EmailConnector emailConnector) {
     this.playerRepository = playerRepository;
-    this.gamePlayerRepository = gamePlayerRepository;
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     this.emailConnector = emailConnector;
   }
@@ -64,17 +60,10 @@ public class PlayerService implements PlayerModule {
   @Override
   @Transactional
   public void update(Player player) {
-    Player playerToUpdate = playerRepository.findById(player.getId()).get();
-    playerToUpdate.setFirstName(player.getFirstName());
-    playerToUpdate.setLastName(player.getLastName());
-    playerToUpdate.setEmail(player.getEmail());
-    playerToUpdate.setPhone(player.getPhone());
-
-    if (player.getPassword() != null) {
-      playerToUpdate.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
-    }
-
-    playerRepository.save(playerToUpdate);
+    Player existingPlayer = playerRepository.findById(player.getId()).get();
+    player.setPassword(existingPlayer.getPassword());
+    player.setRoles((existingPlayer.getRoles()));
+    playerRepository.save(player);
   }
 
   @Override
@@ -107,10 +96,10 @@ public class PlayerService implements PlayerModule {
   @Override
   @Transactional
   public void delete(int id) {
-    int numGames = gamePlayerRepository.getNumGamesByPlayerId(id);
-    if (numGames > 0) {
-      throw new CannotDeletePlayerException("Player with ID " + id + " cannot be deleted");
-    }
+    // TODO call game service to see if player has any games
+//    if (player has any games) {
+//      throw new CannotDeletePlayerException("Player with ID " + id + " cannot be deleted");
+//    }
     playerRepository.deleteById(id);
   }
 

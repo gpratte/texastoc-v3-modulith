@@ -13,10 +13,19 @@ public interface PlayerModule {
   Player create(Player player);
 
   /**
-   * Update a player. Any player can update itself but only an admin can update another player
+   * Update a player. Any player can update itself but only an admin can update another player.
+   * Only the following fields can be updated
+   * <ul>
+   *   <li>firstName</li>
+   *   <li>lastName</li>
+   *   <li>phone</li>
+   *   <li>email</li>
+   * </ul>
    * @param player
    */
   void update(Player player);
+
+  // TODO add/remove role, update password
 
   /**
    * Get all players
