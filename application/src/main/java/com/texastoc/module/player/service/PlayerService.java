@@ -13,10 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -76,8 +73,12 @@ public class PlayerService implements PlayerModule {
 
   @Override
   @Transactional(readOnly = true)
-  public Player get(int id) {
-    Player player = playerRepository.findById(id).get();
+  public Player get(int id) throws NotFoundException {
+    Optional<Player> optionalPlayer = playerRepository.findById(id);
+    if (!optionalPlayer.isPresent()) {
+      throw new NotFoundException("Player with id " + id + " not found");
+    }
+    Player player = optionalPlayer.get();
     player.setPassword(null);
     return player;
   }

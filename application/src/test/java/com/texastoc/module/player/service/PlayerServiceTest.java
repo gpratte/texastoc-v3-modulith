@@ -1,7 +1,9 @@
 package com.texastoc.module.player.service;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.texastoc.TestConstants;
+import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.notification.connector.EmailConnector;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
@@ -13,9 +15,13 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,18 +35,18 @@ public class PlayerServiceTest implements TestConstants {
 
   private PlayerRepository playerRepository;
   private BCryptPasswordEncoder bCryptPasswordEncoder;
-  private EmailConnector emailConnector = mock(EmailConnector.class);
+  private EmailConnector emailConnector;
 
   @Before
   public void before() {
     bCryptPasswordEncoder = mock(BCryptPasswordEncoder.class);
     playerRepository = mock(PlayerRepository.class);
+    emailConnector = mock(EmailConnector.class);
     playerService = new PlayerService(playerRepository, bCryptPasswordEncoder, emailConnector);
   }
 
   @Test
   public void testCreatePlayer() {
-
     // Arrange
     Player expected = Player.builder()
       .firstName("bobs")
@@ -128,4 +134,170 @@ public class PlayerServiceTest implements TestConstants {
     assertThat(param.getRoles()).containsExactly(existingRole);
   }
 
+  @Test
+  public void testGetAll() {
+    // Arrange
+    Player player2 = Player.builder()
+      .id(1)
+      .firstName("firstName2")
+      .lastName("lastName2")
+      .build();
+    Player player1 = Player.builder()
+      .id(1)
+      .firstName("firstName1")
+      .lastName("lastName1")
+      .build();
+    when(playerRepository.findAll()).thenReturn(ImmutableSet.of(player2, player1));
+
+    // Act
+    List<Player> players = playerService.getAll();
+
+    // Assert
+    Mockito.verify(playerRepository, Mockito.times(1)).findAll();
+
+    // Should be sorted with player1 before player2
+    assertThat(players).containsExactly(player1, player2);
+  }
+
+  @Test
+  public void testGetNotFound() {
+    // Arrange
+    when(playerRepository.findById(123)).thenReturn(Optional.empty());
+
+    // Act and Assert
+    assertThatThrownBy(() -> {
+      playerService.get(123);
+    }).isInstanceOf(NotFoundException.class)
+      .hasMessageContaining("Player with id 123 not found");
+  }
+
+  @Test
+  public void testGetFound() {
+    // Arrange
+    Player player = Player.builder()
+      .id(1)
+      .firstName("firstName1")
+      .lastName("lastName1")
+      .build();
+    when(playerRepository.findById(1)).thenReturn(Optional.of(player));
+
+    // Act
+    Player playerRetrieved = playerService.get(1);
+
+    // Assert
+    Mockito.verify(playerRepository, Mockito.times(1)).findById(1);
+  }
+
+  @Test
+  public void testGetByEmailNotFound() {
+    // Arrange
+    when(playerRepository.findByEmail(any())).thenReturn(Collections.emptyList());
+
+    // Act and Assert
+    assertThatThrownBy(() -> {
+      playerService.getByEmail("abc");
+    }).isInstanceOf(NotFoundException.class)
+      .hasMessageStartingWith("Could not find player with email");
+  }
+
+  @Test
+  public void testGetByEmailFound() {
+    // Arrange
+    String email = "abc@def.com";
+    Player player = Player.builder()
+      .id(1)
+      .firstName("firstName1")
+      .lastName("lastName1")
+      .email(email)
+      .build();
+    when(playerRepository.findByEmail(email)).thenReturn(ImmutableList.of(player));
+
+    // Act
+    Player playerRetrieved = playerService.getByEmail(email);
+
+    // Assert
+    Mockito.verify(playerRepository, Mockito.times(1)).findByEmail(email);
+    assertEquals(email, playerRetrieved.getEmail());
+  }
+
+  @Test
+  public void testDelete() {
+    // Act
+    playerService.delete(1);
+
+    // Assert
+    Mockito.verify(playerRepository, Mockito.times(1)).deleteById(1);
+  }
+
+  @Test
+  public void testForgotPassword() {
+    // Act
+    playerService.forgotPassword("abc@def.com");
+
+    // Assert
+    Mockito.verify(emailConnector, Mockito.times(1)).send(anyString(), anyString(), anyString());
+  }
+
+  @Test
+  public void testResetPassword() {
+    // Arrange
+    String email = "abc@def.com";
+    String password = "newPassword";
+
+    playerService.forgotPassword(email);
+
+    ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+    verify(emailConnector).send(anyString(), anyString(), argument.capture());
+    String code = argument.getValue();
+    System.out.println(code);
+
+    Player player = Player.builder()
+      .id(1)
+      .firstName("firstName1")
+      .lastName("lastName1")
+      .email(email)
+      .build();
+    when(playerRepository.findByEmail(email)).thenReturn(ImmutableList.of(player));
+
+
+    // Act
+    playerService.resetPassword(code, password);
+
+    // Assert
+    Mockito.verify(playerRepository, Mockito.times(1)).findByEmail(email);
+    Mockito.verify(bCryptPasswordEncoder, Mockito.times(1)).encode(password);
+    Mockito.verify(playerRepository, Mockito.times(1)).save(any(Player.class));
+  }
+
+  @Test
+  public void testResetPasswordNotFound() {
+    // Arrange
+    String email = "abc@def.com";
+    String password = "newPassword";
+
+    playerService.forgotPassword(email);
+
+    ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+    verify(emailConnector).send(anyString(), anyString(), argument.capture());
+    String code = argument.getValue();
+    System.out.println(code);
+
+    Player player = Player.builder()
+      .id(1)
+      .firstName("firstName1")
+      .lastName("lastName1")
+      .email(email)
+      .build();
+    when(playerRepository.findByEmail(email)).thenReturn(ImmutableList.of(player));
+
+
+    // Act
+    playerService.resetPassword(code, password);
+
+    // Cannot use the same code twice
+    assertThatThrownBy(() -> {
+      playerService.resetPassword(code, password);
+    }).isInstanceOf(NotFoundException.class)
+      .hasMessageContaining("No code found");
+  }
 }
