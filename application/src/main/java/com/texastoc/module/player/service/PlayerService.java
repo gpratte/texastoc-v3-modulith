@@ -63,7 +63,7 @@ public class PlayerService implements PlayerModule {
   @Override
   @Transactional
   public void update(Player player) {
-    checkUserAuthorization(player);
+    verifyLoggedInUserIsAdminOrSelf(player);
     Player existingPlayer = playerRepository.findById(player.getId()).get();
     player.setPassword(existingPlayer.getPassword());
     player.setRoles((existingPlayer.getRoles()));
@@ -105,7 +105,7 @@ public class PlayerService implements PlayerModule {
   @Secured("ROLE_ADMIN")
   @Transactional
   public void delete(int id) {
-    // TODO security check
+    verifyLoggedInUserIsAdmin();
     // TODO call game service to see if player has any games
 //    if (player has any games) {
 //      throw new CannotDeletePlayerException("Player with ID " + id + " cannot be deleted");
@@ -160,7 +160,15 @@ public class PlayerService implements PlayerModule {
     // TODO
   }
 
-  private void checkUserAuthorization(Player player) {
+  // verify the user is an admin
+  private void verifyLoggedInUserIsAdmin() {
+    if (!authorizationHelper.isLoggedInUserHaveRole(SecurityRole.ADMIN)) {
+      throw new AccessDeniedException("A player that is not an admin cannot update another player");
+    }
+  }
+
+  // verify the user is either admin or acting upon itself
+  private void verifyLoggedInUserIsAdminOrSelf(Player player) {
     if (!authorizationHelper.isLoggedInUserHaveRole(SecurityRole.ADMIN)) {
       String email = authorizationHelper.getLoggedInUserEmail();
       List<Player> players = playerRepository.findByEmail(email);

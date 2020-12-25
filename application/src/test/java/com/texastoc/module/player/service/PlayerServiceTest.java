@@ -341,12 +341,29 @@ public class PlayerServiceTest implements TestConstants {
   }
 
   @Test
-  public void testDelete() {
+  public void testDeleteByAdmin() {
+    // Arrange
+    // mock out to pass the authorization check
+    when(authorizationHelper.isLoggedInUserHaveRole(SecurityRole.ADMIN)).thenReturn(true);
+
     // Act
     playerService.delete(1);
 
     // Assert
     Mockito.verify(playerRepository, Mockito.times(1)).deleteById(1);
+  }
+
+  @Test
+  public void testDeleteByNonAdmin() {
+    // Arrange
+    // mock out to pass the authorization check
+    when(authorizationHelper.isLoggedInUserHaveRole(SecurityRole.ADMIN)).thenReturn(false);
+
+    // Act
+    assertThatThrownBy(() -> {
+      playerService.delete(1);
+    }).isInstanceOf(AccessDeniedException.class)
+      .hasMessageContaining("A player that is not an admin cannot update another player");
   }
 
   @Test
