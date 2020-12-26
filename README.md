@@ -162,10 +162,5 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 13-player-module-unit-tests
-Added a few methods to the PlayerModule interface
-* updatePassword
-* addRole
-* removeRole
-
-Also fleshed out all the unit tests for the PlayerService (which implements the PlayerModule interface).
+## Current Branch: 14-arch-unit
+Wrote an [ArchUnit](https://www.archunit.org) test to make sure only certain classes in the player module are accessible.
