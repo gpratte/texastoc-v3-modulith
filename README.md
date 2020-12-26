@@ -162,5 +162,5 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 14-arch-unit
-Wrote an [ArchUnit](https://www.archunit.org) test to make sure only certain classes in the player module are accessible.
+## Current Branch: 15-remove-supply-module
+Removed the supply module since it is not being used.
