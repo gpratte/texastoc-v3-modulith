@@ -77,6 +77,11 @@
             <version>2.9.2</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+            <version>1.7</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
@@ -93,9 +98,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
-            <version>1.7</version>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit</artifactId>
+            <version>0.15.0</version>
+            <scope>test</scope>
         </dependency>
         <!--        <dependency>-->
         <!--            <groupId>org.apache.velocity</groupId>-->
