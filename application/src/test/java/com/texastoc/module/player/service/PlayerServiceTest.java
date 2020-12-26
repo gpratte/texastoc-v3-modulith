@@ -472,7 +472,7 @@ public class PlayerServiceTest implements TestConstants {
     // password should have change
     Assert.assertNotEquals("existingEncodedPassword", param.getPassword());
     // roles should have change
-    assertThat(param.getRoles()).containsExactly(existingRole, newRole);
+    assertThat(param.getRoles()).containsExactlyInAnyOrder(existingRole, newRole);
   }
 
   @Test
