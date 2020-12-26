@@ -1,7 +1,6 @@
 package com.texastoc.module.game;
 
 import com.google.common.collect.ImmutableSet;
-import com.texastoc.common.SecurityRole;
 import com.texastoc.module.game.calculator.GameCalculator;
 import com.texastoc.module.game.calculator.PayoutCalculator;
 import com.texastoc.module.game.calculator.PointsCalculator;
@@ -373,7 +372,7 @@ public class GameService {
       .lastName(lastName)
       .email(firstTimeGamePlayer.getEmail())
       .roles(ImmutableSet.of(Role.builder()
-        .name(SecurityRole.USER.name())
+        .type(Role.Type.USER)
         .build()))
       .build();
     int playerId = getPlayerModule().create(player).getId();
@@ -584,7 +583,7 @@ public class GameService {
       for (Player player : getPlayerModule().getAll()) {
         boolean isAdmin = false;
         for (Role role : player.getRoles()) {
-          if ("ADMIN".equals(role.getName())) {
+          if (Role.Type.ADMIN == role.getType()) {
             isAdmin = true;
             break;
           }

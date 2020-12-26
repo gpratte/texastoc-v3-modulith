@@ -162,5 +162,10 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 12-player-module-interface
-Expose a PlayerModule interface for other services to use.
+## Current Branch: 13-player-module-unit-tests
+Added a few methods to the PlayerModule interface
+* updatePassword
+* addRole
+* removeRole
+
+Also fleshed out all the unit tests for the PlayerService (which implements the PlayerModule interface).

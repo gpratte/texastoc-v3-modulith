@@ -10,8 +10,6 @@ import java.util.List;
 
 @Repository
 public interface PlayerRepository extends CrudRepository<Player, Integer> {
-  String USER = "USER";
-
   @Query("select * from player where email=:email")
   List<Player> findByEmail(@Param("email") String email);
 }

@@ -8,7 +8,10 @@ import org.springframework.data.annotation.Id;
 @Setter
 @EqualsAndHashCode
 public class Role {
+
+  public enum Type {ADMIN, USER}
+
   @Id
   private long id;
-  private String name;
+  private Type type;
 }
