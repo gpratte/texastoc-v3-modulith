@@ -4,11 +4,8 @@ import com.texastoc.module.settings.model.*;
 import com.texastoc.module.settings.repository.SettingsRepository;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -24,7 +21,6 @@ public class SettingsServiceTest {
   public void before() {
     settingsRepository = mock(SettingsRepository.class);
     settingsService = new SettingsService(settingsRepository);
-    ReflectionTestUtils.setField(settingsService, "payouts", generatePayouts());
   }
 
   @Test
@@ -58,39 +54,5 @@ public class SettingsServiceTest {
     Payout thirdPlaceOfThree = actual.getPayouts().get(3).get(2);
     assertEquals(3, thirdPlaceOfThree.getPlace());
     assertEquals(0.2, thirdPlaceOfThree.getPercent(), 0.0);
-  }
-
-  private Object generatePayouts() {
-    Map<Integer, List<Payout>> payouts = new HashMap<>();
-
-    // 2
-    Payout payout = new Payout();
-    payout.setPlace(1);
-    payout.setPercent(0.65);
-    List<Payout> list = new LinkedList<>();
-    list.add(payout);
-    payout = new Payout();
-    payout.setPlace(2);
-    payout.setPercent(0.35);
-    list.add(payout);
-    payouts.put(2, list);
-
-    // 3
-    payout = new Payout();
-    payout.setPlace(1);
-    payout.setPercent(0.5);
-    list = new LinkedList<>();
-    list.add(payout);
-    payout = new Payout();
-    payout.setPlace(2);
-    payout.setPercent(0.3);
-    list.add(payout);
-    payout = new Payout();
-    payout.setPlace(3);
-    payout.setPercent(0.2);
-    list.add(payout);
-    payouts.put(3, list);
-
-    return payouts;
   }
 }
