@@ -1,11 +1,11 @@
 package com.texastoc.module.game.calculator;
 
-import com.texastoc.module.settings.model.Payout;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePayout;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.repository.GamePayoutRepository;
-import com.texastoc.module.settings.repository.PayoutRepository;
+import com.texastoc.module.settings.SettingsModuleFactory;
+import com.texastoc.module.settings.model.Payout;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -15,11 +15,9 @@ import java.util.List;
 @Component
 public class PayoutCalculator {
 
-  private final PayoutRepository payoutRepository;
   private final GamePayoutRepository gamePayoutRepository;
 
-  public PayoutCalculator(PayoutRepository payoutRepository, GamePayoutRepository gamePayoutRepository) {
-    this.payoutRepository = payoutRepository;
+  public PayoutCalculator(GamePayoutRepository gamePayoutRepository) {
     this.gamePayoutRepository = gamePayoutRepository;
   }
 
@@ -61,7 +59,15 @@ public class PayoutCalculator {
       return gamePayouts;
     }
 
-    List<Payout> payouts = payoutRepository.get(numToPay);
+    List<Payout> payouts = new ArrayList<>(numToPay);
+    // TODO settings payouts should change to a set and each set has a list
+    List<Payout> settingsPayouts = SettingsModuleFactory.getSettingsModule().get().getPayouts();
+    for (Payout payout : settingsPayouts) {
+      if (payout.getNumPayouts() == numToPay) {
+        payouts.add(payout);
+      }
+    }
+
     int prizePot = game.getPrizePotCalculated();
     int totalPayout = 0;
     for (Payout payout : payouts) {

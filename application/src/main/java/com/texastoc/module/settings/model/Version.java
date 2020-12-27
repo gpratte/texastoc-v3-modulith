@@ -8,10 +8,9 @@ import org.springframework.data.annotation.Id;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public final class Payout {
+public class Version {
   @Id
   private int id;
-  private int numPayouts;
-  private int place;
-  private double percent;
+  private String env;
+  private String version;
 }

@@ -6,6 +6,7 @@ import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.repository.GamePlayerRepository;
 import com.texastoc.module.game.repository.GameRepository;
+import com.texastoc.module.season.SeasonService;
 import com.texastoc.module.season.calculator.SeasonCalculator;
 import com.texastoc.module.season.model.Season;
 import com.texastoc.module.season.model.SeasonPlayer;
@@ -13,7 +14,6 @@ import com.texastoc.module.season.repository.SeasonPayoutRepository;
 import com.texastoc.module.season.repository.SeasonPayoutSettingsRepository;
 import com.texastoc.module.season.repository.SeasonPlayerRepository;
 import com.texastoc.module.season.repository.SeasonRepository;
-import com.texastoc.module.settings.repository.ConfigRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -37,8 +37,6 @@ public class SeasonCalculatorTest implements TestConstants {
   @MockBean
   private GameRepository gameRepository;
   @MockBean
-  private ConfigRepository configRepository;
-  @MockBean
   private SeasonRepository seasonRepository;
   @MockBean
   private SeasonPlayerRepository seasonPlayerRepository;
@@ -48,12 +46,13 @@ public class SeasonCalculatorTest implements TestConstants {
   private SeasonPayoutRepository seasonPayoutRepository;
   @MockBean
   private SeasonPayoutSettingsRepository seasonPayoutSettingsRepository;
-
+  @MockBean
+  private SeasonService seasonService;
 
   @Before
   public void before() {
     seasonCalculator = new SeasonCalculator(gameRepository, seasonRepository, seasonPlayerRepository, gamePlayerRepository, seasonPayoutRepository, seasonPayoutSettingsRepository);
-    gameCalculator = new GameCalculator(gameRepository, configRepository);
+    gameCalculator = new GameCalculator(gameRepository, seasonService);
   }
 
   @Ignore
@@ -142,7 +141,7 @@ public class SeasonCalculatorTest implements TestConstants {
     gameCombinedPlayers.addAll(gameSeasonPlayers);
     gameCombinedPlayers.addAll(gameNonSeasonPlayers);
 
-    Mockito.when(configRepository.get()).thenReturn(TestConstants.getTocConfig());
+//    Mockito.when(configRepository.get()).thenReturn(TestConstants.getTocConfig());
     Game currentGame = Game.builder()
       .build();
     Game calculatedGame = gameCalculator.calculate(currentGame, gameCombinedPlayers);
@@ -295,7 +294,7 @@ public class SeasonCalculatorTest implements TestConstants {
     game2CombinedPlayers.addAll(game2SeasonPlayers);
     game2CombinedPlayers.addAll(game2NonSeasonPlayers);
 
-    Mockito.when(configRepository.get()).thenReturn(TestConstants.getTocConfig());
+//    Mockito.when(configRepository.get()).thenReturn(TestConstants.getTocConfig());
 
     Game currentGame = Game.builder()
       .build();

@@ -3,21 +3,22 @@ package com.texastoc.module.season;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.texastoc.module.season.exception.DuplicateSeasonException;
-import com.texastoc.module.game.exception.GameInProgressException;
 import com.texastoc.exception.NotFoundException;
-import com.texastoc.module.season.exception.SeasonInProgressException;
+import com.texastoc.module.game.exception.GameInProgressException;
+import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.repository.GamePayoutRepository;
 import com.texastoc.module.game.repository.GamePlayerRepository;
 import com.texastoc.module.game.repository.GameRepository;
-import com.texastoc.module.settings.model.TocConfig;
-import com.texastoc.module.game.model.Game;
+import com.texastoc.module.season.exception.DuplicateSeasonException;
+import com.texastoc.module.season.exception.SeasonInProgressException;
 import com.texastoc.module.season.model.HistoricalSeason;
 import com.texastoc.module.season.model.Quarter;
 import com.texastoc.module.season.model.QuarterlySeason;
 import com.texastoc.module.season.model.Season;
 import com.texastoc.module.season.repository.*;
-import com.texastoc.module.settings.repository.ConfigRepository;
+import com.texastoc.module.settings.SettingsModuleFactory;
+import com.texastoc.module.settings.model.Settings;
+import com.texastoc.module.settings.model.TocConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -51,7 +52,6 @@ public class SeasonService {
   private final GamePlayerRepository gamePlayerRepository;
   private final GamePayoutRepository gamePayoutRepository;
   private final SeasonPlayerRepository seasonPlayerRepository;
-  private final ConfigRepository configRepository;
   private final SeasonPayoutRepository seasonPayoutRepository;
   private final SeasonHistoryRepository seasonHistoryRepository;
   private final QuarterlySeasonPlayerRepository qSeasonPlayerRepository;
@@ -60,11 +60,10 @@ public class SeasonService {
   private String pastSeasonsAsJson = null;
 
   @Autowired
-  public SeasonService(SeasonRepository seasonRepository, QuarterlySeasonRepository qSeasonRepository, GameRepository gameRepository, ConfigRepository configRepository, GamePlayerRepository gamePlayerRepository, GamePayoutRepository gamePayoutRepository, SeasonPlayerRepository seasonPlayerRepository, SeasonPayoutRepository seasonPayoutRepository, SeasonHistoryRepository seasonHistoryRepository, QuarterlySeasonPlayerRepository qSeasonPlayerRepository, QuarterlySeasonPayoutRepository qSeasonPayoutRepository) {
+  public SeasonService(SeasonRepository seasonRepository, QuarterlySeasonRepository qSeasonRepository, GameRepository gameRepository, GamePlayerRepository gamePlayerRepository, GamePayoutRepository gamePayoutRepository, SeasonPlayerRepository seasonPlayerRepository, SeasonPayoutRepository seasonPayoutRepository, SeasonHistoryRepository seasonHistoryRepository, QuarterlySeasonPlayerRepository qSeasonPlayerRepository, QuarterlySeasonPayoutRepository qSeasonPayoutRepository) {
     this.seasonRepository = seasonRepository;
     this.qSeasonRepository = qSeasonRepository;
     this.gameRepository = gameRepository;
-    this.configRepository = configRepository;
     this.gamePlayerRepository = gamePlayerRepository;
     this.gamePayoutRepository = gamePayoutRepository;
     this.seasonPlayerRepository = seasonPlayerRepository;
@@ -100,7 +99,14 @@ public class SeasonService {
     // The end will be the day before the start date next year
     LocalDate end = start.plusYears(1).minusDays(1);
 
-    TocConfig tocConfig = configRepository.get();
+    TocConfig tocConfig = null;
+    Settings settings = SettingsModuleFactory.getSettingsModule().get();
+    for (TocConfig tc : settings.getTocConfigs()) {
+      if (tc.getStartYear() == startYear) {
+        tocConfig = tc;
+        break;
+      }
+    }
 
     // Count the number of Thursdays between the start and end inclusive
     int numThursdays = 0;

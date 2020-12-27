@@ -1,22 +1,24 @@
 package com.texastoc.module.settings.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 
 import java.util.List;
 
-@Data
+@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Settings {
-  private List<Version> uiVersions;
 
-  @Data
-  @NoArgsConstructor
-  public static class Version {
-    private String env;
-    private String version;
-  }
-
+  @Id
+  private int id;
+  @MappedCollection
+  private List<TocConfig> tocConfigs;
+  @MappedCollection
+  private List<Version> versions;
+  @MappedCollection
+  private List<Payout> payouts;
 }

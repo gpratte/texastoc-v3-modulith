@@ -14,10 +14,20 @@ public class ArchitectureTest {
   @Test
   public void playerModuleInterfaceAndModel() {
     JavaClasses importedClasses = new ClassFileImporter().importPackages("com.texastoc.module");
-
-    noClasses().that().resideInAnyPackage("..game..", "..notification..", "..season..", "..supply..")
+    noClasses().that().resideInAnyPackage("..game..", "..notification..", "..season..", "..settings..")
       .should().dependOnClassesThat().resideInAnyPackage("..player.exception..", "..player.repository..", "..player.service..")
       .check(importedClasses);
   }
 
+  /**
+   * Make sure the non-settings modules (player, game, notification and season) do not
+   * access any classes in the settings.repository and settings.service packages.
+   */
+  @Test
+  public void settingsModuleInterfaceAndModel() {
+    JavaClasses importedClasses = new ClassFileImporter().importPackages("com.texastoc.module");
+    noClasses().that().resideInAnyPackage("..player..", "..game..", "..notification..", "..season..")
+      .should().dependOnClassesThat().resideInAnyPackage("..settings.repository..", "..settings.service..")
+      .check(importedClasses);
+  }
 }
