@@ -59,14 +59,7 @@ public class PayoutCalculator {
       return gamePayouts;
     }
 
-    List<Payout> payouts = new ArrayList<>(numToPay);
-    // TODO settings payouts should change to a set and each set has a list
-    List<Payout> settingsPayouts = SettingsModuleFactory.getSettingsModule().get().getPayouts();
-    for (Payout payout : settingsPayouts) {
-      if (payout.getNumPayouts() == numToPay) {
-        payouts.add(payout);
-      }
-    }
+    List<Payout> payouts = SettingsModuleFactory.getSettingsModule().get().getPayouts().get(numToPay);
 
     int prizePot = game.getPrizePotCalculated();
     int totalPayout = 0;

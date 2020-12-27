@@ -99,14 +99,8 @@ public class SeasonService {
     // The end will be the day before the start date next year
     LocalDate end = start.plusYears(1).minusDays(1);
 
-    TocConfig tocConfig = null;
     Settings settings = SettingsModuleFactory.getSettingsModule().get();
-    for (TocConfig tc : settings.getTocConfigs()) {
-      if (tc.getStartYear() == startYear) {
-        tocConfig = tc;
-        break;
-      }
-    }
+    TocConfig tocConfig = settings.getTocConfigs().get(startYear);
 
     // Count the number of Thursdays between the start and end inclusive
     int numThursdays = 0;

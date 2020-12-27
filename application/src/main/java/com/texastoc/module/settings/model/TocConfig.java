@@ -11,7 +11,6 @@ import org.springframework.data.annotation.Id;
 public class TocConfig {
   @Id
   private int id;
-  private int startYear;
   private int kittyDebit;
   private int annualTocCost;
   private int quarterlyTocCost;

@@ -11,6 +11,5 @@ import org.springframework.data.annotation.Id;
 public class Version {
   @Id
   private int id;
-  private String env;
   private String version;
 }

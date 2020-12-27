@@ -92,12 +92,7 @@ public class GameCalculator {
     if (tocConfig == null) {
       Season season = seasonService.getSeason(seasonId);
       Settings settings = SettingsModuleFactory.getSettingsModule().get();
-      for (TocConfig tc : settings.getTocConfigs()) {
-        if (tc.getStartYear() == season.getStart().getYear()) {
-          tocConfig = tc;
-          break;
-        }
-      }
+      tocConfig = settings.getTocConfigs().get(season.getStart().getYear());
     }
     return tocConfig;
   }

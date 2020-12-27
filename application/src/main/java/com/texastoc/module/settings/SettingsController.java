@@ -1,6 +1,6 @@
 package com.texastoc.module.settings;
 
-import com.texastoc.module.settings.model.Settings;
+import com.texastoc.module.settings.model.SystemSettings;
 import com.texastoc.module.settings.service.SettingsService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,7 +16,7 @@ public class SettingsController implements SettingsModule {
 
   @Override
   @GetMapping("/api/v2/settings")
-  public Settings get() {
+  public SystemSettings get() {
     return settingsService.get();
   }
 

@@ -4,7 +4,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 
-import java.util.List;
+import java.util.Map;
 
 @Builder
 @Getter
@@ -15,10 +15,8 @@ public class Settings {
 
   @Id
   private int id;
+  @MappedCollection(idColumn = "ID")
+  Version version;
   @MappedCollection
-  private List<TocConfig> tocConfigs;
-  @MappedCollection
-  private List<Version> versions;
-  @MappedCollection
-  private List<Payout> payouts;
+  private Map<Integer, TocConfig> tocConfigs;
 }
