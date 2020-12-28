@@ -1,10 +1,13 @@
 package com.texastoc.module.game.calculator;
 
-import com.texastoc.module.settings.model.TocConfig;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
-import com.texastoc.module.settings.repository.ConfigRepository;
 import com.texastoc.module.game.repository.GameRepository;
+import com.texastoc.module.season.SeasonService;
+import com.texastoc.module.season.model.Season;
+import com.texastoc.module.settings.SettingsModuleFactory;
+import com.texastoc.module.settings.model.Settings;
+import com.texastoc.module.settings.model.TocConfig;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -14,12 +17,12 @@ import java.util.List;
 public class GameCalculator {
 
   private final GameRepository gameRepository;
-  private final ConfigRepository configRepository;
+  private final SeasonService seasonService;
   private TocConfig tocConfig;
 
-  public GameCalculator(GameRepository gameRepository, ConfigRepository configRepository) {
+  public GameCalculator(GameRepository gameRepository, SeasonService seasonService) {
     this.gameRepository = gameRepository;
-    this.configRepository = configRepository;
+    this.seasonService = seasonService;
   }
 
   // TODO
@@ -50,12 +53,12 @@ public class GameCalculator {
       boolean isAnnualToc = gamePlayer.getAnnualTocCollected() != null && gamePlayer.getAnnualTocCollected() > 0;
       boolean isRebuyAddOn = gamePlayer.getRebuyAddOnCollected() != null && gamePlayer.getRebuyAddOnCollected() > 0;
       if (isAnnualToc && isRebuyAddOn) {
-        annualTocFromRebuyAddOnCalculated += getTocConfig().getRegularRebuyTocDebit();
+        annualTocFromRebuyAddOnCalculated += getTocConfig(game.getSeasonId()).getRegularRebuyTocDebit();
       }
     }
 
     if (buyInCollected > 0) {
-      kittyCalculated = getTocConfig().getKittyDebit();
+      kittyCalculated = getTocConfig(game.getSeasonId()).getKittyDebit();
     }
 
     game.setNumPlayers(numPlayers);
@@ -85,9 +88,11 @@ public class GameCalculator {
   }
 
   // Cache it
-  private TocConfig getTocConfig() {
+  private TocConfig getTocConfig(int seasonId) {
     if (tocConfig == null) {
-      tocConfig = configRepository.get();
+      Season season = seasonService.getSeason(seasonId);
+      Settings settings = SettingsModuleFactory.getSettingsModule().get();
+      tocConfig = settings.getTocConfigs().get(season.getStart().getYear());
     }
     return tocConfig;
   }

@@ -12,6 +12,6 @@ public class Role {
   public enum Type {ADMIN, USER}
 
   @Id
-  private long id;
+  private int id;
   private Type type;
 }

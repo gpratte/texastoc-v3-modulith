@@ -57,7 +57,6 @@ public class PlayerRestController implements PlayerModule {
   }
 
   @Override
-  // TODO need to check for admin role in service method
   @DeleteMapping("/api/v2/players/{id}")
   public void delete(@PathVariable("id") int id) {
     playerService.delete(id);
@@ -90,17 +89,17 @@ public class PlayerRestController implements PlayerModule {
 
   @Override
   public void updatePassword(int id, String newPassword) {
-    // TODO
+    playerService.updatePassword(id, newPassword);
   }
 
   @Override
   public void addRole(int id, Role role) {
-    // TODO
+    playerService.addRole(id, role);
   }
 
   @Override
   public void removeRole(int id, int roleId) {
-    // TODO
+    playerService.removeRole(id, roleId);
   }
 
   @Data

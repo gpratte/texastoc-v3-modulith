@@ -2,7 +2,6 @@ package com.texastoc.module.player.service;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.texastoc.TestConstants;
 import com.texastoc.common.AuthorizationHelper;
 import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.notification.connector.EmailConnector;
@@ -32,10 +31,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.*;
 
-public class PlayerServiceTest implements TestConstants {
+public class PlayerServiceTest {
 
   private PlayerService playerService;
-
   private PlayerRepository playerRepository;
   private BCryptPasswordEncoder bCryptPasswordEncoder;
   private EmailConnector emailConnector;

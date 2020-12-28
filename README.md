@@ -162,5 +162,8 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 15-remove-supply-module
-Removed the supply module since it is not being used.
+## Current Branch: 16-settings-module
+Refactored the settings module to 
+* Spring Data JDBC
+* Expose a SettingsModule interface
+* Unit tests

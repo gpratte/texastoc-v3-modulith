@@ -38,7 +38,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
       .headers().frameOptions().sameOrigin().and()
       .authorizeRequests()
       .antMatchers(HttpMethod.POST, "/login").permitAll()
-      .antMatchers(HttpMethod.GET, "/api/v2/versions").permitAll()
+      .antMatchers(HttpMethod.GET, "/api/v2/settings").permitAll()
       .antMatchers(HttpMethod.POST, "/password/reset").permitAll()
       .antMatchers("/socket").permitAll()
       .antMatchers("/socket/**").permitAll()

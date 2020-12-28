@@ -26,8 +26,8 @@ import com.texastoc.module.season.calculator.SeasonCalculator;
 import com.texastoc.module.season.model.QuarterlySeason;
 import com.texastoc.module.season.model.Season;
 import com.texastoc.module.season.repository.QuarterlySeasonRepository;
+import com.texastoc.module.settings.SettingsModule;
 import com.texastoc.module.settings.model.TocConfig;
-import com.texastoc.module.settings.repository.ConfigRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.Template;
@@ -61,7 +61,6 @@ public class GameService {
   private final GameCalculator gameCalculator;
   private final PayoutCalculator payoutCalculator;
   private final PointsCalculator pointsCalculator;
-  private final ConfigRepository configRepository;
   private final SeasonCalculator seasonCalculator;
   private final QuarterlySeasonCalculator qSeasonCalculator;
 
@@ -72,8 +71,9 @@ public class GameService {
   private TocConfig tocConfig;
   private ExecutorService executorService;
   private PlayerModule playerModule;
+  private SettingsModule settingsModule;
 
-  public GameService(GameRepository gameRepository, GamePlayerRepository gamePlayerRepository, GamePayoutRepository gamePayoutRepository, QuarterlySeasonRepository qSeasonRepository, SeasonService seasonService, GameCalculator gameCalculator, PayoutCalculator payoutCalculator, PointsCalculator pointsCalculator, ConfigRepository configRepository, SeasonCalculator seasonCalculator, QuarterlySeasonCalculator qSeasonCalculator, SeatingRepository seatingRepository, SMSConnector smsConnector, EmailConnector emailConnector, WebSocketConnector webSocketConnector) {
+  public GameService(GameRepository gameRepository, GamePlayerRepository gamePlayerRepository, GamePayoutRepository gamePayoutRepository, QuarterlySeasonRepository qSeasonRepository, SeasonService seasonService, GameCalculator gameCalculator, PayoutCalculator payoutCalculator, PointsCalculator pointsCalculator, SeasonCalculator seasonCalculator, QuarterlySeasonCalculator qSeasonCalculator, SeatingRepository seatingRepository, SMSConnector smsConnector, EmailConnector emailConnector, WebSocketConnector webSocketConnector) {
     this.gameRepository = gameRepository;
     this.gamePlayerRepository = gamePlayerRepository;
     this.gamePayoutRepository = gamePayoutRepository;
@@ -82,7 +82,6 @@ public class GameService {
     this.gameCalculator = gameCalculator;
     this.payoutCalculator = payoutCalculator;
     this.pointsCalculator = pointsCalculator;
-    this.configRepository = configRepository;
     this.seasonCalculator = seasonCalculator;
     this.qSeasonCalculator = qSeasonCalculator;
     this.seatingRepository = seatingRepository;
@@ -504,12 +503,12 @@ public class GameService {
   }
 
   // Cache it
-  private TocConfig getTocConfig() {
-    if (tocConfig == null) {
-      tocConfig = configRepository.get();
-    }
-    return tocConfig;
-  }
+//  private TocConfig getTocConfig() {
+//    if (tocConfig == null) {
+//      tocConfig = configRepository.get();
+//    }
+//    return tocConfig;
+//  }
 
   private void checkFinalized(int id) {
     checkFinalized(gameRepository.getById(id));

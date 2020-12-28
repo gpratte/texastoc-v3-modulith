@@ -1,16 +1,3 @@
-CREATE TABLE tocconfig
-(
-    kittyDebit           int NOT NULL,
-    annualTocCost        int NOT NULL,
-    quarterlyTocCost     int NOT NULL,
-    quarterlyNumPayouts  int NOT NULL,
-    regularBuyInCost     int NOT NULL,
-    regularRebuyCost     int NOT NULL,
-    regularRebuyTocDebit int NOT NULL
-);
-INSERT INTO tocconfig
-VALUES (10, 20, 20, 3, 40, 40, 20);
-
 CREATE TABLE season
 (
     id                                int NOT NULL AUTO_INCREMENT,
@@ -111,7 +98,7 @@ CREATE TABLE role
     PRIMARY KEY (id)
 );
 alter table role
-    add constraint fk_role_id foreign key (player) references player (id);
+    add constraint fk_role_player foreign key (player) references player (id);
 
 INSERT INTO role
 VALUES (1, 'ADMIN', 1),
@@ -241,7 +228,6 @@ VALUES (2, 2,
                           {"place" : 5,"amount" : 0,"percent" : 30}]}]');
 
 
-DROP TABLE IF EXISTS seating;
 CREATE TABLE seating
 (
     gameId   int           NOT NULL,
@@ -249,90 +235,42 @@ CREATE TABLE seating
     PRIMARY KEY (gameId)
 );
 
-DROP TABLE IF EXISTS settings;
+CREATE TABLE version
+(
+    id      int NOT NULL AUTO_INCREMENT,
+    version varchar(8) NOT NULL,
+    PRIMARY KEY (id)
+);
+INSERT INTO version VALUES (1, '2.21');
+
 CREATE TABLE settings
 (
-    id       int NOT NULL AUTO_INCREMENT,
-    settings varchar(1024) DEFAULT NULL,
+    id      int NOT NULL AUTO_INCREMENT,
+    version int,
     PRIMARY KEY (id)
 );
-INSERT INTO settings
-VALUES (1,
-        '{"uiVersions": [{"env": "local", "version": "2.21"}, {"env": "heroku", "version": "2.21"}]}');
+alter table settings
+    add constraint fk_settings_version foreign key (version) references version (id);
+INSERT INTO settings VALUES (1, 1);
 
-DROP TABLE IF EXISTS supply;
-CREATE TABLE supply
+CREATE TABLE toc_config
 (
-    id          int         NOT NULL AUTO_INCREMENT,
-    amount      int         NOT NULL,
-    date        date        NOT NULL,
-    type        varchar(16) NOT NULL,
-    description varchar(64) DEFAULT NULL,
+    id                      int NOT NULL AUTO_INCREMENT,
+    settings_key            int NOT NULL,
+    kitty_debit             int NOT NULL,
+    annual_toc_cost         int NOT NULL,
+    quarterly_toc_cost      int NOT NULL,
+    quarterly_num_payouts   int NOT NULL,
+    regular_buy_in_cost     int NOT NULL,
+    regular_rebuy_cost      int NOT NULL,
+    regular_rebuy_toc_debit int NOT NULL,
+    settings                int NOT NULL,
     PRIMARY KEY (id)
 );
-
-CREATE TABLE payout
-(
-    numPayouts int NOT NULL,
-    place      int NOT NULL,
-    percent    double DEFAULT NULL,
-    PRIMARY KEY (numPayouts, place)
-);
-INSERT INTO payout
-VALUES (2, 1, 0.65),
-       (2, 2, 0.35),
-       (3, 1, 0.5),
-       (3, 2, 0.3),
-       (3, 3, 0.2),
-       (4, 1, 0.45),
-       (4, 2, 0.25),
-       (4, 3, 0.18),
-       (4, 4, 0.12),
-       (5, 1, 0.4),
-       (5, 2, 0.23),
-       (5, 3, 0.16),
-       (5, 4, 0.12),
-       (5, 5, 0.09),
-       (6, 1, 0.38),
-       (6, 2, 0.22),
-       (6, 3, 0.15),
-       (6, 4, 0.11),
-       (6, 5, 0.08),
-       (6, 6, 0.06),
-       (7, 1, 0.35),
-       (7, 2, 0.21),
-       (7, 3, 0.15),
-       (7, 4, 0.11),
-       (7, 5, 0.08),
-       (7, 6, 0.06),
-       (7, 7, 0.04),
-       (8, 1, 0.335),
-       (8, 2, 0.2),
-       (8, 3, 0.145),
-       (8, 4, 0.11),
-       (8, 5, 0.08),
-       (8, 6, 0.06),
-       (8, 7, 0.04),
-       (8, 8, 0.03),
-       (9, 1, 0.32),
-       (9, 2, 0.195),
-       (9, 3, 0.14),
-       (9, 4, 0.11),
-       (9, 5, 0.08),
-       (9, 6, 0.06),
-       (9, 7, 0.04),
-       (9, 8, 0.03),
-       (9, 9, 0.025),
-       (10, 1, 0.3),
-       (10, 2, 0.19),
-       (10, 3, 0.1325),
-       (10, 4, 0.105),
-       (10, 5, 0.075),
-       (10, 6, 0.055),
-       (10, 7, 0.0375),
-       (10, 8, 0.03),
-       (10, 9, 0.0225),
-       (10, 10, 0.015);
+alter table toc_config
+    add constraint fk_toc_config_settings foreign key (settings) references settings (id);
+INSERT INTO toc_config VALUES (1, 2020, 10, 20, 20, 3, 40, 40, 20, 1);
+INSERT INTO toc_config VALUES (2, 2021, 10, 20, 20, 3, 40, 40, 20, 1);
 
 CREATE TABLE historicalseasonplayer
 (
