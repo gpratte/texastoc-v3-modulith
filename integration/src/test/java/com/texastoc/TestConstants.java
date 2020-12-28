@@ -1,7 +1,7 @@
 package com.texastoc;
 
-import com.texastoc.model.common.Payout;
-import com.texastoc.model.config.TocConfig;
+import com.texastoc.module.settings.model.Payout;
+import com.texastoc.module.settings.model.TocConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public interface TestConstants {
 
   String ADMIN_EMAIL = "gilpratte@texastoc.com";
   String ADMIN_PASSWORD = "password";
-  String USER_EMAIL = "brianbaker@texastoc.com";
+  String USER_EMAIL = "guest@texastoc.com";
   String USER_PASSWORD = "password";
 
   static TocConfig getTocConfig() {

@@ -8,38 +8,64 @@
     <version>1.0</version>
     <packaging>pom</packaging>
 
-    <name>texastoc v2 integration</name>
+    <name>texastoc v3 integration</name>
     <description>Texas Tournament Of Champions</description>
 
     <parent>
         <groupId>com.texastoc</groupId>
-        <artifactId>texastoc-v2</artifactId>
+        <artifactId>texastoc-v3</artifactId>
         <version>1.0</version>
     </parent>
+
+    <properties>
+        <cucumber.version>6.9.1</cucumber.version>
+    </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.texastoc</groupId>
-            <artifactId>texastoc-v2-application</artifactId>
+            <artifactId>texastoc-v3-application</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
-            <version>2.3.1</version>
+            <version>${cucumber.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-junit</artifactId>
-            <version>2.3.1</version>
+            <version>${cucumber.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-spring</artifactId>
-            <version>2.3.1</version>
+            <version>${cucumber.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.18.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.16</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

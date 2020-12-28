@@ -47,7 +47,7 @@ public class PlayerService implements PlayerModule {
       .lastName(player.getLastName())
       .email(player.getEmail())
       .phone(player.getPhone())
-      .password(player.getPassword() == null ? null : bCryptPasswordEncoder.encode(player.getPassword()))
+      .password(null)
       .roles(ImmutableSet.of(Role.builder()
         .type(Role.Type.USER)
         .build()))
@@ -68,16 +68,6 @@ public class PlayerService implements PlayerModule {
     player.setRoles((existingPlayer.getRoles()));
     playerRepository.save(player);
   }
-
-  @Override
-  @Transactional
-  public void updatePassword(int id, String newPassword) {
-    Player existingPlayer = playerRepository.findById(id).get();
-    verifyLoggedInUserIsAdminOrSelf(existingPlayer);
-    existingPlayer.setPassword(bCryptPasswordEncoder.encode(newPassword));
-    playerRepository.save(existingPlayer);
-  }
-
 
   @Override
   @Transactional(readOnly = true)

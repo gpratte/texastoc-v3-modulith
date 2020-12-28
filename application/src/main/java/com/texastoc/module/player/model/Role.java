@@ -7,6 +7,8 @@ import org.springframework.data.annotation.Id;
 @Getter
 @Setter
 @EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
 public class Role {
 
   public enum Type {ADMIN, USER}

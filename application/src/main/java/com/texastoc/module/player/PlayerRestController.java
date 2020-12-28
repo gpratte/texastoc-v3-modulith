@@ -88,11 +88,6 @@ public class PlayerRestController implements PlayerModule {
   }
 
   @Override
-  public void updatePassword(int id, String newPassword) {
-    playerService.updatePassword(id, newPassword);
-  }
-
-  @Override
   public void addRole(int id, Role role) {
     playerService.addRole(id, role);
   }
