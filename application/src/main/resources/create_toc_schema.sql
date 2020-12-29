@@ -271,7 +271,7 @@ CREATE TABLE toc_config
 alter table toc_config
     add constraint fk_toc_config_settings foreign key (settings) references settings (id);
 INSERT INTO toc_config VALUES (1, 2020, 10, 20, 20, 3, 40, 40, 20, 1);
-INSERT INTO toc_config VALUES (2, 2021, 10, 20, 20, 3, 40, 40, 20, 1);
+INSERT INTO toc_config VALUES (2, 2021, 0, 20, 20, 3, 40, 40, 20, 1);
 
 CREATE TABLE historicalseasonplayer
 (

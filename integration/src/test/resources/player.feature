@@ -38,7 +38,7 @@ Feature: Player features
     Then a forbidden error happens
 
   Scenario: Add role as admin
-    An admin add a role
+    An admin adds a role
     Given a new player
     When the admin adds a role
     And the player is retrieved
