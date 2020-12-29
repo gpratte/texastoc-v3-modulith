@@ -10,9 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -32,8 +34,6 @@ public class PlayerStepdefs extends SpringBootBaseIntegrationTest {
   List<Player> playersRetrieved;
   Exception exception;
 
-  // UUID?? for random emails
-
   @Before
   public void before() {
     playerToCreate = null;
@@ -51,7 +51,7 @@ public class PlayerStepdefs extends SpringBootBaseIntegrationTest {
     playerToCreate = Player.builder()
       .firstName("John")
       .lastName("Luther")
-      .email("jl@bbc.com")
+      .email(UUID.randomUUID() + "@bbc.com")
       // 2732833 = created on the phone keyboard
       .phone("2732833")
       .password("password")
@@ -66,18 +66,6 @@ public class PlayerStepdefs extends SpringBootBaseIntegrationTest {
       .lastName("Rain")
       .build();
     anotherPlayerCreated = createPlayer(anotherPlayerToCreate, login(ADMIN_EMAIL, ADMIN_PASSWORD));
-  }
-
-  @Given("^a new player with email and password$")
-  public void a_new_player_with_email_and_password() throws Exception {
-    playerToCreate = Player.builder()
-      .firstName("John")
-      .lastName("Luther")
-      .email("john.luther@example.com")
-      .password("jacket")
-      .build();
-
-    playerCreated = createPlayer(playerToCreate, login(ADMIN_EMAIL, ADMIN_PASSWORD));
   }
 
   @When("^the player is updated$")
@@ -119,10 +107,16 @@ public class PlayerStepdefs extends SpringBootBaseIntegrationTest {
   @When("^the player is deleted$")
   public void playerDeleted() throws Exception {
     String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
+    deletePlayer(playerCreated.getId(), token);
+  }
+
+  @When("^the player is deleted by another player$")
+  public void playerDeletedByAnother() throws Exception {
+    String token = login(USER_EMAIL, USER_PASSWORD);
     try {
       deletePlayer(playerCreated.getId(), token);
     } catch (Exception e) {
-      System.out.println(e);
+      exception = e;
     }
   }
 
@@ -131,6 +125,52 @@ public class PlayerStepdefs extends SpringBootBaseIntegrationTest {
     String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
     try {
       playerRetrieved = getPlayer(playerCreated.getId(), token);
+    } catch (Exception e) {
+      exception = e;
+    }
+  }
+
+  @When("^a role is added$")
+  public void addRole() throws Exception {
+    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
+    addRole(playerCreated.getId(), Role.builder()
+      .type(Role.Type.ADMIN)
+      .build(),
+      token);
+  }
+
+  @When("^a role is added by another player$")
+  public void addRoleByAnother() throws Exception {
+    String token = login(USER_EMAIL, USER_PASSWORD);
+    try {
+      addRole(playerCreated.getId(), Role.builder()
+          .type(Role.Type.ADMIN)
+          .build(),
+        token);
+    } catch (Exception e) {
+      exception = e;
+    }
+  }
+
+  @When("^a role is removed$")
+  public void removeRole() throws Exception {
+    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
+    Role role = StreamSupport.stream(playerRetrieved.getRoles().spliterator(), false)
+      .filter(r -> r.getType() == Role.Type.ADMIN)
+      .findFirst().get();
+
+    removeRole(playerCreated.getId(), role.getId(), token);
+  }
+
+  @When("^a role is removed by another player$")
+  public void removeRoleByAnother() throws Exception {
+    Role role = StreamSupport.stream(playerRetrieved.getRoles().spliterator(), false)
+      .filter(r -> r.getType() == Role.Type.ADMIN)
+      .findFirst().get();
+
+    try {
+      String token = login(USER_EMAIL, USER_PASSWORD);
+      removeRole(playerCreated.getId(), role.getId(), token);
     } catch (Exception e) {
       exception = e;
     }
@@ -152,6 +192,22 @@ public class PlayerStepdefs extends SpringBootBaseIntegrationTest {
     playerMatches(updatePlayer, playerRetrieved);
   }
 
+  @Then("^the player has one role$")
+  public void playerHasOneRole() throws Exception {
+    List<Role> roles = StreamSupport.stream(playerRetrieved.getRoles().spliterator(), false).collect(Collectors.toList());
+    assertEquals("should only have one role", 1, roles.size());
+    assertEquals("should be USER role", Role.Type.USER, roles.get(0).getType());
+  }
+
+  @Then("^the player has two roles$")
+  public void playerHasTwoRoles() throws Exception {
+    List<Role> roles = StreamSupport.stream(playerRetrieved.getRoles().spliterator(), false).collect(Collectors.toList());
+    assertEquals("should only have two roles", 2, roles.size());
+    List<Role.Type> types = roles.stream().map(Role::getType).collect(Collectors.toList());
+    assertThat(types).containsExactlyInAnyOrder(Role.Type.USER, Role.Type.ADMIN);
+  }
+
+
   @Then("^a forbidden error happens$")
   public void checkForbidden() throws Exception {
     assertTrue("exception should be HttpClientErrorException", (exception instanceof HttpClientErrorException));
@@ -163,7 +219,7 @@ public class PlayerStepdefs extends SpringBootBaseIntegrationTest {
   public void checkNotFound() throws Exception {
     assertTrue("exception should be HttpClientErrorException", (exception instanceof HttpClientErrorException));
     HttpClientErrorException e = (HttpClientErrorException)exception;
-    assertEquals("status should be forbidden", HttpStatus.FORBIDDEN, e.getStatusCode());
+    assertEquals("status should be not found", HttpStatus.NOT_FOUND, e.getStatusCode());
   }
 
   private void playerMatches(Player request, Player response) throws Exception {

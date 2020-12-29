@@ -5,11 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.texastoc.TestConstants;
 import com.texastoc.module.player.model.Player;
+import com.texastoc.module.player.model.Role;
 import io.cucumber.spring.CucumberContextConfiguration;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -23,14 +22,12 @@ import java.time.Month;
 import java.util.List;
 
 @CucumberContextConfiguration
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class SpringBootBaseIntegrationTest implements TestConstants {
 
   private final String SERVER_URL = "http://localhost";
   private String V2_ENDPOINT;
 
-  @LocalServerPort
-  private int port;
+  private final int port = 8080;
 
   protected RestTemplate restTemplate;
 
@@ -210,13 +207,46 @@ public abstract class SpringBootBaseIntegrationTest implements TestConstants {
     restTemplate.put(endpoint() + "/players/" + player.getId(), entity);
   }
 
-  protected void deletePlayer(int playerId, String token) throws JsonProcessingException {
+  protected void deletePlayer(int playerId, String token) {
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
-    restTemplate.delete(endpoint() + "/players/" + playerId);
+    HttpEntity<String> entity = new HttpEntity<>("", headers);
+
+    restTemplate.exchange(endpoint() + "/players/" + playerId,
+      HttpMethod.DELETE,
+      entity,
+      Void.class);
   }
 
-  protected Player getPlayer(int id, String token) throws JsonProcessingException {
+  protected void addRole(int playerId, Role role, String token) throws JsonProcessingException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.set("Authorization", "Bearer " + token);
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
+    String addRoleRequestAsJson = mapper.writeValueAsString(role);
+    HttpEntity<String> entity = new HttpEntity<>(addRoleRequestAsJson, headers);
+
+    restTemplate.exchange(endpoint() + "/players/" + playerId + "/roles",
+      HttpMethod.POST,
+      entity,
+      Void.class);
+  }
+
+  protected void removeRole(int playerId, int roleId, String token) {
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + token);
+    HttpEntity<String> entity = new HttpEntity<>("", headers);
+
+    restTemplate.exchange(endpoint() + "/players/" + playerId + "/roles/" + roleId,
+      HttpMethod.DELETE,
+      entity,
+      Void.class);
+  }
+
+
+  protected Player getPlayer(int id, String token) {
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
     HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -229,7 +259,7 @@ public abstract class SpringBootBaseIntegrationTest implements TestConstants {
     return response.getBody();
   }
 
-  protected List<Player> getPlayers(String token) throws JsonProcessingException {
+  protected List<Player> getPlayers(String token) {
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
     HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -238,8 +268,7 @@ public abstract class SpringBootBaseIntegrationTest implements TestConstants {
       endpoint() + "/players",
       HttpMethod.GET,
       entity,
-      new ParameterizedTypeReference<List<Player>>() {
-      });
+      new ParameterizedTypeReference<List<Player>>() {});
     return response.getBody();
   }
 
