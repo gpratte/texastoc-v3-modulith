@@ -162,8 +162,10 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 16-settings-module
-Refactored the settings module to 
-* Spring Data JDBC
-* Expose a SettingsModule interface
-* Unit tests
+## Current Branch: 17-player-integration-tests
+Resurrected and enhanced the cucumber integration tests for the player module
+
+Removed the following annotation
+<pre>@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)</pre>
+
+because that annotation was starting the Spring Boot application everytime a test was run (which was slowing things down quite a bit). Instead I start the server from as a separate process and kept the server running. 
