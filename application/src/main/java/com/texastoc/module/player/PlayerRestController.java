@@ -82,24 +82,21 @@ public class PlayerRestController implements PlayerModule {
     playerService.resetPassword(code, password);
   }
 
-  @ExceptionHandler(value = {CannotDeletePlayerException.class})
-  protected void handleCannotDeletePlayerException(CannotDeletePlayerException ex, HttpServletResponse response) throws IOException {
-    response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
-  }
-
   @Override
-  public void updatePassword(int id, String newPassword) {
-    playerService.updatePassword(id, newPassword);
-  }
-
-  @Override
-  public void addRole(int id, Role role) {
+  @PostMapping("/api/v2/players/{id}/roles")
+  public void addRole(@PathVariable("id") int id, @RequestBody @Valid Role role) {
     playerService.addRole(id, role);
   }
 
   @Override
-  public void removeRole(int id, int roleId) {
+  @DeleteMapping("/api/v2/players/{id}/roles/{roleId}")
+  public void removeRole(@PathVariable("id") int id, @PathVariable("roleId") int roleId) {
     playerService.removeRole(id, roleId);
+  }
+
+  @ExceptionHandler(value = {CannotDeletePlayerException.class})
+  protected void handleCannotDeletePlayerException(CannotDeletePlayerException ex, HttpServletResponse response) throws IOException {
+    response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
   }
 
   @Data

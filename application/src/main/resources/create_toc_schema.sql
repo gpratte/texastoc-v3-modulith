@@ -81,6 +81,7 @@ CREATE TABLE player
     password  varchar(255) DEFAULT NULL,
     PRIMARY KEY (id)
 );
+ALTER TABLE player ADD UNIQUE (email);
 # password is password
 INSERT INTO player
 VALUES (1, 'Gil', 'Pratte', '5121231235', 'gilpratte@texastoc.com',

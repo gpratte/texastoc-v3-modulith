@@ -12,7 +12,7 @@
 
     <modules>
         <module>application</module>
-        <!--		<module>integration</module>-->
+        <module>integration</module>
     </modules>
 
     <parent>

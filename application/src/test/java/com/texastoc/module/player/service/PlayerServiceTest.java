@@ -197,50 +197,6 @@ public class PlayerServiceTest {
   }
 
   @Test
-  public void testUpdateSelfPassword() {
-    // Arrange
-    Role existingRole = Role.builder()
-      .id(1)
-      .type(Role.Type.USER)
-      .build();
-    Player existingPlayer = Player.builder()
-      .id(1)
-      .firstName("existingFirstName")
-      .lastName("existingLastName")
-      .email("existing@xyz.com")
-      .phone("existingPhone")
-      .password("existingEncodedPassword")
-      .roles(ImmutableSet.of(existingRole))
-      .build();
-    when(playerRepository.findById(ArgumentMatchers.eq(1))).thenReturn(java.util.Optional.ofNullable(existingPlayer));
-
-    // mock out to pass the authorization check
-    when(authorizationHelper.getLoggedInUserEmail()).thenReturn("existing@xyz.com");
-    when(playerRepository.findByEmail("existing@xyz.com")).thenReturn(ImmutableList.of(existingPlayer));
-
-    // Act
-    playerService.updatePassword(1, "newPassword");
-
-    // Assert
-    Mockito.verify(playerRepository, Mockito.times(1)).findById(1);
-    Mockito.verify(bCryptPasswordEncoder, Mockito.times(1)).encode(any());
-    Mockito.verify(playerRepository, Mockito.times(1)).save(any(Player.class));
-
-    ArgumentCaptor<Player> argument = ArgumentCaptor.forClass(Player.class);
-    verify(playerRepository).save(argument.capture());
-    Player param = argument.getValue();
-    assertEquals("existingFirstName", param.getFirstName());
-    assertEquals("existingLastName", param.getLastName());
-    assertEquals("existingPhone", param.getPhone());
-    assertEquals("existing@xyz.com", param.getEmail());
-
-    // password should have change
-    Assert.assertNotEquals("existingEncodedPassword", param.getPassword());
-    // roles should not change
-    assertThat(param.getRoles()).containsExactly(existingRole);
-  }
-
-  @Test
   public void testGetAll() {
     // Arrange
     Player player2 = Player.builder()
