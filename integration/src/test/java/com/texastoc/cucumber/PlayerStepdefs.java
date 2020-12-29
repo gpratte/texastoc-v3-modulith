@@ -1,5 +1,6 @@
 package com.texastoc.cucumber;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
 import io.cucumber.java.en.Given;
@@ -68,8 +69,8 @@ public class PlayerStepdefs extends SpringBootBaseIntegrationTest {
     anotherPlayerCreated = createPlayer(anotherPlayerToCreate, login(ADMIN_EMAIL, ADMIN_PASSWORD));
   }
 
-  @When("^the player is updated$")
-  public void the_player_is_updated() throws Exception {
+  @When("^the (admin|non-admin) updates the player$")
+  public void updatePlayer(String who) throws Exception {
     updatePlayer = Player.builder()
       .id(playerCreated.getId())
       .firstName("updated_" + playerCreated.getFirstName())
@@ -80,23 +81,7 @@ public class PlayerStepdefs extends SpringBootBaseIntegrationTest {
       .password("updated_" + "password")
       .build();
 
-    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
-    updatePlayer(updatePlayer, token);
-  }
-
-  @When("^the player is updated by another player$")
-  public void playerUpdatedByAnother() throws Exception {
-    updatePlayer = Player.builder()
-      .id(playerCreated.getId())
-      .firstName("updated_" + playerCreated.getFirstName())
-      .lastName("updated_" + playerCreated.getLastName())
-      .email("updated_" + playerCreated.getEmail())
-      // 8732833 = updated on phone keyboard
-      .phone("8732833z")
-      .password("updated_" + "password")
-      .build();
-
-    String token = login(USER_EMAIL, USER_PASSWORD);
+    String token = getToken(who);
     try {
       updatePlayer(updatePlayer, token);
     } catch (Exception e) {
@@ -104,15 +89,9 @@ public class PlayerStepdefs extends SpringBootBaseIntegrationTest {
     }
   }
 
-  @When("^the player is deleted$")
-  public void playerDeleted() throws Exception {
-    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
-    deletePlayer(playerCreated.getId(), token);
-  }
-
-  @When("^the player is deleted by another player$")
-  public void playerDeletedByAnother() throws Exception {
-    String token = login(USER_EMAIL, USER_PASSWORD);
+  @When("^the (admin|non-admin) deletes the player$")
+  public void playerDeleted(String who) throws Exception {
+    String token = getToken(who);
     try {
       deletePlayer(playerCreated.getId(), token);
     } catch (Exception e) {
@@ -130,18 +109,9 @@ public class PlayerStepdefs extends SpringBootBaseIntegrationTest {
     }
   }
 
-  @When("^a role is added$")
-  public void addRole() throws Exception {
-    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
-    addRole(playerCreated.getId(), Role.builder()
-      .type(Role.Type.ADMIN)
-      .build(),
-      token);
-  }
-
-  @When("^a role is added by another player$")
-  public void addRoleByAnother() throws Exception {
-    String token = login(USER_EMAIL, USER_PASSWORD);
+  @When("^the (admin|non-admin) adds a role$")
+  public void addRole(String who) throws Exception {
+    String token = getToken(who);
     try {
       addRole(playerCreated.getId(), Role.builder()
           .type(Role.Type.ADMIN)
@@ -152,24 +122,14 @@ public class PlayerStepdefs extends SpringBootBaseIntegrationTest {
     }
   }
 
-  @When("^a role is removed$")
-  public void removeRole() throws Exception {
-    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
-    Role role = StreamSupport.stream(playerRetrieved.getRoles().spliterator(), false)
-      .filter(r -> r.getType() == Role.Type.ADMIN)
-      .findFirst().get();
-
-    removeRole(playerCreated.getId(), role.getId(), token);
-  }
-
-  @When("^a role is removed by another player$")
-  public void removeRoleByAnother() throws Exception {
+  @When("^the (admin|non-admin) removes a role$")
+  public void removeRole(String who) throws Exception {
+    String token = getToken(who);
     Role role = StreamSupport.stream(playerRetrieved.getRoles().spliterator(), false)
       .filter(r -> r.getType() == Role.Type.ADMIN)
       .findFirst().get();
 
     try {
-      String token = login(USER_EMAIL, USER_PASSWORD);
       removeRole(playerCreated.getId(), role.getId(), token);
     } catch (Exception e) {
       exception = e;
@@ -268,4 +228,12 @@ public class PlayerStepdefs extends SpringBootBaseIntegrationTest {
     assertEquals("phone match", updatePlayer.getPhone(), playerRetrieved.getPhone());
   }
 
+  private String getToken(String who) throws JsonProcessingException {
+    if ("admin".equals(who)) {
+      return login(ADMIN_EMAIL, ADMIN_PASSWORD);
+    } else {
+      return login(USER_EMAIL, USER_PASSWORD);
+    }
+
+  }
 }
