@@ -21,9 +21,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-
-// Tests are run from SpringBootBaseIntegrationTest so must Ignore here
-//@Ignore
 public class PlayerStepdefs extends SpringBootBaseIntegrationTest {
 
   Player playerToCreate;

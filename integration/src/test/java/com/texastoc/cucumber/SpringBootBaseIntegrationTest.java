@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.texastoc.TestConstants;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
+import com.texastoc.module.settings.model.SystemSettings;
 import io.cucumber.spring.CucumberContextConfiguration;
 import lombok.Getter;
 import lombok.Setter;
@@ -271,6 +272,20 @@ public abstract class SpringBootBaseIntegrationTest implements TestConstants {
       new ParameterizedTypeReference<List<Player>>() {});
     return response.getBody();
   }
+
+  protected SystemSettings getSettings() {
+    HttpHeaders headers = new HttpHeaders();
+    HttpEntity<String> entity = new HttpEntity<>(headers);
+
+    ResponseEntity<SystemSettings> response = restTemplate.exchange(
+      endpoint() + "/settings",
+      HttpMethod.GET,
+      entity,
+      SystemSettings.class);
+    return response.getBody();
+  }
+
+
 
 //  protected Game getGame(int id, String token) throws JsonProcessingException {
 //    HttpHeaders headers = new HttpHeaders();

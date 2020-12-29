@@ -5,6 +5,10 @@ import java.util.Map;
 
 public class SystemSettings extends Settings {
 
+  public SystemSettings() {
+    super();
+  }
+
   public SystemSettings(int id, Version version, Map<Integer, TocConfig> tocConfigs, Map<Integer, List<Payout>> payouts) {
     super(id, version, tocConfigs);
     this.payouts = payouts;
