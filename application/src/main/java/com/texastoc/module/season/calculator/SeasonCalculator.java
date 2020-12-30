@@ -1,8 +1,9 @@
 package com.texastoc.module.season.calculator;
 
+import com.texastoc.module.game.GameModule;
+import com.texastoc.module.game.GameModuleFactory;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
-import com.texastoc.module.game.repository.GameRepository;
 import com.texastoc.module.season.model.Season;
 import com.texastoc.module.season.model.SeasonPayout;
 import com.texastoc.module.season.model.SeasonPayoutRange;
@@ -26,14 +27,14 @@ import java.util.Map;
 @Component
 public class SeasonCalculator {
 
-  private final GameRepository gameRepository;
   private final SeasonRepository seasonRepository;
   private final SeasonPlayerRepository seasonPlayerRepository;
   private final SeasonPayoutRepository seasonPayoutRepository;
   private final SeasonPayoutSettingsRepository seasonPayoutSettingsRepository;
 
-  public SeasonCalculator(GameRepository gameRepository, SeasonRepository seasonRepository, SeasonPlayerRepository seasonPlayerRepository, SeasonPayoutRepository seasonPayoutRepository, SeasonPayoutSettingsRepository seasonPayoutSettingsRepository) {
-    this.gameRepository = gameRepository;
+  private GameModule gameModule;
+
+  public SeasonCalculator(SeasonRepository seasonRepository, SeasonPlayerRepository seasonPlayerRepository, SeasonPayoutRepository seasonPayoutRepository, SeasonPayoutSettingsRepository seasonPayoutSettingsRepository) {
     this.seasonRepository = seasonRepository;
     this.seasonPlayerRepository = seasonPlayerRepository;
     this.seasonPayoutRepository = seasonPayoutRepository;
@@ -44,7 +45,7 @@ public class SeasonCalculator {
     Season season = seasonRepository.get(id);
 
     // Calculate season
-    List<Game> games = gameRepository.findBySeasonId(id);
+    List<Game> games = getGameModule().getBySeasonId(id);
 
     season.setNumGamesPlayed(games.size());
 
@@ -242,6 +243,13 @@ public class SeasonCalculator {
       seasonPayout.setAmount(seasonPayout.getAmount() + (int) (payoutExtra));
     }
     return seasonPayout;
+  }
+
+  private GameModule getGameModule() {
+    if (gameModule == null) {
+      gameModule = GameModuleFactory.getGameModule();
+    }
+    return gameModule;
   }
 
 }

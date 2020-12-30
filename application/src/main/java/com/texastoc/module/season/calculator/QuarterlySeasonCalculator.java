@@ -1,7 +1,8 @@
 package com.texastoc.module.season.calculator;
 
+import com.texastoc.module.game.GameModule;
+import com.texastoc.module.game.GameModuleFactory;
 import com.texastoc.module.game.model.Game;
-import com.texastoc.module.game.repository.GameRepository;
 import com.texastoc.module.season.model.QuarterlySeason;
 import com.texastoc.module.season.model.QuarterlySeasonPayout;
 import com.texastoc.module.season.model.QuarterlySeasonPlayer;
@@ -21,14 +22,14 @@ import java.util.Map;
 @Component
 public class QuarterlySeasonCalculator {
 
-  private final GameRepository gameRepository;
   private final QuarterlySeasonRepository qSeasonRepository;
   private final QuarterlySeasonPlayerRepository qSeasonPlayerRepository;
   private final QuarterlySeasonPayoutRepository qSeasonPayoutRepository;
 
-  public QuarterlySeasonCalculator(QuarterlySeasonRepository qSeasonRepository, GameRepository gameRepository, QuarterlySeasonPlayerRepository qSeasonPlayerRepository, QuarterlySeasonPayoutRepository qSeasonPayoutRepository) {
+  private GameModule gameModule;
+
+  public QuarterlySeasonCalculator(QuarterlySeasonRepository qSeasonRepository, QuarterlySeasonPlayerRepository qSeasonPlayerRepository, QuarterlySeasonPayoutRepository qSeasonPayoutRepository) {
     this.qSeasonRepository = qSeasonRepository;
-    this.gameRepository = gameRepository;
     this.qSeasonPlayerRepository = qSeasonPlayerRepository;
     this.qSeasonPayoutRepository = qSeasonPayoutRepository;
   }
@@ -37,7 +38,7 @@ public class QuarterlySeasonCalculator {
     QuarterlySeason qSeason = qSeasonRepository.getById(id);
 
     // Calculate quarterly season
-    List<Game> games = gameRepository.findByQuarterlySeasonId(id);
+    List<Game> games = getGameModule().getByQuarterlySeasonId(id);
 
     qSeason.setNumGamesPlayed(games.size());
 
@@ -157,5 +158,12 @@ public class QuarterlySeasonCalculator {
       .build());
 
     return payouts;
+  }
+
+  private GameModule getGameModule() {
+    if (gameModule == null) {
+      gameModule = GameModuleFactory.getGameModule();
+    }
+    return gameModule;
   }
 }
