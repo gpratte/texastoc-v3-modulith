@@ -67,8 +67,6 @@ public class Game {
   private int kittyCalculated;
   // total collected minus total combined toc collected minus kitty
   private int prizePotCalculated;
-  // TODO
-  private int averageStack;
   private int numPaidPlayers;
   private int numPaidPlayersRemaining;
   private int seasonGameNum;

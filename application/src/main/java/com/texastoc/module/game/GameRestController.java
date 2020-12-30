@@ -2,7 +2,6 @@ package com.texastoc.module.game;
 
 import com.texastoc.module.game.exception.GameInProgressException;
 import com.texastoc.module.game.exception.GameIsFinalizedException;
-import com.texastoc.module.game.model.FirstTimeGamePlayer;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.model.Seating;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
@@ -81,28 +79,20 @@ public class GameRestController {
 
   @PostMapping(value = "/api/v2/games/{id}/players", consumes = MediaType.APPLICATION_JSON_VALUE)
   public GamePlayer createGamePlayer(@PathVariable("id") int id, @RequestBody GamePlayer gamePlayer) {
+    gamePlayer.setGameId(id);
     return gameModule.createGamePlayer(gamePlayer);
   }
 
   @PostMapping(value = "/api/v2/games/{id}/players", consumes = "application/vnd.texastoc.new-player+json")
-  public GamePlayer createFirstTimeGamePlayer(@PathVariable("id") int id, @RequestBody @Valid FirstTimeGamePlayer firstTimeGamePlayer) {
-    Game game = gameModule.get(id);
-    GamePlayer gamePlayer = GamePlayer.builder()
-      .gameId(id)
-      .firstName(firstTimeGamePlayer.getFirstName())
-      .lastName(firstTimeGamePlayer.getLastName())
-      .email(firstTimeGamePlayer.getEmail())
-      .buyInCollected(firstTimeGamePlayer.isBuyInCollected() ? game.getBuyInCost() : null)
-      .annualTocCollected(firstTimeGamePlayer.isAnnualTocCollected() ? game.getAnnualTocCost() : null)
-      .quarterlyTocCollected(firstTimeGamePlayer.isQuarterlyTocCollected() ? game.getQuarterlyTocCost() : null)
-      .build();
+  public GamePlayer createFirstTimeGamePlayer(@PathVariable("id") int id, @RequestBody GamePlayer gamePlayer) {
+    gamePlayer.setGameId(id);
     return gameModule.createFirstTimeGamePlayer(gamePlayer);
   }
 
   @PatchMapping(value = "/api/v2/games/{gameId}/players/{gamePlayerId}", consumes = MediaType.APPLICATION_JSON_VALUE)
   public void updateGamePlayer(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, @RequestBody GamePlayer gamePlayer) {
-    gamePlayer.setPlayerId(gamePlayerId);
     gamePlayer.setGameId(gameId);
+    gamePlayer.setPlayerId(gamePlayerId);
     gameModule.updateGamePlayer(gamePlayer);
   }
 

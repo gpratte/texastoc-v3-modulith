@@ -15,6 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+// TODO remove
 public class CreateGameRequest {
   @NotNull(message = "host id is required")
   private Integer hostId;

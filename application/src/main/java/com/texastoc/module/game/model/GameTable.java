@@ -14,10 +14,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Table {
-
-  private int gameId;
-  private int number;
+public class GameTable {
+  private int id;
+  private int tableNum;
   private List<Seat> seats;
 
   public void addSeat(Seat seat) {

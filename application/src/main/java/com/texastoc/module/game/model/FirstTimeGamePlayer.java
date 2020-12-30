@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+// TODO remove
 public class FirstTimeGamePlayer {
   private String firstName;
   private String lastName;

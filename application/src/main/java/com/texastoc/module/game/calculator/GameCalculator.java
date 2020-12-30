@@ -24,10 +24,6 @@ public class GameCalculator {
     this.seasonService = seasonService;
   }
 
-  // TODO
-  //public Game calculate(int gameId) {
-
-  @SuppressWarnings("Duplicates")
   public Game calculate(Game game) {
     int numPlayers = 0;
     int buyInCollected = 0;

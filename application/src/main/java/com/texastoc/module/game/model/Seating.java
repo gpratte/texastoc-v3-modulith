@@ -15,7 +15,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Seating {
   private int gameId;
-  private List<Integer> numSeatsPerTable;
+  private List<SeatsPerTable> seatsPerTables;
   private List<TableRequest> tableRequests;
-  private List<Table> tables;
+  private List<GameTable> gameTables;
 }

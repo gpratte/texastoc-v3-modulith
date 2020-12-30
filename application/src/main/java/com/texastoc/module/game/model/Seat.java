@@ -10,10 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Seat {
-
-  private int gameId;
-  private int seatNumber;
-  private int tableNumber;
+  private int id;
+  private int seatNum;
+  private int tableNum;
   private Integer gamePlayerId;
   private String gamePlayerName;
 }

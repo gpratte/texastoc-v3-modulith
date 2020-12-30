@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+// TODO remove
 public class UpdateGamePlayerRequest {
   private Integer place;
   private boolean knockedOut;

@@ -21,7 +21,6 @@ import com.texastoc.module.season.SeasonModule;
 import com.texastoc.module.season.SeasonModuleFactory;
 import com.texastoc.module.season.model.QuarterlySeason;
 import com.texastoc.module.season.model.Season;
-import com.texastoc.module.settings.SettingsModule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.Template;
@@ -58,7 +57,6 @@ public class GameService {
   private PlayerModule playerModule;
   private SeasonModule seasonModule;
   private ExecutorService executorService;
-  private SettingsModule settingsModule;
 
   public GameService(GameRepository gameRepository, GameCalculator gameCalculator, PayoutCalculator payoutCalculator, PointsCalculator pointsCalculator, SMSConnector smsConnector, EmailConnector emailConnector, WebSocketConnector webSocketConnector) {
     this.gameRepository = gameRepository;
@@ -112,8 +110,6 @@ public class GameService {
 
     game = gameRepository.save(game);
 
-    // TODO do we need populateGame anymore?
-    //Game gameCreated = populateGame(gameCreated);
     sendUpdatedGame();
     return game;
   }
@@ -177,63 +173,10 @@ public class GameService {
     return gameRepository.findBySeasonId(qSeasonId);
   }
 
-  // TODO move to notifications
-  public void notifySeating(int gameId) {
-//    Seating seating = seatingRepository.get(gameId);
-//    if (seating == null || seating.getTables() == null || seating.getTables().size() == 0) {
-//      return;
-//    }
-//    for (Table table : seating.getTables()) {
-//      if (table.getSeats() == null || table.getSeats().size() == 0) {
-//        continue;
-//      }
-//      for (Seat seat : table.getSeats()) {
-//        if (seat == null) {
-//          continue;
-//        }
-//        GamePlayer gamePlayer = gamePlayerRepository.selectById(seat.getGamePlayerId());
-//        Player player = getPlayerModule().get(gamePlayer.getPlayerId());
-//        if (player.getPhone() != null) {
-//          smsConnector.text(player.getPhone(), player.getName() + " table " +
-//            table.getNumber() + " seat " + seat.getSeatNumber());
-//        }
-//      }
-//    }
-  }
-
-  // TODO is this needed anymore? I think not
-//  private Game populateGame(Game game) {
-//    List<GamePlayer> players = gamePlayerRepository.selectByGameId(game.getId());
-//    game.setPlayers(players);
-//    int numPaidPlayers = 0;
-//    int numPaidPlayersRemaining = 0;
-//    for (GamePlayer player : players) {
-//      if (player.getBuyInCollected() != null && player.getBuyInCollected() > 0) {
-//        ++numPaidPlayers;
-//        if (player.getKnockedOut() == null || !player.getKnockedOut()) {
-//          ++numPaidPlayersRemaining;
-//        }
-//      }
-//    }
-//    game.setNumPaidPlayers(numPaidPlayers);
-//    game.setNumPaidPlayersRemaining(numPaidPlayersRemaining);
-//
-//    game.setPayouts(gamePayoutRepository.getByGameId(game.getId()));
-//
-//    Seating seating = new Seating();
-//    try {
-//      seating = seatingRepository.get(game.getId());
-//    } catch (Exception e) {
-//      // do nothing
-//    }
-//    game.setSeating(seating);
-//    return game;
-//  }
-
   @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
   @Transactional
   public GamePlayer createGamePlayer(GamePlayer gamePlayer) {
-    // TODO validate
+    // TODO bean validation https://www.baeldung.com/javax-validation
     Game game = get(gamePlayer.getGameId());
     checkFinalized(game);
 
@@ -245,7 +188,7 @@ public class GameService {
   @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
   @Transactional
   public GamePlayer createFirstTimeGamePlayer(GamePlayer gamePlayer) {
-    // TODO validate
+    // TODO bean validation https://www.baeldung.com/javax-validation
     Game game = get(gamePlayer.getGameId());
     checkFinalized(game);
 
@@ -303,6 +246,7 @@ public class GameService {
     Game game = get(gameId);
     checkFinalized(game);
 
+    // TODO NotFoundException if not found
     GamePlayer gamePlayer = game.getPlayers().stream()
       .filter(gp -> gp.getId() == gamePlayerId)
       .findFirst().get();
@@ -326,6 +270,7 @@ public class GameService {
     Game game = get(gameId);
     checkFinalized(game);
 
+    // TODO NotFoundException if not found
     GamePlayer gamePlayer = game.getPlayers().stream()
       .filter(gp -> gp.getId() == gamePlayerId)
       .findFirst().get();
@@ -349,6 +294,7 @@ public class GameService {
     Game game = get(gameId);
     checkFinalized(game);
 
+    // TODO NotFoundException if not found
     GamePlayer gamePlayer = game.getPlayers().stream()
       .filter(gp -> gp.getId() == gamePlayerId)
       .findFirst().get();
@@ -358,11 +304,6 @@ public class GameService {
     recalculate(game);
     sendUpdatedGame();
   }
-
-//  @Transactional(readOnly = true)
-//  public GamePlayer getGamePlayer(int gamePlayerId) {
-//    return gamePlayerRepository.selectById(gamePlayerId);
-//  }
 
   @CacheEvict(value = {"currentGame", "currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   @Transactional
@@ -388,7 +329,7 @@ public class GameService {
 
     Season season = getSeasonModule().getSeasonById(gameToOpen.getSeasonId());
     if (season.isFinalized()) {
-      // TODO throw exception and handle in RestControllerAdvise
+      // TODO throw a unique exception and handle in controller
       throw new RuntimeException("Cannot open a game when season is finalized");
     }
 
@@ -438,21 +379,19 @@ public class GameService {
     pointsCalculator.calculate(calculatedGame);
   }
 
-  private void checkFinalized(int id) {
-    checkFinalized(get(id));
-  }
-
   private void checkFinalized(Game game) {
     if (game.isFinalized()) {
       throw new GameIsFinalizedException("Game is finalized");
     }
   }
 
+  // TODO move to notification module
   private void sendGameSummary(int id) {
     SendGameSummary sgs = new SendGameSummary(id);
     new Thread(sgs).start();
   }
 
+  // TODO move to notification module
   private static final VelocityEngine VELOCITY_ENGINE = new VelocityEngine();
 
   static {
@@ -461,6 +400,7 @@ public class GameService {
     VELOCITY_ENGINE.init();
   }
 
+  // TODO move to notification module
   private String getGameSummaryFromTemplate(Game game) {
     Template t = VELOCITY_ENGINE.getTemplate("game-summary.vm");
     VelocityContext context = new VelocityContext();
@@ -492,10 +432,9 @@ public class GameService {
     return writer.toString();
   }
 
+  // TODO move to notification module
   private class SendGameSummary implements Runnable {
-
     private int gameId;
-
     public SendGameSummary(int gameId) {
       this.gameId = gameId;
     }
@@ -523,6 +462,7 @@ public class GameService {
     }
   }
 
+  // TODO move to notification module
   private void sendUpdatedGame() {
     executorService.submit(new GameSender());
   }
@@ -541,6 +481,7 @@ public class GameService {
     return seasonModule;
   }
 
+  // TODO move to notification module
   private class GameSender implements Callable<Void> {
     @Override
     public Void call() throws Exception {

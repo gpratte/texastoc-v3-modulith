@@ -118,6 +118,53 @@ CREATE TABLE seating
 alter table seating
     add constraint fk_seating_game foreign key (game) references game (id);
 
+CREATE TABLE seats_per_table
+(
+    id        int NOT NULL AUTO_INCREMENT,
+    game_id   int NOT NULL,
+    seats     int NOT NULL,
+    table_num int NOT NULL,
+    seating   int NOT NULL,
+    PRIMARY KEY (id)
+);
+alter table seats_per_table
+    add constraint fk_seats_per_table_seating foreign key (seating) references seating (id);
+
+CREATE TABLE table_request
+(
+    id               int          NOT NULL AUTO_INCREMENT,
+    game_player_id   int          NOT NULL,
+    game_player_name varchar(128) NOT NULL,
+    table_num        int          NOT NULL,
+    seating          int          NOT NULL,
+    PRIMARY KEY (id)
+);
+alter table table_request
+    add constraint fk_table_request_seating foreign key (seating) references seating (id);
+
+CREATE TABLE game_table
+(
+    id        int NOT NULL AUTO_INCREMENT,
+    table_num int NOT NULL,
+    seating   int NOT NULL,
+    PRIMARY KEY (id)
+);
+alter table game_table
+    add constraint fk_game_table_seating foreign key (seating) references seating (id);
+
+CREATE TABLE seat
+(
+    id               int          NOT NULL AUTO_INCREMENT,
+    seat_num         int          NOT NULL,
+    table_num        int          NOT NULL,
+    game_player_id   int          NOT NULL,
+    game_player_name varchar(128) NOT NULL,
+    game_table       int          NOT NULL,
+    PRIMARY KEY (id)
+);
+alter table seat
+    add constraint fk_seat_game_table foreign key (game_table) references game_table (id);
+
 CREATE TABLE game
 (
     id                                      int                NOT NULL AUTO_INCREMENT,

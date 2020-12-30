@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TableRequest {
+public class SeatsPerTable {
   private int id;
-  private int gamePlayerId;
-  private String gamePlayerName;
-  private int tableNum;
+  private int gameId;
+  private int seats;
+  private int tableNumber;
 }
