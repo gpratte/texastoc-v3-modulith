@@ -3,7 +3,7 @@ package com.texastoc.module.game.calculator;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePayout;
 import com.texastoc.module.game.model.GamePlayer;
-import com.texastoc.module.game.repository.GamePayoutRepository;
+import com.texastoc.module.game.repository.GameRepository;
 import com.texastoc.module.settings.SettingsModuleFactory;
 import com.texastoc.module.settings.model.Payout;
 import org.springframework.stereotype.Component;
@@ -15,14 +15,13 @@ import java.util.List;
 @Component
 public class PayoutCalculator {
 
-  private final GamePayoutRepository gamePayoutRepository;
+  private final GameRepository gameRepository;
 
-  public PayoutCalculator(GamePayoutRepository gamePayoutRepository) {
-    this.gamePayoutRepository = gamePayoutRepository;
+  public PayoutCalculator(GameRepository gameRepository) {
+    this.gameRepository = gameRepository;
   }
 
-  public List<GamePayout> calculate(Game game, List<GamePlayer> gamePlayers) {
-
+  public List<GamePayout> calculate(Game game) {
     if (game.getPrizePotCalculated() <= 0) {
       return Collections.emptyList();
     }
@@ -41,11 +40,10 @@ public class PayoutCalculator {
     if (numberPaid > 10) {
       numberPaid = 10;
     }
-    return calculatePayout(numberPaid, game, gamePlayers);
+    return calculatePayout(numberPaid, game);
   }
 
-  private List<GamePayout> calculatePayout(int numToPay, Game game, List<GamePlayer> gamePlayers) {
-
+  private List<GamePayout> calculatePayout(int numToPay, Game game) {
     List<GamePayout> gamePayouts = new ArrayList<>(numToPay);
 
     // If only one player then he gets it all
@@ -102,7 +100,7 @@ public class PayoutCalculator {
     // See if there is a chop
     List<Integer> chips = null;
     List<Integer> amounts = null;
-    for (GamePlayer gamePlayer : gamePlayers) {
+    for (GamePlayer gamePlayer : game.getPlayers()) {
       if (gamePlayer.getChop() != null) {
         if (chips == null) {
           chips = new ArrayList<>();
@@ -152,7 +150,7 @@ public class PayoutCalculator {
       if (chops != null && chops.size() > 1) {
         for (Chop chop : chops) {
           outer:
-          for (GamePlayer player : gamePlayers) {
+          for (GamePlayer player : game.getPlayers()) {
             if (player.getChop() != null) {
               for (GamePayout gamePayout : gamePayouts) {
                 if (gamePayout.getAmount() == chop.getOrgAmount()) {
@@ -169,7 +167,7 @@ public class PayoutCalculator {
 
     // flag if the payouts changed
     boolean payoutsChanged = false;
-    List<GamePayout> currentPayouts = gamePayoutRepository.getByGameId(game.getId());
+    List<GamePayout> currentPayouts = gameRepository.findById(game.getId()).get().getPayouts();
     if (gamePayouts.size() != currentPayouts.size()) {
       payoutsChanged = true;
     } else {
@@ -191,10 +189,9 @@ public class PayoutCalculator {
   }
 
   private void persistPayouts(List<GamePayout> gamePayouts, int gameId) {
-    gamePayoutRepository.deleteByGameId(gameId);
-    for (GamePayout gamePayout : gamePayouts) {
-      gamePayoutRepository.save(gamePayout);
-    }
+    Game game = gameRepository.findById(gameId).get();
+    game.setPayouts(gamePayouts);
+    gameRepository.save(game);
   }
 
 }

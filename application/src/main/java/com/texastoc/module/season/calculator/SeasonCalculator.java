@@ -2,10 +2,13 @@ package com.texastoc.module.season.calculator;
 
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
-import com.texastoc.module.game.repository.GamePlayerRepository;
 import com.texastoc.module.game.repository.GameRepository;
-import com.texastoc.module.season.model.*;
+import com.texastoc.module.season.model.Season;
+import com.texastoc.module.season.model.SeasonPayout;
+import com.texastoc.module.season.model.SeasonPayoutRange;
 import com.texastoc.module.season.model.SeasonPayoutRange.SeasonPayoutPlace;
+import com.texastoc.module.season.model.SeasonPayoutSettings;
+import com.texastoc.module.season.model.SeasonPlayer;
 import com.texastoc.module.season.repository.SeasonPayoutRepository;
 import com.texastoc.module.season.repository.SeasonPayoutSettingsRepository;
 import com.texastoc.module.season.repository.SeasonPlayerRepository;
@@ -13,33 +16,35 @@ import com.texastoc.module.season.repository.SeasonRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class SeasonCalculator {
 
   private final GameRepository gameRepository;
   private final SeasonRepository seasonRepository;
-  private final GamePlayerRepository gamePlayerRepository;
   private final SeasonPlayerRepository seasonPlayerRepository;
   private final SeasonPayoutRepository seasonPayoutRepository;
   private final SeasonPayoutSettingsRepository seasonPayoutSettingsRepository;
 
-  public SeasonCalculator(GameRepository gameRepository, SeasonRepository seasonRepository, SeasonPlayerRepository seasonPlayerRepository, GamePlayerRepository gamePlayerRepository, SeasonPayoutRepository seasonPayoutRepository, SeasonPayoutSettingsRepository seasonPayoutSettingsRepository) {
+  public SeasonCalculator(GameRepository gameRepository, SeasonRepository seasonRepository, SeasonPlayerRepository seasonPlayerRepository, SeasonPayoutRepository seasonPayoutRepository, SeasonPayoutSettingsRepository seasonPayoutSettingsRepository) {
     this.gameRepository = gameRepository;
     this.seasonRepository = seasonRepository;
     this.seasonPlayerRepository = seasonPlayerRepository;
-    this.gamePlayerRepository = gamePlayerRepository;
     this.seasonPayoutRepository = seasonPayoutRepository;
     this.seasonPayoutSettingsRepository = seasonPayoutSettingsRepository;
   }
 
   public Season calculate(int id) {
-
     Season season = seasonRepository.get(id);
 
     // Calculate season
-    List<Game> games = gameRepository.getBySeasonId(id);
+    List<Game> games = gameRepository.findBySeasonId(id);
 
     season.setNumGamesPlayed(games.size());
 
@@ -117,7 +122,10 @@ public class SeasonCalculator {
 
     Map<Integer, SeasonPlayer> seasonPlayerMap = new HashMap<>();
 
-    List<GamePlayer> gamePlayers = gamePlayerRepository.selectAnnualTocPlayersBySeasonId(id);
+    // TODO figure this out
+    //List<GamePlayer> gamePlayers = gamePlayerRepository.selectAnnualTocPlayersBySeasonId(id);
+    List<GamePlayer> gamePlayers = Collections.emptyList();
+
     for (GamePlayer gamePlayer : gamePlayers) {
       SeasonPlayer seasonPlayer = seasonPlayerMap.get(gamePlayer.getPlayerId());
       if (seasonPlayer == null) {

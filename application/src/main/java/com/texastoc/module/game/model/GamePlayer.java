@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 @Builder
@@ -16,7 +17,9 @@ public class GamePlayer implements Comparable<GamePlayer> {
   private int qSeasonId;
   private int seasonId;
   private int gameId;
-  private String name;
+  private String firstName;
+  private String lastName;
+  private String email;
   private Integer points;
   private Integer place;
   private Boolean knockedOut;
@@ -26,6 +29,21 @@ public class GamePlayer implements Comparable<GamePlayer> {
   private Integer annualTocCollected;
   private Integer quarterlyTocCollected;
   private Integer chop;
+
+  public String getName() {
+    String name = null;
+
+    if (firstName != null) {
+      name = firstName;
+      if (lastName != null) {
+        name += " " + lastName;
+      }
+    } else if (lastName != null) {
+      name = lastName;
+    }
+
+    return name == null ? "Unknown" : name;
+  }
 
   @Override
   public int compareTo(GamePlayer other) {
@@ -56,18 +74,33 @@ public class GamePlayer implements Comparable<GamePlayer> {
       }
     }
 
-    // If I don't have a name
-    if (name == null) {
+    // If I don't have a first or a last
+    if (firstName == null && lastName == null) {
       // then I come after other
       return 1;
     }
 
-    // If other doesn't have a name
-    if (other.name == null) {
+    // If other doesn't have a first or a last
+    if (other.firstName == null && other.lastName == null) {
       // then I come before other
       return -1;
     }
 
-    return name.toLowerCase().compareTo(other.name.toLowerCase());
+    return makeFullName(this).compareTo(makeFullName(other));
+  }
+
+  private String makeFullName(GamePlayer player) {
+    // Combine the first and last into a full name
+    StringBuffer fullName = new StringBuffer();
+    if (!StringUtils.isBlank(player.firstName)) {
+      fullName.append(player.firstName);
+    }
+    if (!StringUtils.isBlank(player.firstName) && !StringUtils.isBlank(player.lastName)) {
+      fullName.append(" ");
+    }
+    if (!StringUtils.isBlank(player.lastName)) {
+      fullName.append(player.lastName);
+    }
+    return fullName.toString().toLowerCase();
   }
 }

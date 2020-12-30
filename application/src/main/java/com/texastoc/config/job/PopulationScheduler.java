@@ -1,16 +1,15 @@
 package com.texastoc.config.job;
 
-import com.texastoc.module.game.GameService;
-import com.texastoc.module.game.model.FirstTimeGamePlayer;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
-import com.texastoc.module.game.request.CreateGamePlayerRequest;
-import com.texastoc.module.game.request.UpdateGamePlayerRequest;
+import com.texastoc.module.game.service.GameService;
 import com.texastoc.module.player.PlayerModule;
-import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.PlayerModuleFactory;
+import com.texastoc.module.player.model.Player;
 import com.texastoc.module.season.SeasonService;
 import com.texastoc.module.season.model.Season;
+import com.texastoc.module.settings.SettingsModule;
+import com.texastoc.module.settings.SettingsModuleFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -34,6 +33,7 @@ public class PopulationScheduler {
   private final GameService gameService;
   private final Random random = new Random(System.currentTimeMillis());
   private PlayerModule playerModule;
+  private SettingsModule settingsModule;
 
   public PopulationScheduler(SeasonService seasonService, GameService gameService) {
     this.seasonService = seasonService;
@@ -92,28 +92,28 @@ public class PopulationScheduler {
         player = players.get(random.nextInt(numPlayers));
       }
 
-      Game game = gameService.createGame(Game.builder()
+      Game game = gameService.create(Game.builder()
         .hostId(player.getId())
         .date(gameDate)
         .transportRequired(false)
         .build());
 
-      addGamePlayers(game.getId());
-      addGamePlayersRebuy(game.getId());
-      addGamePlayersFinish(game.getId());
+      addGamePlayers(game.getId(), season);
+      addGamePlayersRebuy(game.getId(), season);
+      addGamePlayersFinish(game.getId(), season);
 
       // Is this the last game? Check if the next game is after now.
       LocalDate nextGameDate = findNextThursday(gameDate.plusDays(1));
       if (!nextGameDate.isAfter(now)) {
         // finalize the game
-        gameService.endGame(game.getId());
+        gameService.finalize(game.getId());
       }
       gameDate = findNextThursday(gameDate.plusDays(1));
     }
   }
 
-  private void addGamePlayers(int gameId) {
-    Game game = gameService.getGame(gameId);
+  private void addGamePlayers(int gameId, Season season) {
+    Game game = gameService.get(gameId);
 
     int numPlayersToAddToGame = game.getDate().getDayOfMonth();
     if (numPlayersToAddToGame < 2) {
@@ -123,7 +123,7 @@ public class PopulationScheduler {
     List<Player> existingPlayers = getPlayerModule().getAll();
 
     if (existingPlayers.size() < 30) {
-      addNewPlayer(game);
+      addNewPlayer(game, season);
       numPlayersToAddToGame -= 1;
     }
 
@@ -138,94 +138,101 @@ public class PopulationScheduler {
           continue;
         }
         // Add existing player to the game
-        addExistingPlayer(game, existingPlayer);
+        addExistingPlayer(game, existingPlayer, season);
         existingPlayersIdsInGame.add(existingPlayer.getId());
         --numPlayersToAddToGame;
       }
     } else {
       // not enough existing players so use all existing players and then add new players
       for (Player existingPlayer : existingPlayers) {
-        addExistingPlayer(game, existingPlayer);
+        addExistingPlayer(game, existingPlayer, season);
         --numPlayersToAddToGame;
       }
 
       // now add new players
       for (int i = 0; i < numPlayersToAddToGame; i++) {
-        addNewPlayer(game);
+        addNewPlayer(game, season);
       }
     }
   }
 
-  private void addGamePlayersRebuy(int gameId) {
-    Game game = gameService.getGame(gameId);
+  private void addGamePlayersRebuy(int gameId, Season season) {
+    Game game = gameService.get(gameId);
 
     List<GamePlayer> gamePlayers = game.getPlayers();
     for (GamePlayer gamePlayer : gamePlayers) {
       if (random.nextBoolean()) {
-        UpdateGamePlayerRequest ugpr = new UpdateGamePlayerRequest();
-        ugpr.setBuyInCollected(true);
-        ugpr.setRebuyAddOnCollected(true);
+        gamePlayer.setBuyInCollected(season.getBuyInCost());
+        gamePlayer.setRebuyAddOnCollected(season.getRebuyAddOnCost());
         Integer annualTocCollect = gamePlayer.getAnnualTocCollected();
         if (annualTocCollect != null && annualTocCollect > 0) {
-          ugpr.setAnnualTocCollected(true);
+          gamePlayer.setAnnualTocCollected(season.getTocPerGame());
         }
         Integer qAnnualTocCollect = gamePlayer.getQuarterlyTocCollected();
         if (qAnnualTocCollect != null && qAnnualTocCollect > 0) {
-          ugpr.setQuarterlyTocCollected(true);
+          gamePlayer.setQuarterlyTocCollected(season.getQuarterlyTocPerGame());
         }
-        gameService.updateGamePlayer(game.getId(), gamePlayer.getId(), ugpr);
       }
     }
+    gameService.update(game);
   }
 
-  private void addGamePlayersFinish(int gameId) {
-    Game game = gameService.getGame(gameId);
+  private void addGamePlayersFinish(int gameId, Season season) {
+    Game game = gameService.get(gameId);
 
-    List<GamePlayer> gamePlayers = game.getPlayers();
+    // Make a copy of the list
+    List<GamePlayer> gamePlayers = new ArrayList<>(game.getPlayers());
 
     for (int place = 1; place <= 10 && gamePlayers.size() > 0; ++place) {
       GamePlayer gamePlayer = gamePlayers.remove(random.nextInt(gamePlayers.size()));
-      UpdateGamePlayerRequest ugpr = new UpdateGamePlayerRequest();
-      ugpr.setBuyInCollected(true);
+      gamePlayer.setBuyInCollected(season.getBuyInCost());
       Integer rebuy = gamePlayer.getRebuyAddOnCollected();
       if (rebuy != null && rebuy > 0) {
-        ugpr.setRebuyAddOnCollected(true);
+        gamePlayer.setRebuyAddOnCollected(season.getRebuyAddOnCost());
       }
       Integer annualTocCollect = gamePlayer.getAnnualTocCollected();
       if (annualTocCollect != null && annualTocCollect > 0) {
-        ugpr.setAnnualTocCollected(true);
+        gamePlayer.setAnnualTocCollected(season.getTocPerGame());
       }
       Integer qAnnualTocCollect = gamePlayer.getQuarterlyTocCollected();
       if (qAnnualTocCollect != null && qAnnualTocCollect > 0) {
-        ugpr.setQuarterlyTocCollected(true);
+        gamePlayer.setQuarterlyTocCollected(season.getQuarterlyTocPerGame());
       }
-      ugpr.setPlace(place);
-      gameService.updateGamePlayer(game.getId(), gamePlayer.getId(), ugpr);
+      gamePlayer.setPlace(place);
+      gameService.updateGamePlayer(gamePlayer);
     }
   }
 
-  private void addExistingPlayer(Game game, Player existingPlayer) {
-    CreateGamePlayerRequest cgpr = new CreateGamePlayerRequest();
-    cgpr.setPlayerId(existingPlayer.getId());
-    cgpr.setBuyInCollected(true);
-    cgpr.setAnnualTocCollected(random.nextBoolean());
+  private void addExistingPlayer(Game game, Player existingPlayer, Season season) {
+    GamePlayer gamePlayer = new GamePlayer();
+    gamePlayer.setGameId(game.getId());
+    gamePlayer.setPlayerId(existingPlayer.getId());
+    gamePlayer.setBuyInCollected(season.getBuyInCost());
+    if (random.nextBoolean()) {
+      gamePlayer.setAnnualTocCollected(season.getTocPerGame());
+    }
     // 20% in the quarterly
     if (random.nextInt(5) == 0) {
-      cgpr.setQuarterlyTocCollected(random.nextBoolean());
+      gamePlayer.setQuarterlyTocCollected(season.getQuarterlyTocPerGame());
     }
-    gameService.createGamePlayer(game.getId(), cgpr);
+    gameService.createGamePlayer(gamePlayer);
   }
 
-  private void addNewPlayer(Game game) {
-    FirstTimeGamePlayer ftgp = new FirstTimeGamePlayer();
+  private void addNewPlayer(Game game, Season season) {
+    GamePlayer gamePlayer = new GamePlayer();
+    gamePlayer.setGameId(game.getId());
     int firstNameIndex = random.nextInt(300);
-    ftgp.setFirstName(firstNames[firstNameIndex]);
+    gamePlayer.setFirstName(firstNames[firstNameIndex]);
     int lastNameIndex = random.nextInt(300);
-    ftgp.setLastName(lastNames[lastNameIndex]);
-    ftgp.setBuyInCollected(true);
-    ftgp.setAnnualTocCollected(random.nextBoolean());
-    ftgp.setQuarterlyTocCollected(random.nextBoolean());
-    gameService.createFirstTimeGamePlayer(game.getId(), ftgp);
+    gamePlayer.setLastName(lastNames[lastNameIndex]);
+    gamePlayer.setBuyInCollected(season.getBuyInCost());
+    if (random.nextBoolean()) {
+      gamePlayer.setAnnualTocCollected(season.getTocPerGame());
+    }
+    if (random.nextBoolean()) {
+      gamePlayer.setQuarterlyTocCollected(season.getQuarterlyTocPerGame());
+    }
+    gameService.createFirstTimeGamePlayer(gamePlayer);
   }
 
   private LocalDate findNextThursday(LocalDate date) {
@@ -240,6 +247,13 @@ public class PopulationScheduler {
       playerModule = PlayerModuleFactory.getPlayerModule();
     }
     return playerModule;
+  }
+
+  private SettingsModule getSettingsModule() {
+    if (settingsModule == null) {
+      settingsModule = SettingsModuleFactory.getSettingsModule();
+    }
+    return settingsModule;
   }
 
   static final String[] firstNames = {"James", "John", "Robert", "Michael", "Mary", "William", "David", "Joseph", "Richard", "Charles", "Thomas", "Christopher", "Daniel", "Elizabeth", "Matthew", "Patricia", "George", "Jennifer", "Linda", "Anthony", "Barbara", "Donald", "Paul", "Mark", "Andrew", "Edward", "Steven", "Kenneth", "Margaret", "Joshua", "Kevin", "Brian", "Susan", "Dorothy", "Ronald", "Sarah", "Timothy", "Jessica", "Jason", "Helen", "Nancy", "Betty", "Karen", "Jeffrey", "Lisa", "Ryan", "Jacob", "Frank", "Gary", "Nicholas", "Anna", "Eric", "Sandra", "Stephen", "Emily", "Ashley", "Jonathan", "Kimberly", "Donna", "Ruth", "Carol", "Michelle", "Larry", "Laura", "Amanda", "Justin", "Raymond", "Scott", "Samuel", "Brandon", "Melissa", "Benjamin", "Rebecca", "Deborah", "Stephanie", "Sharon", "Kathleen", "Cynthia", "Gregory", "Jack", "Amy", "Henry", "Shirley", "Patrick", "Alexander", "Emma", "Angela", "Catherine", "Virginia", "Katherine", "Walter", "Dennis", "Jerry", "Brenda", "Pamela", "Frances", "Tyler", "Nicole", "Christine", "Aaron", "Peter", "Samantha", "Evelyn", "Jose", "Rachel", "Alice", "Douglas", "Janet", "Carolyn", "Adam", "Debra", "Harold", "Nathan", "Martha", "Maria", "Marie", "Zachary", "Arthur", "Heather", "Diane", "Julie", "Joyce", "Carl", "Grace", "Victoria", "Albert", "Rose", "Joan", "Kyle", "Christina", "Kelly", "Ann", "Lauren", "Doris", "Julia", "Jean", "Lawrence", "Judith", "Olivia", "Kathryn", "Joe", "Mildred", "Willie", "Gerald", "Lillian", "Roger", "Cheryl", "Megan", "Jeremy", "Keith", "Hannah", "Andrea", "Ethan", "Sara", "Terry", "Jacqueline", "Christian", "Harry", "Jesse", "Sean", "Teresa", "Ralph", "Austin", "Gloria", "Janice", "Roy", "Theresa", "Louis", "Noah", "Bruce", "Billy", "Judy", "Bryan", "Madison", "Eugene", "Beverly", "Jordan", "Denise", "Jane", "Marilyn", "Amber", "Dylan", "Danielle", "Abigail", "Charlotte", "Diana", "Brittany", "Russell", "Natalie", "Wayne", "Irene", "Ruby", "Annie", "Sophia", "Alan", "Juan", "Gabriel", "Howard", "Fred", "Vincent", "Lori", "Philip", "Kayla", "Alexis", "Tiffany", "Florence", "Isabella", "Kathy", "Louise", "Logan", "Lois", "Tammy", "Crystal", "Randy", "Bonnie", "Phyllis", "Anne", "Taylor", "Victor", "Bobby", "Erin", "Johnny", "Phillip", "Martin", "Josephine", "Alyssa", "Bradley", "Ella", "Shawn", "Clarence", "Travis", "Ernest", "Stanley", "Allison", "Craig", "Shannon", "Elijah", "Edna", "Peggy", "Tina", "Leonard", "Robin", "Dawn", "Carlos", "Earl", "Eleanor", "Jimmy", "Francis", "Cody", "Caleb", "Mason", "Rita", "Danny", "Isaac", "Audrey", "Todd", "Wanda", "Clara", "Ethel", "Paula", "Cameron", "Norma", "Dale", "Ellen", "Luis", "Alex", "Marjorie", "Luke", "Jamie", "Nathaniel", "Allen", "Leslie", "Joel", "Evan", "Edith", "Connie", "Eva", "Gladys", "Carrie", "Ava", "Frederick", "Wendy", "Hazel", "Valerie", "Curtis", "Elaine", "Courtney", "Esther", "Cindy", "Vanessa", "Brianna", "Lucas", "Norman", "Marvin", "Tracy", "Tony", "Monica", "Antonio", "Glenn", "Melanie"};

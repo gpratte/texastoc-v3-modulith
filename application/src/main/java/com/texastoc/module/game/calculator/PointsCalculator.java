@@ -2,7 +2,7 @@ package com.texastoc.module.game.calculator;
 
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
-import com.texastoc.module.game.repository.GamePlayerRepository;
+import com.texastoc.module.game.repository.GameRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,35 +17,34 @@ public class PointsCalculator {
   private final Double tenthPlaceIncr;
   private final Integer tenthPlacePoints;
   private final Double multiplier;
-  private final GamePlayerRepository gamePlayerRepository;
+  private final GameRepository gameRepository;
 
   private final Map<Integer, Map<Integer, Integer>> POINT_SYSTEM = new HashMap<>();
 
-  public PointsCalculator(@Value("${points.tenthPlaceIncr}") Double tenthPlaceIncr, @Value("${points.tenthPlacePoints}") Integer tenthPlacePoints, @Value("${points.multiplier}") Double multiplier, GamePlayerRepository gamePlayerRepository) {
+  public PointsCalculator(@Value("${points.tenthPlaceIncr}") Double tenthPlaceIncr, @Value("${points.tenthPlacePoints}") Integer tenthPlacePoints, @Value("${points.multiplier}") Double multiplier, GameRepository gameRepository) {
     this.tenthPlaceIncr = tenthPlaceIncr;
     this.tenthPlacePoints = tenthPlacePoints;
     this.multiplier = multiplier;
-    this.gamePlayerRepository = gamePlayerRepository;
+    this.gameRepository = gameRepository;
   }
 
-  public List<GamePlayer> calculate(Game game, List<GamePlayer> gamePlayers) {
-
+  public void calculate(Game game) {
     boolean calculationRequired = false;
-    for (GamePlayer gamePlayer : gamePlayers) {
+    for (GamePlayer gamePlayer : game.getPlayers()) {
       if (gamePlayer.getPlace() != null && gamePlayer.getPlace() < 11) {
         calculationRequired = true;
         break;
       }
     }
     if (!calculationRequired) {
-      return gamePlayers;
+      return;
     }
 
     // Get the points for a game with given number of players
     Map<Integer, Integer> placePoints = calculatePlacePoints(game.getNumPlayers());
 
     boolean pointsChanged = false;
-    for (GamePlayer gamePlayer : gamePlayers) {
+    for (GamePlayer gamePlayer : game.getPlayers()) {
       // Check if game player is in top 10
       if (gamePlayer.getPlace() != null && gamePlayer.getPlace() < 11) {
         if (gamePlayer.getPoints() == null || gamePlayer.getPoints().intValue() != placePoints.get(gamePlayer.getPlace())) {
@@ -60,7 +59,7 @@ public class PointsCalculator {
 
     // See if there is a chop
     boolean chopRequired = false;
-    for (GamePlayer gamePlayer : gamePlayers) {
+    for (GamePlayer gamePlayer : game.getPlayers()) {
       if (gamePlayer.getChop() != null) {
         chopRequired = true;
         break;
@@ -68,15 +67,15 @@ public class PointsCalculator {
     }
     if (!chopRequired) {
       if (pointsChanged) {
-        persistPoints(gamePlayers);
+        persistPoints(game);
       }
-      return gamePlayers;
+      return;
     }
 
 
     List<Integer> chips = null;
     List<Integer> amounts = null;
-    for (GamePlayer gamePlayer : gamePlayers) {
+    for (GamePlayer gamePlayer : game.getPlayers()) {
       if (gamePlayer.getChop() != null) {
         if (chips == null) {
           chips = new ArrayList<>();
@@ -111,7 +110,7 @@ public class PointsCalculator {
       List<Chop> chops = ChopCalculator.calculate(chips, amounts);
       if (chops != null && chops.size() > 1) {
         for (Chop chop : chops) {
-          for (GamePlayer gamePlayer : gamePlayers) {
+          for (GamePlayer gamePlayer : game.getPlayers()) {
             if (gamePlayer.getPoints() != null &&
               gamePlayer.getPoints() == chop.getOrgAmount()) {
               gamePlayer.setPoints(chop.getChopAmount());
@@ -120,10 +119,8 @@ public class PointsCalculator {
           }
         }
       }
-      persistPoints(gamePlayers);
+      persistPoints(game);
     }
-
-    return gamePlayers;
   }
 
   /**
@@ -166,20 +163,17 @@ public class PointsCalculator {
     return placePoints;
   }
 
-  private void persistPoints(List<GamePlayer> gamePlayers) {
-    for (GamePlayer gamePlayer : gamePlayers) {
-      GamePlayer currentGamePlayer = gamePlayerRepository.selectById(gamePlayer.getId());
-
-      boolean isToc = currentGamePlayer.getAnnualTocCollected() != null && currentGamePlayer.getAnnualTocCollected() > 0;
-      boolean isQToc = currentGamePlayer.getQuarterlyTocCollected() != null && currentGamePlayer.getQuarterlyTocCollected() > 0;
+  private void persistPoints(Game game) {
+    for (GamePlayer gamePlayer : game.getPlayers()) {
+      boolean isToc = gamePlayer.getAnnualTocCollected() != null && gamePlayer.getAnnualTocCollected() > 0;
+      boolean isQToc = gamePlayer.getQuarterlyTocCollected() != null && gamePlayer.getQuarterlyTocCollected() > 0;
 
       if (isToc || isQToc) {
-        currentGamePlayer.setPoints(gamePlayer.getPoints());
+        gamePlayer.setPoints(gamePlayer.getPoints());
       } else {
-        currentGamePlayer.setPoints(null);
+        gamePlayer.setPoints(null);
       }
-      gamePlayerRepository.update(currentGamePlayer);
     }
+    gameRepository.save(game);
   }
-
 }

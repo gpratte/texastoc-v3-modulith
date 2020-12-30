@@ -6,7 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,8 +25,10 @@ public class Game {
   private int seasonId;
   private int qSeasonId;
 
+  @Min(1)
   private int hostId;
 
+  @NotNull
   private LocalDate date;
 
   // Denormalized fields
@@ -77,8 +82,10 @@ public class Game {
   private LocalDateTime lastCalculated;
   private boolean canRebuy = true;
 
+  @MappedCollection
   private List<GamePlayer> players;
+  @MappedCollection
   private List<GamePayout> payouts;
-
+  @MappedCollection(idColumn = "ID")
   private Seating seating;
 }
