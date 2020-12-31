@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ public class GameTable {
   @Id
   private int id;
   private int tableNum;
+  @MappedCollection
   private List<Seat> seats;
 
   public void addSeat(Seat seat) {

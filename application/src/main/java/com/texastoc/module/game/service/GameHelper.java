@@ -10,7 +10,6 @@ import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.repository.GameRepository;
 import com.texastoc.module.notification.connector.EmailConnector;
-import com.texastoc.module.notification.connector.SMSConnector;
 import com.texastoc.module.player.PlayerModule;
 import com.texastoc.module.player.PlayerModuleFactory;
 import com.texastoc.module.player.model.Player;
@@ -44,22 +43,20 @@ public class GameHelper {
   private final GameCalculator gameCalculator;
   private final PayoutCalculator payoutCalculator;
   private final PointsCalculator pointsCalculator;
+  private final ExecutorService executorService;
 
   // TODO move to the notification module
-  private final SMSConnector smsConnector;
   private final EmailConnector emailConnector;
   private final WebSocketConnector webSocketConnector;
 
   private PlayerModule playerModule;
   private SeasonModule seasonModule;
-  private ExecutorService executorService;
 
-  public GameHelper(GameRepository gameRepository, GameCalculator gameCalculator, PayoutCalculator payoutCalculator, PointsCalculator pointsCalculator, SMSConnector smsConnector, EmailConnector emailConnector, WebSocketConnector webSocketConnector) {
+  public GameHelper(GameRepository gameRepository, GameCalculator gameCalculator, PayoutCalculator payoutCalculator, PointsCalculator pointsCalculator, EmailConnector emailConnector, WebSocketConnector webSocketConnector) {
     this.gameRepository = gameRepository;
     this.gameCalculator = gameCalculator;
     this.payoutCalculator = payoutCalculator;
     this.pointsCalculator = pointsCalculator;
-    this.smsConnector = smsConnector;
     this.emailConnector = emailConnector;
     this.webSocketConnector = webSocketConnector;
 
@@ -79,14 +76,12 @@ public class GameHelper {
     int seasonId = getSeasonModule().getCurrentSeasonId();
     List<Game> games = gameRepository.findUnfinalizedBySeasonId(seasonId);
     if (games.size() > 0) {
-      Game game = games.get(0);
-      return game;
+      return games.get(0);
     }
 
     games = gameRepository.findMostRecentBySeasonId(seasonId);
     if (games.size() > 0) {
-      Game game = games.get(0);
-      return game;
+      return games.get(0);
     }
 
     throw new NotFoundException("Current game not found");
@@ -109,6 +104,11 @@ public class GameHelper {
     if (game.isFinalized()) {
       throw new GameIsFinalizedException("Game is finalized");
     }
+  }
+
+  // TODO move to notification module
+  public void sendUpdatedGame() {
+    executorService.submit(new GameSender());
   }
 
   // TODO move to notification module
@@ -186,11 +186,6 @@ public class GameHelper {
         }
       }
     }
-  }
-
-  // TODO move to notification module
-  public void sendUpdatedGame() {
-    executorService.submit(new GameSender());
   }
 
   private PlayerModule getPlayerModule() {

@@ -10,9 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class PayoutCalculator {
@@ -23,9 +21,9 @@ public class PayoutCalculator {
     this.gameRepository = gameRepository;
   }
 
-  public Set<GamePayout> calculate(Game game) {
+  public List<GamePayout> calculate(Game game) {
     if (game.getPrizePotCalculated() <= 0) {
-      return Collections.emptySet();
+      return Collections.emptyList();
     }
 
     // round to multiple of 5 (e.g. 12 rounds to 10 but 13 rounds to 15)
@@ -45,8 +43,8 @@ public class PayoutCalculator {
     return calculatePayout(numberPaid, game);
   }
 
-  private LinkedHashSet<GamePayout> calculatePayout(int numToPay, Game game) {
-    LinkedHashSet<GamePayout> gamePayouts = new LinkedHashSet<>(numToPay);
+  private List<GamePayout> calculatePayout(int numToPay, Game game) {
+    List<GamePayout> gamePayouts = new ArrayList<>(numToPay);
 
     // If only one player then he gets it all
     if (numToPay == 1) {
@@ -188,7 +186,7 @@ public class PayoutCalculator {
     return gamePayouts;
   }
 
-  private void persistPayouts(LinkedHashSet<GamePayout> gamePayouts, int gameId) {
+  private void persistPayouts(List<GamePayout> gamePayouts, int gameId) {
     Game game = gameRepository.findById(gameId).get();
     game.setPayouts(gamePayouts);
     gameRepository.save(game);

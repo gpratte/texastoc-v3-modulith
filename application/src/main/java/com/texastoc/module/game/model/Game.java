@@ -14,8 +14,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @Builder
@@ -84,9 +83,9 @@ public class Game {
   private boolean canRebuy = true;
 
   @MappedCollection
-  private Set<GamePlayer> players;
+  private List<GamePlayer> players;
   @MappedCollection
-  private LinkedHashSet<GamePayout> payouts;
+  private List<GamePayout> payouts;
   @MappedCollection(idColumn = "ID")
   private Seating seating;
 }

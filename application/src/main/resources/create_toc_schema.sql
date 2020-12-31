@@ -177,6 +177,7 @@ CREATE TABLE game_player
     quarterly_toc_collected boolean     DEFAULT NULL,
     chop                    int         DEFAULT NULL,
     game                    int         NOT NULL,
+    game_key                int         NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY game_player_unique (game_id, player_id)
 );
@@ -192,6 +193,7 @@ CREATE TABLE game_payout
     chop_amount  int    DEFAULT NULL,
     chop_percent double DEFAULT NULL,
     game         int        NOT NULL,
+    game_key     int        NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY game_payout_unique (game_id, place)
 );
@@ -200,11 +202,11 @@ alter table game_payout
 
 CREATE TABLE seats_per_table
 (
-    id        int NOT NULL AUTO_INCREMENT,
-    game_id   int NOT NULL,
-    seats     int NOT NULL,
-    table_num int NOT NULL,
-    seating   int NOT NULL,
+    id          int NOT NULL AUTO_INCREMENT,
+    seats       int NOT NULL,
+    table_num   int NOT NULL,
+    seating     int NOT NULL,
+    seating_key int NOT NULL,
     PRIMARY KEY (id)
 );
 alter table seats_per_table
@@ -217,6 +219,7 @@ CREATE TABLE table_request
     game_player_name varchar(128) NOT NULL,
     table_num        int          NOT NULL,
     seating          int          NOT NULL,
+    seating_key      int          NOT NULL,
     PRIMARY KEY (id)
 );
 alter table table_request
@@ -224,9 +227,10 @@ alter table table_request
 
 CREATE TABLE game_table
 (
-    id        int NOT NULL AUTO_INCREMENT,
-    table_num int NOT NULL,
-    seating   int NOT NULL,
+    id          int NOT NULL AUTO_INCREMENT,
+    table_num   int NOT NULL,
+    seating     int NOT NULL,
+    seating_key int NOT NULL,
     PRIMARY KEY (id)
 );
 alter table game_table
@@ -237,9 +241,10 @@ CREATE TABLE seat
     id               int          NOT NULL AUTO_INCREMENT,
     seat_num         int          NOT NULL,
     table_num        int          NOT NULL,
-    game_player_id   int          NOT NULL,
-    game_player_name varchar(128) NOT NULL,
+    game_player_id   int          DEFAULT NULL,
+    game_player_name varchar(128) DEFAULT NULL,
     game_table       int          NOT NULL,
+    game_table_key   int          NOT NULL,
     PRIMARY KEY (id)
 );
 alter table seat

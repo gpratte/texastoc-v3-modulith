@@ -6,6 +6,7 @@ import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.model.GameTable;
 import com.texastoc.module.game.model.Seat;
 import com.texastoc.module.game.model.Seating;
+import com.texastoc.module.game.model.SeatsPerTable;
 import com.texastoc.module.game.model.TableRequest;
 import com.texastoc.module.game.repository.GameRepository;
 import org.springframework.stereotype.Service;
@@ -13,9 +14,10 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SeatingService {
@@ -52,7 +54,7 @@ public class SeatingService {
       return seating;
     }
 
-    Set<GamePlayer> currentPlayers = game.getPlayers();
+    List<GamePlayer> currentPlayers = game.getPlayers();
     // Count the players that are in the game and have a buy in
     int numPlayersWithBuyIns = 0;
     for (GamePlayer gamePlayer : currentPlayers) {
@@ -83,9 +85,14 @@ public class SeatingService {
         .tableNum(i + 1)
         .build();
       gameTables.add(gameTable);
-      List<Seat> seats = new ArrayList<>(seating.getSeatsPerTables().size());
+      // Get the seats per table for table i+1
+      final int tableNum = i+1;
+      SeatsPerTable seatsPerTable = seating.getSeatsPerTables().stream()
+        .filter(spt -> spt.getTableNum() == tableNum)
+        .findFirst().get();
+      List<Seat> seats = new ArrayList<>(seatsPerTable.getSeats());
       // All seats are dead stacks
-      for (int j = 0; j < seating.getSeatsPerTables().size(); j++) {
+      for (int j = 0; j < seatsPerTable.getSeats(); j++) {
         seats.add(null);
       }
       gameTable.setSeats(seats);
@@ -163,6 +170,13 @@ public class SeatingService {
           }
         }
       }
+    }
+
+    // Remove the null seats
+    for (GameTable gameTable : seating.getGameTables()) {
+      gameTable.setSeats(gameTable.getSeats().stream()
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList()));
     }
 
     gameRepository.save(game);

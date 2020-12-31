@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 
 import java.util.List;
 
@@ -18,7 +19,10 @@ public class Seating {
   @Id
   private int id;
   private int gameId;
+  @MappedCollection
   private List<SeatsPerTable> seatsPerTables;
+  @MappedCollection
   private List<TableRequest> tableRequests;
+  @MappedCollection
   private List<GameTable> gameTables;
 }

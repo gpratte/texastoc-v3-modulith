@@ -1,9 +1,14 @@
 package com.texastoc.config.job;
 
+import com.google.common.collect.ImmutableList;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
+import com.texastoc.module.game.model.Seating;
+import com.texastoc.module.game.model.SeatsPerTable;
+import com.texastoc.module.game.model.TableRequest;
 import com.texastoc.module.game.service.GamePlayerService;
 import com.texastoc.module.game.service.GameService;
+import com.texastoc.module.game.service.SeatingService;
 import com.texastoc.module.player.PlayerModule;
 import com.texastoc.module.player.PlayerModuleFactory;
 import com.texastoc.module.player.model.Player;
@@ -19,9 +24,9 @@ import org.springframework.stereotype.Component;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * When running with an embedded H2 database populate the current season with games.
@@ -34,18 +39,21 @@ public class PopulationScheduler {
   private final SeasonService seasonService;
   private final GameService gameService;
   private final GamePlayerService gamePlayerService;
+  private final SeatingService seatingService;
   private final Random random = new Random(System.currentTimeMillis());
   private PlayerModule playerModule;
   private SettingsModule settingsModule;
 
-  public PopulationScheduler(SeasonService seasonService, GameService gameService, GamePlayerService gamePlayerService) {
+  public PopulationScheduler(SeasonService seasonService, GameService gameService, GamePlayerService gamePlayerService, SeatingService seatingService) {
     this.seasonService = seasonService;
     this.gameService = gameService;
     this.gamePlayerService = gamePlayerService;
+    this.seatingService = seatingService;
   }
 
   // delay one minute then run every hour
-  @Scheduled(fixedDelay = 3600000, initialDelay = 60000)
+  //@Scheduled(fixedDelay = 3600000, initialDelay = 60000)
+  @Scheduled(fixedDelay = 3600000, initialDelay = 5000)
   public void populate() {
     createSeason();
   }
@@ -103,6 +111,7 @@ public class PopulationScheduler {
         .build());
 
       addGamePlayers(game.getId());
+      seatGamePlayers(game.getId());
       addGamePlayersRebuy(game.getId());
       addGamePlayersFinish(game.getId());
 
@@ -160,10 +169,43 @@ public class PopulationScheduler {
     }
   }
 
+  private void seatGamePlayers(int gameId) {
+    Game game = gameService.get(gameId);
+
+    // one table for every 8 players
+    int numPlayers = game.getNumPlayers();
+    int numTables = numPlayers / 8;
+    boolean remainder = (game.getNumPlayers() % 8) > 0;
+    numTables = remainder ? ++numTables : numTables;
+
+    List<SeatsPerTable> seatsPerTables = new LinkedList<>();
+    for (int i = 1; i <= numTables; i++) {
+      SeatsPerTable seatsPerTable = new SeatsPerTable();
+      seatsPerTables.add(seatsPerTable);
+      seatsPerTable.setSeats(8);
+      seatsPerTable.setTableNum(i);
+    }
+
+    Seating seating = new Seating();
+    seating.setSeatsPerTables(seatsPerTables);
+
+    // One table request
+    GamePlayer gamePlayer = game.getPlayers().stream()
+      .findAny().get();
+    TableRequest tableRequest = new TableRequest();
+    tableRequest.setGamePlayerId(gamePlayer.getId());
+    tableRequest.setGamePlayerName(gamePlayer.getName());
+    tableRequest.setTableNum(1);
+    seating.setTableRequests(ImmutableList.of(tableRequest));
+
+    seating.setGameId(game.getId());
+    seatingService.seatGamePlayers(seating);
+  }
+
   private void addGamePlayersRebuy(int gameId) {
     Game game = gameService.get(gameId);
 
-    Set<GamePlayer> gamePlayers = game.getPlayers();
+    List<GamePlayer> gamePlayers = game.getPlayers();
     for (GamePlayer gamePlayer : gamePlayers) {
       if (random.nextBoolean()) {
         gamePlayer.setRebuyAddOnCollected(true);
