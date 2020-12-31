@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 
 @Service
 public class SeatingService {
@@ -51,7 +52,7 @@ public class SeatingService {
       return seating;
     }
 
-    List<GamePlayer> currentPlayers = game.getPlayers();
+    Set<GamePlayer> currentPlayers = game.getPlayers();
     // Count the players that are in the game and have a buy in
     int numPlayersWithBuyIns = 0;
     for (GamePlayer gamePlayer : currentPlayers) {

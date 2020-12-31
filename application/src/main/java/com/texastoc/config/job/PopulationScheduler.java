@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * When running with an embedded H2 database populate the current season with games.
@@ -159,7 +160,7 @@ public class PopulationScheduler {
   private void addGamePlayersRebuy(int gameId, Season season) {
     Game game = gameService.get(gameId);
 
-    List<GamePlayer> gamePlayers = game.getPlayers();
+    Set<GamePlayer> gamePlayers = game.getPlayers();
     for (GamePlayer gamePlayer : gamePlayers) {
       if (random.nextBoolean()) {
         gamePlayer.setBuyInCollected(season.getBuyInCost());

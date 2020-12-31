@@ -22,7 +22,7 @@ CREATE TABLE season
     numGames                          int     DEFAULT NULL,
     numGamesPlayed                    int     DEFAULT NULL,
     finalized                         boolean DEFAULT NULL,
-    lastCalculated                    date    DEFAULT NULL,
+    lastCalculated                    timestamp DEFAULT NULL,
     PRIMARY KEY (id)
 );
 
@@ -39,7 +39,7 @@ CREATE TABLE quarterlyseason
     qTocCollected  int     DEFAULT NULL,
     qTocPerGame    int     DEFAULT NULL,
     numPayouts     int NOT NULL,
-    lastCalculated date    DEFAULT NULL,
+    lastCalculated timestamp DEFAULT NULL,
     PRIMARY KEY (id)
 );
 
@@ -110,13 +110,93 @@ VALUES (1, 'ADMIN', 1),
 
 CREATE TABLE seating
 (
+    id       int NOT NULL AUTO_INCREMENT,
     game_id  int           NOT NULL,
-    settings varchar(8192) NOT NULL,
-    game     int           NOT NULL,
-    PRIMARY KEY (gameId)
+    PRIMARY KEY (id)
 );
-alter table seating
-    add constraint fk_seating_game foreign key (game) references game (id);
+ALTER TABLE seating ADD UNIQUE (game_id);
+
+CREATE TABLE game
+(
+    id                                      int                NOT NULL AUTO_INCREMENT,
+    season_id                               int                NOT NULL,
+    q_season_id                             int                NOT NULL,
+    host_id                                 int            DEFAULT NULL,
+    game_date                               date               NOT NULL,
+    host_name                               varchar(64)    DEFAULT NULL,
+    quarter                                 varchar(16)    DEFAULT NULL,
+    transport_required                      boolean        DEFAULT FALSE,
+    kitty_cost                              int            DEFAULT 0,
+    buy_in_cost                             int            DEFAULT 0,
+    rebuy_add_on_cost                       int            DEFAULT 0,
+    rebuy_add_on_toc_debit                  int            DEFAULT 0,
+    annual_toc_cost                         int            DEFAULT 0,
+    quarterly_toc_cost                      int            DEFAULT 0,
+    started                                 timestamp NULL DEFAULT NULL,
+    num_players                             int            DEFAULT 0,
+    num_paid_players                        int            DEFAULT 0,
+    buy_in_collected                        int            DEFAULT 0,
+    rebuy_add_on_collected                  int            DEFAULT 0,
+    annual_toc_collected                    int            DEFAULT 0,
+    quarterly_toc_collected                 int            DEFAULT 0,
+    total_collected                         int            DEFAULT 0,
+    kitty_calculated                        int            DEFAULT 0,
+    annual_toc_from_rebuy_add_on_calculated int            DEFAULT 0,
+    rebuy_add_on_less_annual_toc_calculated int            DEFAULT 0,
+    total_combined_toc_calculated           int            DEFAULT 0,
+    prize_pot_calculated                    int            DEFAULT 0,
+    payout_delta                            int            DEFAULT NULL,
+    season_game_num                         int            DEFAULT NULL,
+    quarterly_game_num                      int            DEFAULT NULL,
+    finalized                               boolean        DEFAULT FALSE,
+    last_calculated                         timestamp      DEFAULT NULL,
+    can_rebuy                               boolean        DEFAULT TRUE,
+    seating_id                              int,
+    PRIMARY KEY (id)
+);
+alter table game
+    add constraint fk_game_seating foreign key (seating_id) references seating (id);
+
+CREATE TABLE game_player
+(
+    id                      int         NOT NULL AUTO_INCREMENT,
+    player_id               int         NOT NULL,
+    game_id                 int         NOT NULL,
+    q_season_id             int         NOT NULL,
+    season_id               int         NOT NULL,
+    first_name              varchar(64) DEFAULT NULL,
+    last_name               varchar(64) DEFAULT NULL,
+    email                   varchar(64) DEFAULT NULL,
+    place                   int     DEFAULT NULL,
+    points                  int     DEFAULT NULL,
+    knocked_out             boolean DEFAULT FALSE,
+    round_updates           boolean DEFAULT FALSE,
+    buy_in_collected        int     DEFAULT NULL,
+    rebuy_add_on_collected  int     DEFAULT NULL,
+    annual_toc_collected    int     DEFAULT NULL,
+    quarterly_toc_collected int     DEFAULT NULL,
+    chop                    int     DEFAULT NULL,
+    game                    int         NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY game_player_unique (game_id, player_id)
+);
+alter table game_player
+    add constraint fk_game_player_game foreign key (game) references game (id);
+
+CREATE TABLE game_payout
+(
+    id           int        NOT NULL AUTO_INCREMENT,
+    game_id      int        NOT NULL,
+    place        int        NOT NULL,
+    amount       int    DEFAULT NULL,
+    chop_amount  int    DEFAULT NULL,
+    chop_percent double DEFAULT NULL,
+    game         int        NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY game_payout_unique (game_id, place)
+);
+alter table game_payout
+    add constraint fk_game_payout_game foreign key (game) references game (id);
 
 CREATE TABLE seats_per_table
 (
@@ -164,83 +244,6 @@ CREATE TABLE seat
 );
 alter table seat
     add constraint fk_seat_game_table foreign key (game_table) references game_table (id);
-
-CREATE TABLE game
-(
-    id                                      int                NOT NULL AUTO_INCREMENT,
-    season_id                               int                NOT NULL,
-    q_season_id                             int                NOT NULL,
-    host_id                                 int            DEFAULT NULL,
-    game_date                               date               NOT NULL,
-    host_name                               varchar(64)    DEFAULT NULL,
-    quarter                                 int            DEFAULT NULL,
-    transport_required                      boolean        DEFAULT FALSE,
-    kitty_cost                              int            DEFAULT 0,
-    buy_in_cost                             int            DEFAULT 0,
-    rebuy_add_on_cost                       int            DEFAULT 0,
-    rebuy_add_on_toc_debit                  int            DEFAULT 0,
-    annual_toc_cost                         int            DEFAULT 0,
-    quarterly_toc_cost                      int            DEFAULT 0,
-    started                                 timestamp NULL DEFAULT NULL,
-    num_players                             int            DEFAULT 0,
-    buy_on_collected                        int            DEFAULT 0,
-    rebuy_add_on_collected                  int            DEFAULT 0,
-    annual_toc_collected                    int            DEFAULT 0,
-    quarterly_toc_collected                 int            DEFAULT 0,
-    total_collected                         int            DEFAULT 0,
-    kitty_calculated                        int            DEFAULT 0,
-    annual_toc_from_rebuy_add_on_calculated int            DEFAULT 0,
-    rebuy_add_on_less_annual_toc_calculated int            DEFAULT 0,
-    total_combined_toc_calculated           int            DEFAULT 0,
-    prize_pot_calculated                    int            DEFAULT 0,
-    payout_delta                            int            DEFAULT NULL,
-    season_game_num                         int            DEFAULT NULL,
-    quarterly_game_num                      int            DEFAULT NULL,
-    finalized                               boolean        DEFAULT FALSE,
-    last_calculated                         date           DEFAULT NULL,
-    can_rebuy                               boolean        DEFAULT TRUE,
-    PRIMARY KEY (id)
-);
-
-CREATE TABLE game_player
-(
-    id                      int         NOT NULL AUTO_INCREMENT,
-    player_id               int         NOT NULL,
-    game_id                 int         NOT NULL,
-    q_season_id             int         NOT NULL,
-    season_id               int         NOT NULL,
-    first_name              varchar(64) NOT NULL,
-    last_name               varchar(64) NOT NULL,
-    place                   int     DEFAULT NULL,
-    points                  int     DEFAULT NULL,
-    knocked_out             boolean DEFAULT FALSE,
-    round_updates           boolean DEFAULT FALSE,
-    buy_in_collected        int     DEFAULT NULL,
-    rebuy_add_on_collected  int     DEFAULT NULL,
-    annual_toc_collected    int     DEFAULT NULL,
-    quarterly_toc_collected int     DEFAULT NULL,
-    chop                    int     DEFAULT NULL,
-    game                    int         NOT NULL,
-    PRIMARY KEY (id)
-);
-alter table game_player
-    add constraint fk_game_player_game foreign key (game) references game (id);
-
-CREATE TABLE game_payout
-(
-    id          int        NOT NULL AUTO_INCREMENT,
-    gameId      int        NOT NULL,
-    place       int        NOT NULL,
-    amount      int    DEFAULT NULL,
-    chopAmount  int    DEFAULT NULL,
-    chopPercent double DEFAULT NULL,
-    game        int        NOT NULL,
-    PRIMARY KEY (id),
-    UNIQUE KEY game_payout_unique (gameId, place)
-);
-alter table game_payout
-    add constraint fk_game_payout_game foreign key (game) references game (id);
-
 
 CREATE TABLE quarterlyseasonpayout
 (
@@ -320,7 +323,7 @@ CREATE TABLE toc_config
     regular_buy_in_cost     int NOT NULL,
     regular_rebuy_cost      int NOT NULL,
     regular_rebuy_toc_debit int NOT NULL,
-    settings_key            int NOT NULL,
+    year                    int NOT NULL,
     settings                int NOT NULL,
     PRIMARY KEY (id)
 );

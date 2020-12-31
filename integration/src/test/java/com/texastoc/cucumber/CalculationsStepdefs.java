@@ -3,7 +3,11 @@ package com.texastoc.cucumber;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePayout;
 import com.texastoc.module.game.model.GamePlayer;
-import com.texastoc.module.season.model.*;
+import com.texastoc.module.season.model.QuarterlySeason;
+import com.texastoc.module.season.model.QuarterlySeasonPayout;
+import com.texastoc.module.season.model.QuarterlySeasonPlayer;
+import com.texastoc.module.season.model.Season;
+import com.texastoc.module.season.model.SeasonPlayer;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -14,7 +18,9 @@ import org.junit.Ignore;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 // Tests are run from SpringBootBaseIntegrationTest so must Ignore here
 @Ignore
@@ -212,7 +218,7 @@ public class CalculationsStepdefs extends SpringBootBaseIntegrationTest {
     Assert.assertTrue("not finalized", game.isFinalized());
   }
 
-  private void checkPayouts(int prizePot, List<GamePayout> gamePayouts) {
+  private void checkPayouts(int prizePot, LinkedHashSet<GamePayout> gamePayouts) {
 
     Assert.assertNotNull("list of game payouts should not be null", gamePayouts);
     Assert.assertEquals("list of game payouts should be size 2", 2, gamePayouts.size());
@@ -228,8 +234,8 @@ public class CalculationsStepdefs extends SpringBootBaseIntegrationTest {
 
     int totalPaidOut = 0;
 
-    for (int i = 0; i < gamePayouts.size(); ++i) {
-      GamePayout gamePayout = gamePayouts.get(i);
+    int i = 0;
+    for (GamePayout gamePayout : gamePayouts) {
       int amount = amounts.get(i);
       int place = i + 1;
 
@@ -238,13 +244,14 @@ public class CalculationsStepdefs extends SpringBootBaseIntegrationTest {
       Assert.assertNull("payout chop amount should be null", gamePayout.getChopAmount());
       Assert.assertNull("payout chop percentage should be null", gamePayout.getChopPercent());
       totalPaidOut += gamePayout.getAmount();
+      ++i;
     }
 
     Assert.assertEquals("sum of payouts for 10 players should be " + prizePot, prizePot, totalPaidOut);
 
   }
 
-  private void checkGamePoints(List<GamePlayer> gamePlayers) {
+  private void checkGamePoints(Set<GamePlayer> gamePlayers) {
     Assert.assertNotNull("list of game players should not be null", gamePlayers);
     Assert.assertEquals("list of game players should be 10", NUM_PLAYERS, gamePlayers.size());
 

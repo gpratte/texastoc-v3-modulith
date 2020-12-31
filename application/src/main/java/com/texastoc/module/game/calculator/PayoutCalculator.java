@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class PayoutCalculator {
@@ -21,9 +23,9 @@ public class PayoutCalculator {
     this.gameRepository = gameRepository;
   }
 
-  public List<GamePayout> calculate(Game game) {
+  public Set<GamePayout> calculate(Game game) {
     if (game.getPrizePotCalculated() <= 0) {
-      return Collections.emptyList();
+      return Collections.emptySet();
     }
 
     // round to multiple of 5 (e.g. 12 rounds to 10 but 13 rounds to 15)
@@ -43,8 +45,8 @@ public class PayoutCalculator {
     return calculatePayout(numberPaid, game);
   }
 
-  private List<GamePayout> calculatePayout(int numToPay, Game game) {
-    List<GamePayout> gamePayouts = new ArrayList<>(numToPay);
+  private LinkedHashSet<GamePayout> calculatePayout(int numToPay, Game game) {
+    LinkedHashSet<GamePayout> gamePayouts = new LinkedHashSet<>(numToPay);
 
     // If only one player then he gets it all
     if (numToPay == 1) {
@@ -78,10 +80,13 @@ public class PayoutCalculator {
       int extra = totalPayout - prizePot;
       while (extra > 0) {
         for (int i = gamePayouts.size() - 1; i >= 0; --i) {
-          GamePayout gp = gamePayouts.get(i);
-          gp.setAmount(gp.getAmount() - 1);
-          if (--extra == 0) {
-            break;
+          for (GamePayout gp : gamePayouts) {
+            if (gp.getPlace() == i) {
+              gp.setAmount(gp.getAmount() - 1);
+              if (--extra == 0) {
+                break;
+              }
+            }
           }
         }
       }
@@ -165,30 +170,25 @@ public class PayoutCalculator {
       }
     }
 
+    // TODO check if the game payouts are not the same as the current payouts
     // flag if the payouts changed
-    boolean payoutsChanged = false;
-    List<GamePayout> currentPayouts = gameRepository.findById(game.getId()).get().getPayouts();
-    if (gamePayouts.size() != currentPayouts.size()) {
-      payoutsChanged = true;
-    } else {
-      for (int i = 0; i < gamePayouts.size(); i++) {
-        GamePayout gamePayout = gamePayouts.get(i);
-        GamePayout currentPayout = currentPayouts.get(i);
-        if (!gamePayout.equals(currentPayout)) {
-          payoutsChanged = true;
-          break;
-        }
-      }
-    }
-
-    if (payoutsChanged) {
-      persistPayouts(gamePayouts, game.getId());
-    }
+//    boolean payoutsChanged = false;
+//    Set<GamePayout> currentPayouts = gameRepository.findById(game.getId()).get().getPayouts();
+//    if (gamePayouts.size() != currentPayouts.size()) {
+//      payoutsChanged = true;
+//    } else {
+//       figure this out
+//    }
+//
+//    if (payoutsChanged) {
+//      persistPayouts(gamePayouts, game.getId());
+//    }
+    persistPayouts(gamePayouts, game.getId());
 
     return gamePayouts;
   }
 
-  private void persistPayouts(List<GamePayout> gamePayouts, int gameId) {
+  private void persistPayouts(LinkedHashSet<GamePayout> gamePayouts, int gameId) {
     Game game = gameRepository.findById(gameId).get();
     game.setPayouts(gamePayouts);
     gameRepository.save(game);

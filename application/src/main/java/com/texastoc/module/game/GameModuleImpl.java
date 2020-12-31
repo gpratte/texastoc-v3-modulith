@@ -5,9 +5,11 @@ import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.model.Seating;
 import com.texastoc.module.game.service.GameService;
 import com.texastoc.module.game.service.SeatingService;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class GameModuleImpl implements GameModule {
 
   private final GameService gameService;

@@ -5,13 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.annotation.Id;
+
+import java.util.Objects;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class GamePlayer implements Comparable<GamePlayer> {
-
+  @Id
   private int id;
   private int playerId;
   private int qSeasonId;
@@ -102,5 +105,19 @@ public class GamePlayer implements Comparable<GamePlayer> {
       fullName.append(player.lastName);
     }
     return fullName.toString().toLowerCase();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    GamePlayer that = (GamePlayer) o;
+    return playerId == that.playerId &&
+      gameId == that.gameId;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(playerId, gameId);
   }
 }

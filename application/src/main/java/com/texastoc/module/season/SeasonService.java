@@ -80,7 +80,7 @@ public class SeasonService implements SeasonModule {
 
   @Override
   public QuarterlySeason getQuarterlySeasonByDate(LocalDate date) {
-    return null;
+    return qSeasonRepository.getByDate(date);
   }
 
   @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)

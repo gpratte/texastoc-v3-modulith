@@ -6,13 +6,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Data
 @Builder
@@ -20,7 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Game {
-
+  @Id
   private int id;
   private int seasonId;
   private int qSeasonId;
@@ -28,6 +31,7 @@ public class Game {
   @Min(1)
   private int hostId;
 
+  @Column("GAME_DATE")
   @NotNull
   private LocalDate date;
 
@@ -68,7 +72,6 @@ public class Game {
   // total collected minus total combined toc collected minus kitty
   private int prizePotCalculated;
   private int numPaidPlayers;
-  private int numPaidPlayersRemaining;
   private int seasonGameNum;
   private int quarterlyGameNum;
 
@@ -81,9 +84,9 @@ public class Game {
   private boolean canRebuy = true;
 
   @MappedCollection
-  private List<GamePlayer> players;
+  private Set<GamePlayer> players;
   @MappedCollection
-  private List<GamePayout> payouts;
+  private LinkedHashSet<GamePayout> payouts;
   @MappedCollection(idColumn = "ID")
   private Seating seating;
 }
