@@ -2,6 +2,7 @@ package com.texastoc.config.job;
 
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
+import com.texastoc.module.game.service.GamePlayerService;
 import com.texastoc.module.game.service.GameService;
 import com.texastoc.module.player.PlayerModule;
 import com.texastoc.module.player.PlayerModuleFactory;
@@ -32,13 +33,15 @@ public class PopulationScheduler {
 
   private final SeasonService seasonService;
   private final GameService gameService;
+  private final GamePlayerService gamePlayerService;
   private final Random random = new Random(System.currentTimeMillis());
   private PlayerModule playerModule;
   private SettingsModule settingsModule;
 
-  public PopulationScheduler(SeasonService seasonService, GameService gameService) {
+  public PopulationScheduler(SeasonService seasonService, GameService gameService, GamePlayerService gamePlayerService) {
     this.seasonService = seasonService;
     this.gameService = gameService;
+    this.gamePlayerService = gamePlayerService;
   }
 
   // delay one minute then run every hour
@@ -200,7 +203,7 @@ public class PopulationScheduler {
         gamePlayer.setQuarterlyTocCollected(season.getQuarterlyTocPerGame());
       }
       gamePlayer.setPlace(place);
-      gameService.updateGamePlayer(gamePlayer);
+      gamePlayerService.updateGamePlayer(gamePlayer);
     }
   }
 
@@ -216,7 +219,7 @@ public class PopulationScheduler {
     if (random.nextInt(5) == 0) {
       gamePlayer.setQuarterlyTocCollected(season.getQuarterlyTocPerGame());
     }
-    gameService.createGamePlayer(gamePlayer);
+    gamePlayerService.createGamePlayer(gamePlayer);
   }
 
   private void addNewPlayer(Game game, Season season) {
@@ -233,7 +236,7 @@ public class PopulationScheduler {
     if (random.nextBoolean()) {
       gamePlayer.setQuarterlyTocCollected(season.getQuarterlyTocPerGame());
     }
-    gameService.createFirstTimeGamePlayer(gamePlayer);
+    gamePlayerService.createFirstTimeGamePlayer(gamePlayer);
   }
 
   private LocalDate findNextThursday(LocalDate date) {

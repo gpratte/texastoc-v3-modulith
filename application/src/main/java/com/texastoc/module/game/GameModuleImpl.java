@@ -3,6 +3,7 @@ package com.texastoc.module.game;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.model.Seating;
+import com.texastoc.module.game.service.GamePlayerService;
 import com.texastoc.module.game.service.GameService;
 import com.texastoc.module.game.service.SeatingService;
 import org.springframework.stereotype.Component;
@@ -13,10 +14,12 @@ import java.util.List;
 public class GameModuleImpl implements GameModule {
 
   private final GameService gameService;
+  private final GamePlayerService gamePlayerService;
   private final SeatingService seatingService;
 
-  public GameModuleImpl(GameService gameService, SeatingService seatingService) {
+  public GameModuleImpl(GameService gameService, GamePlayerService gamePlayerService, SeatingService seatingService) {
     this.gameService = gameService;
+    this.gamePlayerService = gamePlayerService;
     this.seatingService = seatingService;
   }
 
@@ -62,32 +65,32 @@ public class GameModuleImpl implements GameModule {
 
   @Override
   public GamePlayer createGamePlayer(GamePlayer gamePlayer) {
-    return gameService.createGamePlayer(gamePlayer);
+    return gamePlayerService.createGamePlayer(gamePlayer);
   }
 
   @Override
   public GamePlayer createFirstTimeGamePlayer(GamePlayer gamePlayer) {
-    return gameService.createFirstTimeGamePlayer(gamePlayer);
+    return gamePlayerService.createFirstTimeGamePlayer(gamePlayer);
   }
 
   @Override
   public void updateGamePlayer(GamePlayer gamePlayer) {
-    gameService.updateGamePlayer(gamePlayer);
+    gamePlayerService.updateGamePlayer(gamePlayer);
   }
 
   @Override
   public void toggleGamePlayerKnockedOut(int gameId, int gamePlayerId) {
-    gameService.toggleGamePlayerKnockedOut(gameId, gamePlayerId);
+    gamePlayerService.toggleGamePlayerKnockedOut(gameId, gamePlayerId);
   }
 
   @Override
   public void toggleGamePlayerRebuy(int gameId, int gamePlayerId) {
-    gameService.toggleGamePlayerRebuy(gameId, gamePlayerId);
+    gamePlayerService.toggleGamePlayerRebuy(gameId, gamePlayerId);
   }
 
   @Override
   public void deleteGamePlayer(int gameId, int gamePlayerId) {
-    gameService.deleteGamePlayer(gameId, gamePlayerId);
+    gamePlayerService.deleteGamePlayer(gameId, gamePlayerId);
   }
 
   @Override

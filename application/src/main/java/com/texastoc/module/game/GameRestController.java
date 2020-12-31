@@ -108,7 +108,7 @@ public class GameRestController {
 
   @DeleteMapping("/api/v2/games/{gameId}/players/{gamePlayerId}")
   public void deleteGamePlayer(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId) {
-    gameService.deleteGamePlayer(gameId, gamePlayerId);
+    gameModule.deleteGamePlayer(gameId, gamePlayerId);
   }
 
   @PostMapping(value = "/api/v2/games/{gameId}/seats", consumes = "application/vnd.texastoc.assign-seats+json")

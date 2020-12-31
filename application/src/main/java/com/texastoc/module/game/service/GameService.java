@@ -1,73 +1,36 @@
 package com.texastoc.module.game.service;
 
-import com.google.common.collect.ImmutableSet;
-import com.texastoc.exception.NotFoundException;
-import com.texastoc.module.game.calculator.GameCalculator;
-import com.texastoc.module.game.calculator.PayoutCalculator;
-import com.texastoc.module.game.calculator.PointsCalculator;
-import com.texastoc.module.game.connector.WebSocketConnector;
 import com.texastoc.module.game.exception.GameInProgressException;
-import com.texastoc.module.game.exception.GameIsFinalizedException;
 import com.texastoc.module.game.model.Game;
-import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.repository.GameRepository;
-import com.texastoc.module.notification.connector.EmailConnector;
-import com.texastoc.module.notification.connector.SMSConnector;
 import com.texastoc.module.player.PlayerModule;
 import com.texastoc.module.player.PlayerModuleFactory;
 import com.texastoc.module.player.model.Player;
-import com.texastoc.module.player.model.Role;
 import com.texastoc.module.season.SeasonModule;
 import com.texastoc.module.season.SeasonModuleFactory;
 import com.texastoc.module.season.model.QuarterlySeason;
 import com.texastoc.module.season.model.Season;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.runtime.RuntimeConstants;
-import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.StringWriter;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Slf4j
 @Service
 public class GameService {
 
   private final GameRepository gameRepository;
-  private final GameCalculator gameCalculator;
-  private final PayoutCalculator payoutCalculator;
-  private final PointsCalculator pointsCalculator;
-
-  // TODO move to the notification module
-  private final SMSConnector smsConnector;
-  private final EmailConnector emailConnector;
-  private final WebSocketConnector webSocketConnector;
+  private final GameHelper gameHelper;
 
   private PlayerModule playerModule;
   private SeasonModule seasonModule;
-  private ExecutorService executorService;
 
-  public GameService(GameRepository gameRepository, GameCalculator gameCalculator, PayoutCalculator payoutCalculator, PointsCalculator pointsCalculator, SMSConnector smsConnector, EmailConnector emailConnector, WebSocketConnector webSocketConnector) {
+  public GameService(GameRepository gameRepository, GameHelper gameHelper) {
     this.gameRepository = gameRepository;
-    this.gameCalculator = gameCalculator;
-    this.payoutCalculator = payoutCalculator;
-    this.pointsCalculator = pointsCalculator;
-    this.smsConnector = smsConnector;
-    this.emailConnector = emailConnector;
-    this.webSocketConnector = webSocketConnector;
-
-    executorService = Executors.newCachedThreadPool();
+    this.gameHelper = gameHelper;
   }
 
   @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
@@ -110,7 +73,7 @@ public class GameService {
 
     game = gameRepository.save(game);
 
-    sendUpdatedGame();
+    gameHelper.sendUpdatedGame();
     return game;
   }
 
@@ -119,44 +82,28 @@ public class GameService {
   public void update(Game game) {
     // TODO bean validation https://www.baeldung.com/javax-validation
     Game currentGame = get(game.getId());
-    checkFinalized(currentGame);
+    gameHelper.checkFinalized(currentGame);
     currentGame.setHostId(game.getHostId());
     currentGame.setDate(game.getDate());
     currentGame.setTransportRequired(game.isTransportRequired());
     gameRepository.save(currentGame);
-    sendUpdatedGame();
+    gameHelper.sendUpdatedGame();
   }
 
   @Transactional(readOnly = true)
   public Game get(int id) {
-    Optional<Game> optionalGame = gameRepository.findById(id);
-    if (!optionalGame.isPresent()) {
-      throw new NotFoundException("Game with id " + id + " not found");
-    }
-    return optionalGame.get();
-  }
-
-  @CacheEvict(value = "currentGame", allEntries = true)
-  public void geClearCacheGame() {
+    return gameHelper.get(id);
   }
 
   @Transactional(readOnly = true)
   @Cacheable("currentGame")
   public Game getCurrent() {
-    int seasonId = getSeasonModule().getCurrentSeasonId();
-    List<Game> games = gameRepository.findUnfinalizedBySeasonId(seasonId);
-    if (games.size() > 0) {
-      Game game = games.get(0);
-      return game;
-    }
+    return gameHelper.getCurrent();
+  }
 
-    games = gameRepository.findMostRecentBySeasonId(seasonId);
-    if (games.size() > 0) {
-      Game game = games.get(0);
-      return game;
-    }
 
-    throw new NotFoundException("Current game not found");
+  @CacheEvict(value = "currentGame", allEntries = true)
+  public void geClearCacheGame() {
   }
 
   @Transactional(readOnly = true)
@@ -173,153 +120,21 @@ public class GameService {
     return gameRepository.findBySeasonId(qSeasonId);
   }
 
-  @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
-  @Transactional
-  public GamePlayer createGamePlayer(GamePlayer gamePlayer) {
-    // TODO bean validation https://www.baeldung.com/javax-validation
-    Game game = get(gamePlayer.getGameId());
-    checkFinalized(game);
-
-    GamePlayer gamePlayerCreated = createGamePlayerWorker(gamePlayer, game);
-    sendUpdatedGame();
-    return gamePlayerCreated;
-  }
-
-  @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
-  @Transactional
-  public GamePlayer createFirstTimeGamePlayer(GamePlayer gamePlayer) {
-    // TODO bean validation https://www.baeldung.com/javax-validation
-    Game game = get(gamePlayer.getGameId());
-    checkFinalized(game);
-
-    String firstName = gamePlayer.getFirstName();
-    String lastName = gamePlayer.getLastName();
-    Player player = Player.builder()
-      .firstName(firstName)
-      .lastName(lastName)
-      .email(gamePlayer.getEmail())
-      .roles(ImmutableSet.of(Role.builder()
-        .type(Role.Type.USER)
-        .build()))
-      .build();
-    int playerId = getPlayerModule().create(player).getId();
-    gamePlayer.setPlayerId(playerId);
-
-    GamePlayer gamePlayerCreated = createGamePlayerWorker(gamePlayer, game);
-    sendUpdatedGame();
-    return gamePlayerCreated;
-  }
-
-  @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
-  @Transactional
-  public void updateGamePlayer(GamePlayer gamePlayer) {
-    Game game = get(gamePlayer.getGameId());
-    checkFinalized(game);
-
-    GamePlayer existingGamePlayer = game.getPlayers().stream()
-      .filter(gp -> gp.getId() == gamePlayer.getId())
-      .findFirst().get();
-
-    existingGamePlayer.setPlace(gamePlayer.getPlace());
-    existingGamePlayer.setRoundUpdates(gamePlayer.getRoundUpdates());
-    existingGamePlayer.setBuyInCollected(gamePlayer.getBuyInCollected());
-    existingGamePlayer.setRebuyAddOnCollected(gamePlayer.getRebuyAddOnCollected());
-    existingGamePlayer.setAnnualTocCollected(gamePlayer.getAnnualTocCollected());
-    existingGamePlayer.setQuarterlyTocCollected(gamePlayer.getQuarterlyTocCollected());
-    existingGamePlayer.setChop(gamePlayer.getChop());
-
-    if (gamePlayer.getPlace() != null && gamePlayer.getPlace() <= 10) {
-      gamePlayer.setKnockedOut(true);
-    } else {
-      gamePlayer.setKnockedOut(gamePlayer.getKnockedOut());
-    }
-
-    gameRepository.save(game);
-
-    recalculate(game);
-    sendUpdatedGame();
-  }
-
-  @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
-  @Transactional
-  public void toggleGamePlayerKnockedOut(int gameId, int gamePlayerId) {
-    Game game = get(gameId);
-    checkFinalized(game);
-
-    // TODO NotFoundException if not found
-    GamePlayer gamePlayer = game.getPlayers().stream()
-      .filter(gp -> gp.getId() == gamePlayerId)
-      .findFirst().get();
-    Boolean knockedOut = gamePlayer.getKnockedOut();
-    if (knockedOut == null) {
-      knockedOut = true;
-    } else {
-      knockedOut = !knockedOut;
-    }
-    gamePlayer.setKnockedOut(knockedOut);
-
-    gameRepository.save(game);
-
-    recalculate(game);
-    sendUpdatedGame();
-  }
-
-  @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
-  @Transactional
-  public void toggleGamePlayerRebuy(int gameId, int gamePlayerId) {
-    Game game = get(gameId);
-    checkFinalized(game);
-
-    // TODO NotFoundException if not found
-    GamePlayer gamePlayer = game.getPlayers().stream()
-      .filter(gp -> gp.getId() == gamePlayerId)
-      .findFirst().get();
-    Integer rebuy = gamePlayer.getRebuyAddOnCollected();
-    if (rebuy == null || rebuy != game.getRebuyAddOnCost()) {
-      rebuy = game.getRebuyAddOnCost();
-    } else {
-      rebuy = null;
-    }
-    gamePlayer.setRebuyAddOnCollected(rebuy);
-
-    gameRepository.save(game);
-
-    recalculate(game);
-    sendUpdatedGame();
-  }
-
-  @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
-  @Transactional
-  public void deleteGamePlayer(int gameId, int gamePlayerId) {
-    Game game = get(gameId);
-    checkFinalized(game);
-
-    // TODO NotFoundException if not found
-    GamePlayer gamePlayer = game.getPlayers().stream()
-      .filter(gp -> gp.getId() == gamePlayerId)
-      .findFirst().get();
-    game.getPlayers().remove(gamePlayer);
-    gameRepository.save(game);
-
-    recalculate(game);
-    sendUpdatedGame();
-  }
-
   @CacheEvict(value = {"currentGame", "currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   @Transactional
   public void finalize(int id) {
     // TODO check that the game has the appropriate finishes (e.g. 1st, 2nd, ...)
     Game game = get(id);
-    recalculate(game);
+    gameHelper.recalculate(game);
     game = get(id);
     game.setFinalized(true);
     game.setSeating(null);
     // TODO set game.chopped
     gameRepository.save(game);
     // TODO message season for it to recalculate season and quarter
-    sendUpdatedGame();
+    gameHelper.sendUpdatedGame();
     // TODO message clock to end
-    sendSummary(id);
+    gameHelper.sendSummary(id);
   }
 
   @CacheEvict(value = {"currentGame", "currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
@@ -346,125 +161,7 @@ public class GameService {
 
     gameToOpen.setFinalized(false);
     gameRepository.save(gameToOpen);
-    sendUpdatedGame();
-  }
-
-  // TODO pulled this out of the endGame method because there seems to be
-  // a transactional problem
-  public void sendSummary(int gameId) {
-    sendGameSummary(gameId);
-  }
-
-  // Worker to avoid one @Transacation calling anther @Transactional
-  private GamePlayer createGamePlayerWorker(GamePlayer gamePlayer, Game game) {
-    if (gamePlayer.getFirstName() == null && gamePlayer.getLastName() == null) {
-      Player player = getPlayerModule().get(gamePlayer.getPlayerId());
-      gamePlayer.setFirstName(player.getFirstName());
-      gamePlayer.setLastName(player.getLastName());
-    }
-    gamePlayer.setQSeasonId(game.getQSeasonId());
-    gamePlayer.setSeasonId(game.getSeasonId());
-
-    game.getPlayers().add(gamePlayer);
-    // TODO verify the game player id gets set by spring data jdbc
-    gameRepository.save(game);
-    recalculate(game);
-    return gamePlayer;
-  }
-
-  // TODO separate thread
-  private void recalculate(Game game) {
-    Game calculatedGame = gameCalculator.calculate(game);
-    payoutCalculator.calculate(calculatedGame);
-    pointsCalculator.calculate(calculatedGame);
-  }
-
-  private void checkFinalized(Game game) {
-    if (game.isFinalized()) {
-      throw new GameIsFinalizedException("Game is finalized");
-    }
-  }
-
-  // TODO move to notification module
-  private void sendGameSummary(int id) {
-    SendGameSummary sgs = new SendGameSummary(id);
-    new Thread(sgs).start();
-  }
-
-  // TODO move to notification module
-  private static final VelocityEngine VELOCITY_ENGINE = new VelocityEngine();
-
-  static {
-    VELOCITY_ENGINE.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
-    VELOCITY_ENGINE.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
-    VELOCITY_ENGINE.init();
-  }
-
-  // TODO move to notification module
-  private String getGameSummaryFromTemplate(Game game) {
-    Template t = VELOCITY_ENGINE.getTemplate("game-summary.vm");
-    VelocityContext context = new VelocityContext();
-
-    context.put("game", game);
-
-    boolean chopped = false;
-    for (GamePlayer gamePlayer : game.getPlayers()) {
-      if (gamePlayer.getChop() != null && gamePlayer.getChop() > 0) {
-        chopped = true;
-        break;
-      }
-    }
-    context.put("gameChopped", chopped);
-
-    Season season = getSeasonModule().getSeasonById(game.getSeasonId());
-    context.put("season", season);
-
-    QuarterlySeason currentQSeason = seasonModule.getQuarterlySeasonByDate(game.getDate());
-    for (QuarterlySeason qs : season.getQuarterlySeasons()) {
-      if (qs.getId() == currentQSeason.getId()) {
-        currentQSeason = qs;
-      }
-    }
-    context.put("qSeason", currentQSeason);
-
-    StringWriter writer = new StringWriter();
-    t.merge(context, writer);
-    return writer.toString();
-  }
-
-  // TODO move to notification module
-  private class SendGameSummary implements Runnable {
-    private int gameId;
-    public SendGameSummary(int gameId) {
-      this.gameId = gameId;
-    }
-
-    @Override
-    public void run() {
-      Game game = get(gameId);
-
-      String body = getGameSummaryFromTemplate(game);
-      String subject = "Summary " + game.getDate();
-
-      for (Player player : getPlayerModule().getAll()) {
-        boolean isAdmin = false;
-        for (Role role : player.getRoles()) {
-          if (Role.Type.ADMIN == role.getType()) {
-            isAdmin = true;
-            break;
-          }
-        }
-
-        if (isAdmin && !StringUtils.isBlank(player.getEmail())) {
-          emailConnector.send(player.getEmail(), subject, body);
-        }
-      }
-    }
-  }
-
-  // TODO move to notification module
-  private void sendUpdatedGame() {
-    executorService.submit(new GameSender());
+    gameHelper.sendUpdatedGame();
   }
 
   private PlayerModule getPlayerModule() {
@@ -481,12 +178,4 @@ public class GameService {
     return seasonModule;
   }
 
-  // TODO move to notification module
-  private class GameSender implements Callable<Void> {
-    @Override
-    public Void call() throws Exception {
-      webSocketConnector.sendGame(getCurrent());
-      return null;
-    }
-  }
 }

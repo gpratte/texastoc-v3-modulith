@@ -6,6 +6,7 @@ import com.texastoc.module.game.calculator.PayoutCalculator;
 import com.texastoc.module.game.calculator.PointsCalculator;
 import com.texastoc.module.game.connector.WebSocketConnector;
 import com.texastoc.module.game.repository.GameRepository;
+import com.texastoc.module.game.service.GameHelper;
 import com.texastoc.module.game.service.GameService;
 import com.texastoc.module.notification.connector.EmailConnector;
 import com.texastoc.module.notification.connector.SMSConnector;
@@ -29,6 +30,8 @@ public class GameServiceTest implements TestConstants {
   @MockBean
   private GameRepository gameRepository;
   @MockBean
+  private GameHelper gameHelper;
+  @MockBean
   private GameCalculator gameCalculator;
   @MockBean
   private PayoutCalculator payoutCalculator;
@@ -48,7 +51,7 @@ public class GameServiceTest implements TestConstants {
   @Before
 
   public void before() {
-    gameService = new GameService(gameRepository, gameCalculator, payoutCalculator, pointsCalculator, smsConnector, emailConnector, webSocketConnector);
+    gameService = new GameService(gameRepository, gameHelper);
   }
 
 //  @Ignore
