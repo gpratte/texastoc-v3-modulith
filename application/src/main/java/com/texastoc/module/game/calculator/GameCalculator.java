@@ -36,13 +36,13 @@ public class GameCalculator {
 
     for (GamePlayer gamePlayer : game.getPlayers()) {
       ++numPlayers;
-      buyInCollected += gamePlayer.getBuyInCollected() == null ? 0 : gamePlayer.getBuyInCollected();
-      rebuyAddOnCollected += gamePlayer.getRebuyAddOnCollected() == null ? 0 : gamePlayer.getRebuyAddOnCollected();
-      annualTocCollected += gamePlayer.getAnnualTocCollected() == null ? 0 : gamePlayer.getAnnualTocCollected();
-      quarterlyTocCollected += gamePlayer.getQuarterlyTocCollected() == null ? 0 : gamePlayer.getQuarterlyTocCollected();
+      buyInCollected += gamePlayer.isBuyInCollected() ? 0 : game.getBuyInCost();
+      rebuyAddOnCollected += gamePlayer.isRebuyAddOnCollected() ? 0 : game.getRebuyAddOnCost();
+      annualTocCollected += gamePlayer.isAnnualTocCollected() ? 0 : game.getAnnualTocCost();
+      quarterlyTocCollected += gamePlayer.isQuarterlyTocCollected() ? 0 : game.getQuarterlyTocCost();
 
-      boolean isAnnualToc = gamePlayer.getAnnualTocCollected() != null && gamePlayer.getAnnualTocCollected() > 0;
-      boolean isRebuyAddOn = gamePlayer.getRebuyAddOnCollected() != null && gamePlayer.getRebuyAddOnCollected() > 0;
+      boolean isAnnualToc = gamePlayer.isAnnualTocCollected();
+      boolean isRebuyAddOn = gamePlayer.isRebuyAddOnCollected();
       if (isAnnualToc && isRebuyAddOn) {
         annualTocFromRebuyAddOnCalculated += getTocConfig(game.getSeasonId()).getRegularRebuyTocDebit();
       }

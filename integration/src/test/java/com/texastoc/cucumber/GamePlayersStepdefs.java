@@ -190,14 +190,14 @@ public class GamePlayersStepdefs extends SpringBootBaseIntegrationTest {
     Assert.assertEquals("game player created name should be " + expected.getName(), expected.getName(), actual.getName());
 
     Assert.assertNull("the game player points should be null", actual.getPoints());
-    Assert.assertNull("the game player buyInCollected should be null", actual.getBuyInCollected());
-    Assert.assertNull("the game player rebuyAddOnCollected should be null", actual.getRebuyAddOnCollected());
-    Assert.assertNull("the game player annualTocCollected should be null", actual.getAnnualTocCollected());
-    Assert.assertNull("the game player quarterlyTocCollected should be null", actual.getQuarterlyTocCollected());
+    Assert.assertFalse("the game player buyInCollected should be false", actual.isBuyInCollected());
+    Assert.assertFalse("the game player rebuyAddOnCollected should be false", actual.isRebuyAddOnCollected());
+    Assert.assertFalse("the game player annualTocCollected should be false", actual.isAnnualTocCollected());
+    Assert.assertFalse("the game player quarterlyTocCollected should be false", actual.isQuarterlyTocCollected());
     Assert.assertNull("the game player chop should be null", actual.getChop());
     Assert.assertNull("the game player finish should be null", actual.getPlace());
-    Assert.assertNull("the game player knockedOut should be null", actual.getKnockedOut());
-    Assert.assertNull("the game player roundUpdates should be null", actual.getRoundUpdates());
+    Assert.assertFalse("the game player knockedOut should be false", actual.isKnockedOut());
+    Assert.assertFalse("the game player roundUpdates should be false", actual.isRoundUpdates());
   }
 
   @Then("^the retrieved game has one game player with buy-in$")
@@ -217,10 +217,10 @@ public class GamePlayersStepdefs extends SpringBootBaseIntegrationTest {
     GamePlayer actual = gameRetrieved.getPlayers().stream().findFirst().get();
 
     Assert.assertNull("the game player points should be null", actual.getPoints());
-    Assert.assertEquals("the game player buyInCollected should be " + GAME_BUY_IN, GAME_BUY_IN, (int) actual.getBuyInCollected());
-    Assert.assertNull("the game player rebuyAddOnCollected should be null", actual.getRebuyAddOnCollected());
-    Assert.assertNull("the game player annualTocCollected should be null", actual.getAnnualTocCollected());
-    Assert.assertNull("the game player quarterlyTocCollected should be null", actual.getQuarterlyTocCollected());
+    Assert.assertTrue("the game player buyInCollected should be true", actual.isBuyInCollected());
+    Assert.assertFalse("the game player rebuyAddOnCollected should be false", actual.isRebuyAddOnCollected());
+    Assert.assertFalse("the game player annualTocCollected should be false", actual.isAnnualTocCollected());
+    Assert.assertFalse("the game player quarterlyTocCollected should be false", actual.isQuarterlyTocCollected());
     Assert.assertNull("the game player chop should be null", actual.getChop());
   }
 
@@ -242,10 +242,10 @@ public class GamePlayersStepdefs extends SpringBootBaseIntegrationTest {
       GamePlayer actual = gameRetrieved.getPlayers().stream().findAny().get();
 
       Assert.assertNull("the game player points should be null", actual.getPoints());
-      Assert.assertEquals("the game player buyInCollected should be " + GAME_BUY_IN, GAME_BUY_IN, (int) actual.getBuyInCollected());
-      Assert.assertNull("the game player rebuyAddOnCollected should be null", actual.getRebuyAddOnCollected());
-      Assert.assertNull("the game player annualTocCollected should be null", actual.getAnnualTocCollected());
-      Assert.assertNull("the game player quarterlyTocCollected should be null", actual.getQuarterlyTocCollected());
+      Assert.assertTrue("the game player buyInCollected should be true", actual.isBuyInCollected());
+      Assert.assertFalse("the game player rebuyAddOnCollected should be false", actual.isRebuyAddOnCollected());
+      Assert.assertFalse("the game player annualTocCollected should be false", actual.isAnnualTocCollected());
+      Assert.assertFalse("the game player quarterlyTocCollected should be false", actual.isQuarterlyTocCollected());
       Assert.assertNull("the game player chop should be null", actual.getChop());
     }
   }
@@ -291,24 +291,24 @@ public class GamePlayersStepdefs extends SpringBootBaseIntegrationTest {
       GamePlayer actual = gameRetrieved.getPlayers().stream().findAny().get();
 
       Assert.assertNull("the game player points should be null", actual.getPoints());
-      Assert.assertEquals("the game player buyInCollected should be " + GAME_BUY_IN, GAME_BUY_IN, (int) actual.getBuyInCollected());
+      Assert.assertTrue("the game player buyInCollected should be true", actual.isBuyInCollected());
 
-      if (expected.getRebuyAddOnCollected() == null) {
-        Assert.assertNull("the game player rebuyAddOnCollected should be null", actual.getRebuyAddOnCollected());
+      if (!expected.isRebuyAddOnCollected()) {
+        Assert.assertFalse("the game player rebuyAddOnCollected should be false", actual.isRebuyAddOnCollected());
       } else {
-        Assert.assertEquals("the game player rebuyAddOnCollected should be " + expected.getRebuyAddOnCollected(), expected.getRebuyAddOnCollected(), actual.getRebuyAddOnCollected());
+        Assert.assertTrue("the game player rebuyAddOnCollected should be true", actual.isRebuyAddOnCollected());
       }
 
-      if (expected.getAnnualTocCollected() == null) {
-        Assert.assertNull("the game player annualTocCollected should be null", actual.getAnnualTocCollected());
+      if (!expected.isAnnualTocCollected()) {
+        Assert.assertFalse("the game player annualTocCollected should be false", actual.isAnnualTocCollected());
       } else {
-        Assert.assertEquals("the game player annualTocCollected should be " + expected.getAnnualTocCollected(), expected.getAnnualTocCollected(), actual.getAnnualTocCollected());
+        Assert.assertTrue("the game player annualTocCollected should be true", actual.isAnnualTocCollected());
       }
 
-      if (expected.getQuarterlyTocCollected() == null) {
-        Assert.assertNull("the game player quarterlyTocCollected should be null", actual.getQuarterlyTocCollected());
+      if (!expected.isQuarterlyTocCollected()) {
+        Assert.assertFalse("the game player quarterlyTocCollected should be false", actual.isQuarterlyTocCollected());
       } else {
-        Assert.assertEquals("the game player quarterlyTocCollected should be " + expected.getQuarterlyTocCollected(), expected.getQuarterlyTocCollected(), actual.getQuarterlyTocCollected());
+        Assert.assertTrue("the game player quarterlyTocCollected should be true", actual.isQuarterlyTocCollected());
       }
 
       Assert.assertNull("the game player chop should be null", actual.getChop());
@@ -340,39 +340,39 @@ public class GamePlayersStepdefs extends SpringBootBaseIntegrationTest {
     }
 
     if (expected.isKnockedOut() || (expected.getPlace() != null && expected.getPlace() < 11)) {
-      Assert.assertTrue("the game player should be knockedOut", actual.getKnockedOut());
+      Assert.assertTrue("the game player should be knockedOut", actual.isKnockedOut());
     } else {
-      Assert.assertTrue("the game player should not be knockedOut", actual.getKnockedOut() == null || !actual.getKnockedOut());
+      Assert.assertFalse("the game player should not be knockedOut", actual.isKnockedOut());
     }
 
     if (expected.isRoundUpdates()) {
-      Assert.assertTrue("the game player should be in for round updates", actual.getRoundUpdates());
+      Assert.assertTrue("the game player should be in for round updates", actual.isRoundUpdates());
     } else {
-      Assert.assertTrue("the game player should not be in for round updates", actual.getRoundUpdates() == null || !actual.getRoundUpdates());
+      Assert.assertFalse("the game player should not be in for round updates", actual.isRoundUpdates());
     }
 
     if (expected.isBuyInCollected()) {
-      Assert.assertEquals("the game player buyInCollected should be " + gameRetrieved.getBuyInCost(), gameRetrieved.getBuyInCost(), (int) actual.getBuyInCollected());
+      Assert.assertTrue("the game player buyInCollected should be true", actual.isBuyInCollected());
     } else {
-      Assert.assertNull("the game player should not be bought in", actual.getBuyInCollected());
+      Assert.assertFalse("the game player should not be bought in", actual.isBuyInCollected());
     }
 
     if (expected.isRebuyAddOnCollected()) {
-      Assert.assertEquals("the game player rebuyAddOn should be " + gameRetrieved.getRebuyAddOnCost(), gameRetrieved.getRebuyAddOnCost(), (int) actual.getRebuyAddOnCollected());
+      Assert.assertTrue("the game player rebuyAddOn should be true", actual.isRebuyAddOnCollected());
     } else {
-      Assert.assertNull("the game player should not have rebought", actual.getRebuyAddOnCollected());
+      Assert.assertFalse("the game player should not have rebought", actual.isRebuyAddOnCollected());
     }
 
     if (expected.isAnnualTocCollected()) {
-      Assert.assertEquals("the game player annual toc should be " + gameRetrieved.getAnnualTocCost(), gameRetrieved.getAnnualTocCost(), (int) actual.getAnnualTocCollected());
+      Assert.assertTrue("the game player annual toc should be true", actual.isAnnualTocCollected());
     } else {
-      Assert.assertNull("the game player should not have annual toc", actual.getAnnualTocCollected());
+      Assert.assertFalse("the game player should not have annual toc", actual.isAnnualTocCollected());
     }
 
     if (expected.isQuarterlyTocCollected()) {
-      Assert.assertEquals("the game player quarterly annual toc should be " + gameRetrieved.getQuarterlyTocCost(), gameRetrieved.getQuarterlyTocCost(), (int) actual.getQuarterlyTocCollected());
+      Assert.assertTrue("the game player quarterly annual toc should be true", actual.isQuarterlyTocCollected());
     } else {
-      Assert.assertNull("the game player should not have quarterly annual toc", actual.getQuarterlyTocCollected());
+      Assert.assertFalse("the game player should not have quarterly annual toc", actual.isQuarterlyTocCollected());
     }
 
     Assert.assertNull("the game player chop should be null", actual.getChop());

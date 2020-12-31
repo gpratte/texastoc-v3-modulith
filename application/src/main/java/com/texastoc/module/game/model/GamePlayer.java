@@ -25,12 +25,12 @@ public class GamePlayer implements Comparable<GamePlayer> {
   private String email;
   private Integer points;
   private Integer place;
-  private Boolean knockedOut;
-  private Boolean roundUpdates;
-  private Integer buyInCollected;
-  private Integer rebuyAddOnCollected;
-  private Integer annualTocCollected;
-  private Integer quarterlyTocCollected;
+  private boolean knockedOut;
+  private boolean roundUpdates;
+  private boolean buyInCollected;
+  private boolean rebuyAddOnCollected;
+  private boolean annualTocCollected;
+  private boolean quarterlyTocCollected;
   private Integer chop;
 
   public String getName() {

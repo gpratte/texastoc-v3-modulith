@@ -165,8 +165,8 @@ public class PointsCalculator {
 
   private void persistPoints(Game game) {
     for (GamePlayer gamePlayer : game.getPlayers()) {
-      boolean isToc = gamePlayer.getAnnualTocCollected() != null && gamePlayer.getAnnualTocCollected() > 0;
-      boolean isQToc = gamePlayer.getQuarterlyTocCollected() != null && gamePlayer.getQuarterlyTocCollected() > 0;
+      boolean isToc = gamePlayer.isAnnualTocCollected();
+      boolean isQToc = gamePlayer.isQuarterlyTocCollected();
 
       if (isToc || isQToc) {
         gamePlayer.setPoints(gamePlayer.getPoints());

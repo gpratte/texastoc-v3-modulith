@@ -75,21 +75,20 @@ public class GamePlayerService {
       .findFirst().get();
 
     existingGamePlayer.setPlace(gamePlayer.getPlace());
-    existingGamePlayer.setRoundUpdates(gamePlayer.getRoundUpdates());
-    existingGamePlayer.setBuyInCollected(gamePlayer.getBuyInCollected());
-    existingGamePlayer.setRebuyAddOnCollected(gamePlayer.getRebuyAddOnCollected());
-    existingGamePlayer.setAnnualTocCollected(gamePlayer.getAnnualTocCollected());
-    existingGamePlayer.setQuarterlyTocCollected(gamePlayer.getQuarterlyTocCollected());
+    existingGamePlayer.setRoundUpdates(gamePlayer.isRoundUpdates());
+    existingGamePlayer.setBuyInCollected(gamePlayer.isBuyInCollected());
+    existingGamePlayer.setRebuyAddOnCollected(gamePlayer.isRebuyAddOnCollected());
+    existingGamePlayer.setAnnualTocCollected(gamePlayer.isAnnualTocCollected());
+    existingGamePlayer.setQuarterlyTocCollected(gamePlayer.isQuarterlyTocCollected());
     existingGamePlayer.setChop(gamePlayer.getChop());
 
     if (gamePlayer.getPlace() != null && gamePlayer.getPlace() <= 10) {
       gamePlayer.setKnockedOut(true);
     } else {
-      gamePlayer.setKnockedOut(gamePlayer.getKnockedOut());
+      gamePlayer.setKnockedOut(gamePlayer.isKnockedOut());
     }
 
     gameRepository.save(game);
-
     gameHelper.recalculate(game);
     gameHelper.sendUpdatedGame();
   }
@@ -104,16 +103,14 @@ public class GamePlayerService {
     GamePlayer gamePlayer = game.getPlayers().stream()
       .filter(gp -> gp.getId() == gamePlayerId)
       .findFirst().get();
-    Boolean knockedOut = gamePlayer.getKnockedOut();
+    Boolean knockedOut = gamePlayer.isKnockedOut();
     if (knockedOut == null) {
       knockedOut = true;
     } else {
       knockedOut = !knockedOut;
     }
     gamePlayer.setKnockedOut(knockedOut);
-
     gameRepository.save(game);
-
     gameHelper.recalculate(game);
     gameHelper.sendUpdatedGame();
   }
@@ -128,16 +125,8 @@ public class GamePlayerService {
     GamePlayer gamePlayer = game.getPlayers().stream()
       .filter(gp -> gp.getId() == gamePlayerId)
       .findFirst().get();
-    Integer rebuy = gamePlayer.getRebuyAddOnCollected();
-    if (rebuy == null || rebuy != game.getRebuyAddOnCost()) {
-      rebuy = game.getRebuyAddOnCost();
-    } else {
-      rebuy = null;
-    }
-    gamePlayer.setRebuyAddOnCollected(rebuy);
-
+    gamePlayer.setRebuyAddOnCollected(!gamePlayer.isRebuyAddOnCollected());
     gameRepository.save(game);
-
     gameHelper.recalculate(game);
     gameHelper.sendUpdatedGame();
   }

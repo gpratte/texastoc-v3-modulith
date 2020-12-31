@@ -56,7 +56,7 @@ public class SeatingService {
     // Count the players that are in the game and have a buy in
     int numPlayersWithBuyIns = 0;
     for (GamePlayer gamePlayer : currentPlayers) {
-      if (gamePlayer.getBuyInCollected() != null && gamePlayer.getBuyInCollected() > 0) {
+      if (gamePlayer.isBuyInCollected()) {
         ++numPlayersWithBuyIns;
       }
     }
@@ -64,7 +64,7 @@ public class SeatingService {
     // Players that are in the game and have a buy in
     List<GamePlayer> playersToRandomize = new ArrayList<>(numPlayersWithBuyIns);
     for (GamePlayer gamePlayer : currentPlayers) {
-      if (gamePlayer.getBuyInCollected() != null && gamePlayer.getBuyInCollected() > 0) {
+      if (gamePlayer.isBuyInCollected()) {
         playersToRandomize.add(gamePlayer);
       }
     }

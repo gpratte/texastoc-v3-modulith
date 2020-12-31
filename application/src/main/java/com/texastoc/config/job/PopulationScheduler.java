@@ -102,9 +102,9 @@ public class PopulationScheduler {
         .transportRequired(false)
         .build());
 
-      addGamePlayers(game.getId(), season);
-      addGamePlayersRebuy(game.getId(), season);
-      addGamePlayersFinish(game.getId(), season);
+      addGamePlayers(game.getId());
+      addGamePlayersRebuy(game.getId());
+      addGamePlayersFinish(game.getId());
 
       // Is this the last game? Check if the next game is after now.
       LocalDate nextGameDate = findNextThursday(gameDate.plusDays(1));
@@ -116,7 +116,7 @@ public class PopulationScheduler {
     }
   }
 
-  private void addGamePlayers(int gameId, Season season) {
+  private void addGamePlayers(int gameId) {
     Game game = gameService.get(gameId);
 
     int numPlayersToAddToGame = game.getDate().getDayOfMonth();
@@ -127,7 +127,7 @@ public class PopulationScheduler {
     List<Player> existingPlayers = getPlayerModule().getAll();
 
     if (existingPlayers.size() < 30) {
-      addNewPlayer(game, season);
+      addNewPlayer(game);
       numPlayersToAddToGame -= 1;
     }
 
@@ -142,46 +142,37 @@ public class PopulationScheduler {
           continue;
         }
         // Add existing player to the game
-        addExistingPlayer(game, existingPlayer, season);
+        addExistingPlayer(game, existingPlayer);
         existingPlayersIdsInGame.add(existingPlayer.getId());
         --numPlayersToAddToGame;
       }
     } else {
       // not enough existing players so use all existing players and then add new players
       for (Player existingPlayer : existingPlayers) {
-        addExistingPlayer(game, existingPlayer, season);
+        addExistingPlayer(game, existingPlayer);
         --numPlayersToAddToGame;
       }
 
       // now add new players
       for (int i = 0; i < numPlayersToAddToGame; i++) {
-        addNewPlayer(game, season);
+        addNewPlayer(game);
       }
     }
   }
 
-  private void addGamePlayersRebuy(int gameId, Season season) {
+  private void addGamePlayersRebuy(int gameId) {
     Game game = gameService.get(gameId);
 
     Set<GamePlayer> gamePlayers = game.getPlayers();
     for (GamePlayer gamePlayer : gamePlayers) {
       if (random.nextBoolean()) {
-        gamePlayer.setBuyInCollected(season.getBuyInCost());
-        gamePlayer.setRebuyAddOnCollected(season.getRebuyAddOnCost());
-        Integer annualTocCollect = gamePlayer.getAnnualTocCollected();
-        if (annualTocCollect != null && annualTocCollect > 0) {
-          gamePlayer.setAnnualTocCollected(season.getTocPerGame());
-        }
-        Integer qAnnualTocCollect = gamePlayer.getQuarterlyTocCollected();
-        if (qAnnualTocCollect != null && qAnnualTocCollect > 0) {
-          gamePlayer.setQuarterlyTocCollected(season.getQuarterlyTocPerGame());
-        }
+        gamePlayer.setRebuyAddOnCollected(true);
       }
     }
     gameService.update(game);
   }
 
-  private void addGamePlayersFinish(int gameId, Season season) {
+  private void addGamePlayersFinish(int gameId) {
     Game game = gameService.get(gameId);
 
     // Make a copy of the list
@@ -189,52 +180,39 @@ public class PopulationScheduler {
 
     for (int place = 1; place <= 10 && gamePlayers.size() > 0; ++place) {
       GamePlayer gamePlayer = gamePlayers.remove(random.nextInt(gamePlayers.size()));
-      gamePlayer.setBuyInCollected(season.getBuyInCost());
-      Integer rebuy = gamePlayer.getRebuyAddOnCollected();
-      if (rebuy != null && rebuy > 0) {
-        gamePlayer.setRebuyAddOnCollected(season.getRebuyAddOnCost());
-      }
-      Integer annualTocCollect = gamePlayer.getAnnualTocCollected();
-      if (annualTocCollect != null && annualTocCollect > 0) {
-        gamePlayer.setAnnualTocCollected(season.getTocPerGame());
-      }
-      Integer qAnnualTocCollect = gamePlayer.getQuarterlyTocCollected();
-      if (qAnnualTocCollect != null && qAnnualTocCollect > 0) {
-        gamePlayer.setQuarterlyTocCollected(season.getQuarterlyTocPerGame());
-      }
       gamePlayer.setPlace(place);
       gamePlayerService.updateGamePlayer(gamePlayer);
     }
   }
 
-  private void addExistingPlayer(Game game, Player existingPlayer, Season season) {
+  private void addExistingPlayer(Game game, Player existingPlayer) {
     GamePlayer gamePlayer = new GamePlayer();
     gamePlayer.setGameId(game.getId());
     gamePlayer.setPlayerId(existingPlayer.getId());
-    gamePlayer.setBuyInCollected(season.getBuyInCost());
+    gamePlayer.setBuyInCollected(true);
     if (random.nextBoolean()) {
-      gamePlayer.setAnnualTocCollected(season.getTocPerGame());
+      gamePlayer.setAnnualTocCollected(true);
     }
     // 20% in the quarterly
     if (random.nextInt(5) == 0) {
-      gamePlayer.setQuarterlyTocCollected(season.getQuarterlyTocPerGame());
+      gamePlayer.setQuarterlyTocCollected(true);
     }
     gamePlayerService.createGamePlayer(gamePlayer);
   }
 
-  private void addNewPlayer(Game game, Season season) {
+  private void addNewPlayer(Game game) {
     GamePlayer gamePlayer = new GamePlayer();
     gamePlayer.setGameId(game.getId());
     int firstNameIndex = random.nextInt(300);
     gamePlayer.setFirstName(firstNames[firstNameIndex]);
     int lastNameIndex = random.nextInt(300);
     gamePlayer.setLastName(lastNames[lastNameIndex]);
-    gamePlayer.setBuyInCollected(season.getBuyInCost());
+    gamePlayer.setBuyInCollected(true);
     if (random.nextBoolean()) {
-      gamePlayer.setAnnualTocCollected(season.getTocPerGame());
+      gamePlayer.setAnnualTocCollected(true);
     }
     if (random.nextBoolean()) {
-      gamePlayer.setQuarterlyTocCollected(season.getQuarterlyTocPerGame());
+      gamePlayer.setQuarterlyTocCollected(true);
     }
     gamePlayerService.createFirstTimeGamePlayer(gamePlayer);
   }
