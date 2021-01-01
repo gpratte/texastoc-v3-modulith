@@ -182,7 +182,7 @@ public class PopulationScheduler {
     for (int i = 1; i <= numTables; i++) {
       SeatsPerTable seatsPerTable = new SeatsPerTable();
       seatsPerTables.add(seatsPerTable);
-      seatsPerTable.setSeats(8);
+      seatsPerTable.setNumSeats(8);
       seatsPerTable.setTableNum(i);
     }
 

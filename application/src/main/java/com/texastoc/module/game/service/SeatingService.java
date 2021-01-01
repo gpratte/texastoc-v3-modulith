@@ -55,72 +55,63 @@ public class SeatingService {
     }
 
     List<GamePlayer> currentPlayers = game.getPlayers();
-    // Count the players that are in the game and have a buy in
-    int numPlayersWithBuyIns = 0;
-    for (GamePlayer gamePlayer : currentPlayers) {
-      if (gamePlayer.isBuyInCollected()) {
-        ++numPlayersWithBuyIns;
-      }
-    }
-
     // Players that are in the game and have a buy in
-    List<GamePlayer> playersToRandomize = new ArrayList<>(numPlayersWithBuyIns);
+    List<GamePlayer> playersWithBuyin = new ArrayList<>(currentPlayers.size());
     for (GamePlayer gamePlayer : currentPlayers) {
       if (gamePlayer.isBuyInCollected()) {
-        playersToRandomize.add(gamePlayer);
+        playersWithBuyin.add(gamePlayer);
       }
     }
 
-    if (playersToRandomize.size() > 2) {
+    if (playersWithBuyin.size() > 2) {
       // shuffle the players
       Random random = new Random(System.currentTimeMillis());
       for (int loop = 0; loop < 10; ++loop) {
-        Collections.shuffle(playersToRandomize, random);
+        Collections.shuffle(playersWithBuyin, random);
       }
     }
 
     // Create the seats for the tables (tables are numbered 1's based)
-    for (int i = 0; i < numTables; i++) {
+    for (int i = 1; i <= numTables; i++) {
       GameTable gameTable = GameTable.builder()
-        .tableNum(i + 1)
+        .tableNum(i)
         .build();
       gameTables.add(gameTable);
-      // Get the seats per table for table i+1
-      final int tableNum = i+1;
+      // Get the seats per table for table
+      final int tableNum = i;
       SeatsPerTable seatsPerTable = seating.getSeatsPerTables().stream()
         .filter(spt -> spt.getTableNum() == tableNum)
         .findFirst().get();
-      List<Seat> seats = new ArrayList<>(seatsPerTable.getSeats());
+      List<Seat> seats = new ArrayList<>(seatsPerTable.getNumSeats());
       // All seats are dead stacks
-      for (int j = 0; j < seatsPerTable.getSeats(); j++) {
+      for (int j = 0; j < seatsPerTable.getNumSeats(); j++) {
         seats.add(null);
       }
       gameTable.setSeats(seats);
     }
 
-    int totalPlayersRemaining = playersToRandomize.size();
+    int totalPlayersRemaining = playersWithBuyin.size();
     while ((totalPlayersRemaining) > 0) {
       // Add players in order
       for (GameTable gameTable : gameTables) {
-        if (totalPlayersRemaining > 0) {
-          // Get a player
-          GamePlayer gamePlayer = playersToRandomize.get(totalPlayersRemaining - 1);
-          totalPlayersRemaining -= 1;
+        if (totalPlayersRemaining == 0) {
+          break;
+        }
+        // Get a player
+        GamePlayer gamePlayer = playersWithBuyin.get(--totalPlayersRemaining);
 
-          // Put the player at an empty seat
-          List<Seat> seats = gameTable.getSeats();
-          int seatIndex = 0;
-          for (; seatIndex < seats.size(); seatIndex++) {
-            if (seats.get(seatIndex) == null) {
-              break;
-            }
+        // Put the player at an empty seat
+        List<Seat> seats = gameTable.getSeats();
+        for (int i = 0; i < seats.size(); i++) {
+          if (seats.get(i) == null) {
+            seats.set(i, Seat.builder()
+              .seatNum(i + 1)
+              .tableNum(gameTable.getTableNum())
+              .gamePlayerId(gamePlayer.getId())
+              .gamePlayerName(gamePlayer.getName())
+              .build());
+            break;
           }
-          seats.set(seatIndex, Seat.builder()
-            .seatNum(seatIndex + 1)
-            .tableNum(gameTable.getTableNum())
-            .gamePlayerId(gamePlayer.getId())
-            .gamePlayerName(gamePlayer.getName())
-            .build());
         }
       }
     }
@@ -156,7 +147,7 @@ public class SeatingService {
       if (playerThatWantsToSwapSeat.getTableNum() != tableToMoveTo.getTableNum()) {
         for (Seat seatAtTableToMoveTo : tableToMoveTo.getSeats()) {
           // Find a seat to swap - avoid seats that are dead stacks and avoid seats of players that have already been swapped
-          if (seatAtTableToMoveTo.getGamePlayerId() != null && !seatBelongsToPlayerThatRequestedTheTable(seatAtTableToMoveTo.getGamePlayerId(), seating.getTableRequests())) {
+          if (seatAtTableToMoveTo != null && seatAtTableToMoveTo.getGamePlayerId() != null && !seatBelongsToPlayerThatRequestedTheTable(seatAtTableToMoveTo.getGamePlayerId(), seating.getTableRequests())) {
             // Swap
             int saveGamePlayerId = seatAtTableToMoveTo.getGamePlayerId();
             String saveGamePlayerName = seatAtTableToMoveTo.getGamePlayerName();
@@ -183,7 +174,7 @@ public class SeatingService {
     return seating;
   }
 
-  List<Seat> spacePlayersWithDeadStacks(List<Seat> seats) {
+  private List<Seat> spacePlayersWithDeadStacks(List<Seat> seats) {
     // Some sanity checking
     if (seats == null || seats.size() == 0 || seats.get(0) == null) {
       return seats;
@@ -201,17 +192,22 @@ public class SeatingService {
     int numDeadStacks = numSeats - numPlayers;
 
     if (numPlayers >= numDeadStacks) {
-      // alternate player and dead stack
+      // The number of dead stacks do not outnumber the players. Alternate player and dead stack.
+      // Currently all the players are seated in the first seats of the table.
       List<Seat> newSeats = new ArrayList<>(numSeats);
       int numDeadStacksSeated = 0;
       int seatNumber = 1;
       for (int i = 0; i < seats.size(); i++) {
         Seat seat = seats.get(i);
         if (seat != null) {
-          seat.setSeatNum(seatNumber);
+          // Found a seat with a player in it
+          seat.setSeatNum(seatNumber++);
           newSeats.add(seat);
-          if (++numDeadStacksSeated <= numDeadStacks) {
+          // Now decide if the next seat should be a dead stack
+          if (numDeadStacksSeated < numDeadStacks) {
+            // Make the next seat a dead stack
             ++seatNumber;
+            ++numDeadStacksSeated;
             newSeats.add(null);
           }
         }
@@ -219,18 +215,25 @@ public class SeatingService {
       return newSeats;
     }
 
-    int numDeadsBetween = numDeadStacks / numPlayers;
+    // The number of dead stacks outnumber the players. Put multiple deads stacks between the
+    // players. Currently all the players are seated in the first seats of the table.
     List<Seat> newSeats = new ArrayList<>(numSeats);
+    final double averageDeadsBetween = numDeadStacks / (double)numPlayers;
+    double remainder = 0.0;
     int seatNumber = 1;
     for (int i = 0; i < seats.size(); i++) {
       Seat seat = seats.get(i);
       if (seat != null) {
-        seat.setSeatNum(seatNumber);
+        seat.setSeatNum(seatNumber++);
         newSeats.add(seat);
-        for (int j = 0; j < numDeadsBetween; j++) {
+
+        double numDeadsBetween = averageDeadsBetween + remainder;
+        int deads = (int)Math.floor(numDeadsBetween);
+        for (int j = 0; j < deads; j++) {
           ++seatNumber;
           newSeats.add(null);
         }
+        remainder = numDeadsBetween - deads;
       }
     }
     return newSeats;

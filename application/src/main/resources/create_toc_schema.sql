@@ -203,7 +203,7 @@ alter table game_payout
 CREATE TABLE seats_per_table
 (
     id          int NOT NULL AUTO_INCREMENT,
-    seats       int NOT NULL,
+    num_seats   int NOT NULL,
     table_num   int NOT NULL,
     seating     int NOT NULL,
     seating_key int NOT NULL,

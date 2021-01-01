@@ -13,6 +13,6 @@ import org.springframework.data.annotation.Id;
 public class SeatsPerTable {
   @Id
   private int id;
-  private int seats;
+  private int numSeats;
   private int tableNum;
 }

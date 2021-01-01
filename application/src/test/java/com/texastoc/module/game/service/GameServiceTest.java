@@ -1,4 +1,4 @@
-package com.texastoc.service;
+package com.texastoc.module.game.service;
 
 import com.texastoc.TestConstants;
 import com.texastoc.module.game.calculator.GameCalculator;
@@ -6,8 +6,6 @@ import com.texastoc.module.game.calculator.PayoutCalculator;
 import com.texastoc.module.game.calculator.PointsCalculator;
 import com.texastoc.module.game.connector.WebSocketConnector;
 import com.texastoc.module.game.repository.GameRepository;
-import com.texastoc.module.game.service.GameHelper;
-import com.texastoc.module.game.service.GameService;
 import com.texastoc.module.notification.connector.EmailConnector;
 import com.texastoc.module.notification.connector.SMSConnector;
 import com.texastoc.module.season.calculator.QuarterlySeasonCalculator;
