@@ -117,7 +117,7 @@ public class GameService {
 
   @Transactional(readOnly = true)
   public List<Game> getByQuarterlySeasonId(Integer qSeasonId) {
-    return gameRepository.findBySeasonId(qSeasonId);
+    return gameRepository.findByQuarterlySeasonId(qSeasonId);
   }
 
   @CacheEvict(value = {"currentGame", "currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
