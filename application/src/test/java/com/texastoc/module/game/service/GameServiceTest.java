@@ -1,176 +1,157 @@
 package com.texastoc.module.game.service;
 
+import com.google.common.collect.ImmutableList;
 import com.texastoc.TestConstants;
-import com.texastoc.module.game.calculator.GameCalculator;
-import com.texastoc.module.game.calculator.PayoutCalculator;
-import com.texastoc.module.game.calculator.PointsCalculator;
-import com.texastoc.module.game.connector.WebSocketConnector;
+import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.repository.GameRepository;
-import com.texastoc.module.notification.connector.EmailConnector;
-import com.texastoc.module.notification.connector.SMSConnector;
-import com.texastoc.module.season.calculator.QuarterlySeasonCalculator;
-import com.texastoc.module.season.calculator.SeasonCalculator;
+import com.texastoc.module.player.PlayerModule;
+import com.texastoc.module.player.model.Player;
+import com.texastoc.module.season.SeasonModule;
+import com.texastoc.module.season.model.Quarter;
+import com.texastoc.module.season.model.QuarterlySeason;
+import com.texastoc.module.season.model.Season;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDate;
 import java.util.Random;
 
-@Ignore
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 @RunWith(SpringRunner.class)
 public class GameServiceTest implements TestConstants {
 
-  private GameService gameService;
-  private Random random = new Random(System.currentTimeMillis());
+  private static final Random RANDOM = new Random(System.currentTimeMillis());
 
-  @MockBean
+  private GameService gameService;
+
   private GameRepository gameRepository;
-  @MockBean
   private GameHelper gameHelper;
-  @MockBean
-  private GameCalculator gameCalculator;
-  @MockBean
-  private PayoutCalculator payoutCalculator;
-  @MockBean
-  private PointsCalculator pointsCalculator;
-  @MockBean
-  private SeasonCalculator seasonCalculator;
-  @MockBean
-  private QuarterlySeasonCalculator qSeasonCalculator;
-  @MockBean
-  private SMSConnector smsConnector;
-  @MockBean
-  private EmailConnector emailConnector;
-  @MockBean
-  private WebSocketConnector webSocketConnector;
+
+  private PlayerModule playerModule;
+  private SeasonModule seasonModule;
 
   @Before
-
-  public void before() {
+  public void init() {
+    gameRepository = mock(GameRepository.class);
+    gameHelper = mock(GameHelper.class);
+    playerModule = mock(PlayerModule.class);
+    seasonModule = mock(SeasonModule.class);
     gameService = new GameService(gameRepository, gameHelper);
+    ReflectionTestUtils.setField(gameService, "playerModule", playerModule);
+    ReflectionTestUtils.setField(gameService, "seasonModule", seasonModule);
   }
 
-//  @Ignore
-//  @Test
-//  public void testCreateGame() {
-//
-//    // Arrange
-//    LocalDate start = LocalDate.now();
-//    Game expected = Game.builder()
-//      .date(start)
-//      .hostId(1)
-//      .transportRequired(true)
-//      .build();
-//
-//    Mockito.when(gameRepository.getById((1))).thenReturn(Game.builder()
-//      .id(1)
-//      .date(start)
-//      .hostId(1)
-//      .transportRequired(true)
-//      .seasonId(1)
-//      .qSeasonId(1)
-//      .hostName("Brian Baker")
-//      .quarter(Quarter.FIRST)
-//      .kittyCost(KITTY_PER_GAME)
-//      .annualTocCost(TOC_PER_GAME)
-//      .quarterlyTocCost(QUARTERLY_TOC_PER_GAME)
-//      .seasonGameNum(21)
-//      .quarterlyGameNum(8)
-//      .build());
-//
-//    Mockito.when(gameRepository.save((Game) notNull())).thenReturn(1);
-//
-////    Mockito.when(playerRepository.findAll(ArgumentMatchers.eq(1)))
-////      .thenReturn(Player.builder()
-////        .id(1)
-////        .firstName("Brian")
-////        .lastName("Baker")
-////        .build());
-//
-//    Mockito.when(qSeasonRepository.getCurrent())
-//      .thenReturn(QuarterlySeason.builder()
-//        .id(1)
-//        .quarter(Quarter.FIRST)
-//        .seasonId(1)
-//        .numGamesPlayed(7)
-//        .build());
-//
-//    Mockito.when(seasonRepository.getCurrent())
-//      .thenReturn(Season.builder()
-//        .id(1)
-//        .kittyPerGame(KITTY_PER_GAME)
-//        .tocPerGame(TOC_PER_GAME)
-//        .quarterlyTocPerGame(QUARTERLY_TOC_PER_GAME)
-//        .quarterlyNumPayouts(QUARTERLY_NUM_PAYOUTS)
-//        .buyInCost(GAME_BUY_IN)
-//        .rebuyAddOnCost(GAME_REBUY)
-//        .rebuyAddOnTocDebit(GAME_REBUY_TOC_DEBIT)
-//        .numGamesPlayed(20)
-//        .build());
-//
-//    // Act
-//    Game actual = gameService.createGame(expected);
-//
-//    // Game repository called once
-//    Mockito.verify(gameRepository, Mockito.times(1)).save(any(Game.class));
-//
-//    // Game argument match
-//    ArgumentCaptor<Game> gameArg = ArgumentCaptor.forClass(Game.class);
-//    Mockito.verify(gameRepository).save(gameArg.capture());
-//    assertEquals(start, gameArg.getValue().getDate());
-//    assertEquals(1, (int) gameArg.getValue().getHostId());
-//    Assert.assertTrue(gameArg.getValue().isTransportRequired());
-//
-//
-//    // Assert
-//    assertNotNull("new game should not be null", actual);
-//    assertEquals("new game id should be 1", 1, (int) actual.getId());
-//
-//    assertEquals("SeasonId should be 1", 1, (int) actual.getSeasonId());
-//    assertEquals("QuarterlySeasonId should be 1", 1, (int) actual.getQSeasonId());
-//    assertEquals("Host id should be 1", expected.getHostId(), actual.getHostId());
-//    assertEquals("date should be now", expected.getDate(), actual.getDate());
-//
-//    Assert.assertTrue("Host name should be Brian Baker", "Brian Baker".equals(actual.getHostName()));
-//    assertEquals("Quarter should be first", Quarter.FIRST, actual.getQuarter());
-//
-//    assertNull("last calculated should be null", actual.getLastCalculated());
-//
-//
-//    // Game setup variables
-//    assertEquals("transport required", expected.isTransportRequired(), actual.isTransportRequired());
-//    assertEquals("Kitty cost should be amount set for season", KITTY_PER_GAME, (int) actual.getKittyCost());
-//    assertEquals("Annual TOC be amount set for season", TOC_PER_GAME, (int) actual.getAnnualTocCost());
-//    assertEquals("Quarterly TOC be amount set for season", QUARTERLY_TOC_PER_GAME, (int) actual.getQuarterlyTocCost());
-//
-//    // Game runtime variables
-//    assertNull("not started", actual.getStarted());
-//
-//    assertEquals("No players", 0, (int) actual.getNumPlayers());
-//    assertEquals("No buy in collected", 0, (int) actual.getBuyInCollected());
-//    assertEquals("No rebuy collected", 0, (int) actual.getRebuyAddOnCollected());
-//    assertEquals("No annual toc collected", 0, (int) actual.getAnnualTocCollected());
-//    assertEquals("No quarterly toc collected", 0, (int) actual.getQuarterlyTocCollected());
-//    assertEquals("total collected", 0, (int) actual.getTotalCollected());
-//
-//    assertEquals("Season game number should be one more than the number of season games played", 21, actual.getSeasonGameNum());
-//    assertEquals("Quarterly season game number should be one more than the number of quarterly season games played", 8, actual.getQuarterlyGameNum());
-//
-//    assertEquals("no annualTocFromRebuyAddOnCalculated", 0, (int) actual.getAnnualTocFromRebuyAddOnCalculated());
-//    assertEquals("no rebuyAddOnLessAnnualTocCalculated", 0, (int) actual.getRebuyAddOnLessAnnualTocCalculated());
-//    assertEquals("no totalCombinedTocCalculated", 0, (int) actual.getTotalCombinedTocCalculated());
-//    assertEquals("No kitty calculated", 0, (int) actual.getKittyCalculated());
-//    assertEquals("no prizePotCalculated", 0, (int) actual.getPrizePotCalculated());
-//
-//    Assert.assertFalse("not finalized", actual.isFinalized());
-//
-//    assertEquals("Buy in cost should be amount set for season", GAME_BUY_IN, (int) actual.getBuyInCost());
-//    assertEquals("Rebuy cost should be amount set for season", GAME_REBUY, (int) actual.getRebuyAddOnCost());
-//    assertEquals("Rebuy Toc debit cost should be amount set for season", GAME_REBUY_TOC_DEBIT, (int) actual.getRebuyAddOnTocDebit());
-//  }
-//
+  @Test
+  public void testCreateGame() {
+    // Arrange
+    // Current season
+    when(seasonModule.getCurrentSeason())
+      .thenReturn(Season.builder()
+        .id(16)
+        .kittyPerGame(KITTY_PER_GAME)
+        .tocPerGame(TOC_PER_GAME)
+        .quarterlyTocPerGame(QUARTERLY_TOC_PER_GAME)
+        .quarterlyNumPayouts(QUARTERLY_NUM_PAYOUTS)
+        .buyInCost(GAME_BUY_IN)
+        .rebuyAddOnCost(GAME_REBUY)
+        .rebuyAddOnTocDebit(GAME_REBUY_TOC_DEBIT)
+        .numGamesPlayed(20)
+        .build());
+
+    // Other games are finalized
+    when(gameRepository.findBySeasonId(16))
+      .thenReturn(ImmutableList.of(Game.builder()
+        .finalized(true)
+        .build()));
+
+    // Quarterly season
+    LocalDate gameDate = LocalDate.now();
+    when(seasonModule.getQuarterlySeasonByDate(gameDate))
+      .thenReturn(QuarterlySeason.builder()
+        .id(17)
+        .quarter(Quarter.FIRST)
+        .seasonId(16)
+        .numGamesPlayed(8)
+        .build());
+
+    // Host
+    Mockito.when(playerModule.get(55))
+      .thenReturn(Player.builder()
+        .id(1)
+        .firstName("Johnny")
+        .lastName("Host The Most")
+        .build());
+
+    Game expected = Game.builder()
+      .date(gameDate)
+      .hostId(55)
+      .transportRequired(true)
+      .build();
+
+    // Act
+    gameService.create(expected);
+
+    // Game repository called once
+    Mockito.verify(gameRepository, Mockito.times(1)).save(any(Game.class));
+
+    // Game argument match
+    ArgumentCaptor<Game> gameArg = ArgumentCaptor.forClass(Game.class);
+    Mockito.verify(gameRepository).save(gameArg.capture());
+    Game actual = gameArg.getValue();
+
+    // Assert
+    assertNotNull(actual);
+    assertEquals("SeasonId should be 16", 16, actual.getSeasonId());
+    assertEquals("QuarterlySeasonId should be 17", 17, actual.getQSeasonId());
+    assertEquals("Host id should be 55", expected.getHostId(), actual.getHostId());
+    assertEquals("date should be now", expected.getDate(), actual.getDate());
+
+    assertTrue("Host name should be Johnny Host The Most", "Johnny Host The Most".equals(actual.getHostName()));
+    assertEquals("Quarter should be first", Quarter.FIRST, actual.getQuarter());
+    assertNull("last calculated should be null", actual.getLastCalculated());
+
+    // Game setup variables
+    assertEquals("transport required", expected.isTransportRequired(), actual.isTransportRequired());
+    assertEquals("Kitty cost should be amount set for season", KITTY_PER_GAME, (int) actual.getKittyCost());
+    assertEquals("Annual TOC be amount set for season", TOC_PER_GAME, (int) actual.getAnnualTocCost());
+    assertEquals("Quarterly TOC be amount set for season", QUARTERLY_TOC_PER_GAME, (int) actual.getQuarterlyTocCost());
+
+    // Game runtime variables
+    assertNull("not started", actual.getStarted());
+
+    assertEquals("No players", 0, (int) actual.getNumPlayers());
+    assertEquals("No buy in collected", 0, (int) actual.getBuyInCollected());
+    assertEquals("No rebuy collected", 0, (int) actual.getRebuyAddOnCollected());
+    assertEquals("No annual toc collected", 0, (int) actual.getAnnualTocCollected());
+    assertEquals("No quarterly toc collected", 0, (int) actual.getQuarterlyTocCollected());
+    assertEquals("total collected", 0, (int) actual.getTotalCollected());
+
+    assertEquals("no annualTocFromRebuyAddOnCalculated", 0, (int) actual.getAnnualTocFromRebuyAddOnCalculated());
+    assertEquals("no rebuyAddOnLessAnnualTocCalculated", 0, (int) actual.getRebuyAddOnLessAnnualTocCalculated());
+    assertEquals("no totalCombinedTocCalculated", 0, (int) actual.getTotalCombinedTocCalculated());
+    assertEquals("No kitty calculated", 0, (int) actual.getKittyCalculated());
+    assertEquals("no prizePotCalculated", 0, (int) actual.getPrizePotCalculated());
+
+    Assert.assertFalse("not finalized", actual.isFinalized());
+
+    assertEquals("Buy in cost should be amount set for season", GAME_BUY_IN, (int) actual.getBuyInCost());
+    assertEquals("Rebuy cost should be amount set for season", GAME_REBUY, (int) actual.getRebuyAddOnCost());
+    assertEquals("Rebuy Toc debit cost should be amount set for season", GAME_REBUY_TOC_DEBIT, (int) actual.getRebuyAddOnTocDebit());
+  }
+
 //  /**
 //   * Somewhat of an anorexic test since there are no players but then again
 //   * the game service code is just a pass through to the repositories.

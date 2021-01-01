@@ -49,16 +49,11 @@ public class GameService {
       }
     }
 
-    QuarterlySeason currentQSeason = getSeasonModule().getQuarterlySeasonByDate(game.getDate());
-    game.setSeasonId(currentQSeason.getSeasonId());
-    game.setQSeasonId(currentQSeason.getId());
-    game.setQuarter(currentQSeason.getQuarter());
-    game.setQuarterlyGameNum(currentQSeason.getNumGamesPlayed() + 1);
-
     Player player = getPlayerModule().get(game.getHostId());
     game.setHostName(player.getName());
 
     // Game setup variables
+    game.setSeasonId(currentSeason.getId());
     game.setKittyCost(currentSeason.getKittyPerGame());
     game.setBuyInCost(currentSeason.getBuyInCost());
     game.setRebuyAddOnCost(currentSeason.getRebuyAddOnCost());
@@ -70,6 +65,11 @@ public class GameService {
     game.setBuyInCost(currentSeason.getBuyInCost());
     game.setRebuyAddOnCost(currentSeason.getRebuyAddOnCost());
     game.setRebuyAddOnTocDebit(currentSeason.getRebuyAddOnTocDebit());
+
+    QuarterlySeason currentQSeason = getSeasonModule().getQuarterlySeasonByDate(game.getDate());
+    game.setQSeasonId(currentQSeason.getId());
+    game.setQuarter(currentQSeason.getQuarter());
+    game.setQuarterlyGameNum(currentQSeason.getNumGamesPlayed() + 1);
 
     game = gameRepository.save(game);
 
