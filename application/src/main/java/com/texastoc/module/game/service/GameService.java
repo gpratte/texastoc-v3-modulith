@@ -45,7 +45,7 @@ public class GameService {
     List<Game> otherGames = gameRepository.findBySeasonId(currentSeason.getId());
     for (Game otherGame : otherGames) {
       if (!otherGame.isFinalized()) {
-        throw new GameInProgressException("There is a game in progress.");
+        throw new GameInProgressException("There is a game in progress");
       }
     }
 
@@ -125,6 +125,11 @@ public class GameService {
   public void finalize(int id) {
     // TODO check that the game has the appropriate finishes (e.g. 1st, 2nd, ...)
     Game game = get(id);
+
+    if (game.isFinalized()) {
+      return;
+    }
+
     gameHelper.recalculate(game);
     game = get(id);
     game.setFinalized(true);
@@ -142,6 +147,10 @@ public class GameService {
     // TODO admin only
     Game gameToOpen = get(id);
 
+    if (!gameToOpen.isFinalized()) {
+      return;
+    }
+
     Season season = getSeasonModule().getSeasonById(gameToOpen.getSeasonId());
     if (season.isFinalized()) {
       // TODO throw a unique exception and handle in controller
@@ -155,7 +164,7 @@ public class GameService {
         continue;
       }
       if (!game.isFinalized()) {
-        throw new GameInProgressException("There is a game in progress.");
+        throw new GameInProgressException("There is a game in progress");
       }
     }
 

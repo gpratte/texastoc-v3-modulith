@@ -2,6 +2,7 @@ package com.texastoc.module.game.service;
 
 import com.google.common.collect.ImmutableList;
 import com.texastoc.TestConstants;
+import com.texastoc.module.game.exception.GameInProgressException;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.repository.GameRepository;
 import com.texastoc.module.player.PlayerModule;
@@ -22,12 +23,16 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -102,12 +107,13 @@ public class GameServiceTest implements TestConstants {
     // Act
     gameService.create(expected);
 
+    // Assert
     // Game repository called once
-    Mockito.verify(gameRepository, Mockito.times(1)).save(any(Game.class));
+    verify(gameRepository, Mockito.times(1)).save(any(Game.class));
 
     // Game argument match
     ArgumentCaptor<Game> gameArg = ArgumentCaptor.forClass(Game.class);
-    Mockito.verify(gameRepository).save(gameArg.capture());
+    verify(gameRepository).save(gameArg.capture());
     Game actual = gameArg.getValue();
 
     // Assert
@@ -151,7 +157,30 @@ public class GameServiceTest implements TestConstants {
   }
 
   @Test
+  public void testCannotCreateGame() {
+    // Arrange
+    // Current season
+    when(seasonModule.getCurrentSeason())
+      .thenReturn(Season.builder()
+        .id(16)
+        .build());
+
+    // One other games is not finalized
+    when(gameRepository.findBySeasonId(16))
+      .thenReturn(ImmutableList.of(Game.builder()
+        .finalized(false)
+        .build()));
+
+    // Act & Assert
+    assertThatThrownBy(() -> {
+      gameService.create(new Game());
+    }).isInstanceOf(GameInProgressException.class)
+      .hasMessageContaining("There is a game in progress");
+  }
+
+  @Test
   public void testUpdateGame() {
+    // Arrange
     Mockito.when(gameHelper.get(1)).thenReturn(Game.builder()
       .id(1)
       .hostId(0)
@@ -167,23 +196,31 @@ public class GameServiceTest implements TestConstants {
       .date(now)
       .transportRequired(true)
       .build();
+
+    // Act
     gameService.update(expected);
 
-    Mockito.verify(gameRepository, Mockito.times(1)).save(any(Game.class));
+    // Assert
+    verify(gameRepository, Mockito.times(1)).save(any(Game.class));
   }
 
   @Test
   public void testGetBySeasonId() {
+    // Arrange
     when(gameRepository.findBySeasonId(1))
       .thenReturn(ImmutableList.of(Game.builder().id(1).build(),
         Game.builder().id(2).build()));
 
+    // Act
     List<Game> games = gameService.getBySeasonId(1);
+
+    // Assert
     assertEquals("expect two games", 2, games.size());
   }
 
   @Test
   public void testGetByNoSeasonId() {
+    // Arrange
     when(seasonModule.getCurrentSeasonId()).thenReturn(1);
 
     when(gameRepository.findBySeasonId(1))
@@ -191,128 +228,155 @@ public class GameServiceTest implements TestConstants {
         Game.builder().id(2).build(),
         Game.builder().id(3).build()));
 
+    // Act
     List<Game> games = gameService.getBySeasonId(null);
+
+    // Assert
     assertEquals("expect three games", 3, games.size());
   }
 
   @Test
   public void testGetByQuarterlySeasonId() {
+    // Arrange
     when(gameRepository.findByQuarterlySeasonId(1))
       .thenReturn(ImmutableList.of(Game.builder().id(1).build(),
         Game.builder().id(2).build()));
 
+    // Act
     List<Game> games = gameService.getByQuarterlySeasonId(1);
+
+    // Assert
     assertEquals("expect two games", 2, games.size());
   }
 
-//  @Test
-//  public void testFinalize() {
-//    Mockito.when(gameRepository.getById(1))
-//      .thenReturn(Game.builder()
-//        .id(1)
-//        .qSeasonId(1)
-//        .seasonId(1)
-//        .build());
-//
-//    Mockito.doNothing().when(gameRepository).update((Game) notNull());
-//
-//    gameService.endGame(1);
-//
-//    Mockito.verify(gameRepository, Mockito.times(1)).getById(1);
-//    Mockito.verify(gameRepository, Mockito.times(1)).update(any(Game.class));
-//    Mockito.verify(qSeasonCalculator, Mockito.times(1)).calculate(1);
-//    Mockito.verify(seasonCalculator, Mockito.times(1)).calculate(1);
-//    Mockito.verify(seatingRepository, Mockito.times(1)).deleteByGameId(1);
-//  }
-//
-//  @Test
-//  public void testFinalizeNoChanges() {
-//    Mockito.when(gameRepository.getById(1))
-//      .thenReturn(Game.builder()
-//        .id(1)
-//        .finalized(true)
-//        .build());
-//
-//    try {
-//      gameService.updateGame(Game.builder()
-//        .id(1)
-//        .build());
-//      Assert.fail("should not be able to update a finalized game");
-//    } catch (GameIsFinalizedException e) {
-//      // all good
-//    }
-//
-//    try {
-//      gameService.createGamePlayer(1, CreateGamePlayerRequest.builder()
-//        .build());
-//      Assert.fail("should not be able to update a finalized game");
-//    } catch (GameIsFinalizedException e) {
-//      // all good
-//    }
-//
-//    try {
-//      gameService.updateGamePlayer(1, 1, UpdateGamePlayerRequest.builder().build());
-//      Assert.fail("should not be able to update a finalized game");
-//    } catch (GameIsFinalizedException e) {
-//      // all good
-//    }
-//
-//    Mockito.when(gamePlayerRepository.selectById(1)).thenReturn(GamePlayer.builder()
-//      .id(1)
-//      .gameId(1)
-//      .build());
-//
-//    try {
-//      gameService.deleteGamePlayer(1, 1);
-//      Assert.fail("should not be able to update a finalized game");
-//    } catch (GameIsFinalizedException e) {
-//      // all good
-//    }
-//
-//    try {
-//      gameService.createFirstTimeGamePlayer(1, FirstTimeGamePlayer.builder()
-//        .build());
-//      Assert.fail("should not be able to update a finalized game");
-//    } catch (GameIsFinalizedException e) {
-//      // all good
-//    }
-//  }
-//
-//  @Ignore
-//  @Test
-//  public void testUnFinalizeNoNewGame() {
-//
-//    // Mocking needed to get current game begin >>>
-//    Season season = Season.builder()
-//      .id(1)
-//      .build();
-//    Mockito.when(seasonRepository.getCurrent())
-//      .thenReturn(season);
-//
-//    List<Game> games = new LinkedList<>();
-//    games.add(Game.builder()
-//      .id(1)
-//      .finalized(false)
-//      .build());
-//    Mockito.when(gameRepository.getMostRecent(1))
-//      .thenReturn(games);
-//
-//    Mockito.when(gamePlayerRepository.selectByGameId(1))
-//      .thenReturn(Collections.emptyList());
-//
-//    Mockito.when(gamePayoutRepository.getByGameId(1))
-//      .thenReturn(Collections.emptyList());
-//    // <<< Mocking needed to get current game end
-//
-//    try {
-//      gameService.createGame(Game.builder()
-//        .id(1)
-//        .build());
-//      Assert.fail("should not be able to update a finalized game");
-//    } catch (GameInProgressException e) {
-//      // all good
-//    }
-//
-//  }
+  @Test
+  public void testFinalize() {
+    // Arrange
+    Mockito.when(gameHelper.get(1))
+      .thenReturn(Game.builder()
+        .id(1)
+        .qSeasonId(1)
+        .seasonId(1)
+        .build());
+
+    // Act
+    gameService.finalize(1);
+
+    // Assert
+    verify(gameHelper, Mockito.times(2)).get(1);
+    verify(gameHelper, Mockito.times(1)).recalculate(any(Game.class));
+
+    ArgumentCaptor<Game> gameArg = ArgumentCaptor.forClass(Game.class);
+    verify(gameRepository).save(gameArg.capture());
+    Game actual = gameArg.getValue();
+
+    assertTrue("game should be finalized", actual.isFinalized());
+    assertNull("seating should be null", actual.getSeating());
+  }
+
+  @Test
+  public void testAlreadyFinalize() {
+    // Arrange
+    Mockito.when(gameHelper.get(1))
+      .thenReturn(Game.builder()
+        .id(1)
+        .seasonId(16)
+        .finalized(true)
+        .build());
+
+    // Act
+    gameService.finalize(1);
+
+    // Assert
+    verify(gameRepository, times(0)).save(any());
+  }
+
+  @Test
+  public void testUnfinalize() {
+    // Arrange
+    Mockito.when(gameHelper.get(1))
+      .thenReturn(Game.builder()
+        .id(1)
+        .seasonId(16)
+        .finalized(true)
+        .build());
+
+    when(seasonModule.getSeasonById(16))
+      .thenReturn(Season.builder()
+        .id(16)
+        .finalized(false)
+        .build());
+
+    // Other games are finalized
+    when(gameRepository.findBySeasonId(16))
+      .thenReturn(ImmutableList.of(Game.builder()
+        .finalized(true)
+        .build()));
+
+    // Act
+    gameService.unfinalize(1);
+
+    // Assert
+    ArgumentCaptor<Game> gameArg = ArgumentCaptor.forClass(Game.class);
+    verify(gameRepository).save(gameArg.capture());
+    Game actual = gameArg.getValue();
+
+    assertFalse("game should be unfinalized", actual.isFinalized());
+  }
+
+  @Test
+  public void testCannotUnfinalized() {
+    // Arrange
+    Mockito.when(gameHelper.get(1))
+      .thenReturn(Game.builder()
+        .id(1)
+        .seasonId(16)
+        .finalized(true)
+        .build());
+
+    // Cannot unfinalize because the season is finalized
+    when(seasonModule.getSeasonById(16))
+      .thenReturn(Season.builder()
+        .id(16)
+        .finalized(true)
+        .build());
+
+
+    // Act & Assert
+    assertThatThrownBy(() -> {
+      gameService.unfinalize(1);
+    }).isInstanceOf(RuntimeException.class)
+      .hasMessageContaining("Cannot open a game when season is finalized");
+  }
+
+  @Test
+  public void testCannotUnfinalized2() {
+    // Arrange
+    Mockito.when(gameHelper.get(1))
+      .thenReturn(Game.builder()
+        .id(1)
+        .seasonId(16)
+        .finalized(true)
+        .build());
+
+    when(seasonModule.getSeasonById(16))
+      .thenReturn(Season.builder()
+        .id(16)
+        .finalized(false)
+        .build());
+
+    // One other game is unfinalized
+    when(gameRepository.findBySeasonId(16))
+      .thenReturn(ImmutableList.of(Game.builder()
+        .finalized(false)
+        .build()));
+
+
+    // Act & Assert
+    assertThatThrownBy(() -> {
+      gameService.unfinalize(1);
+    }).isInstanceOf(GameInProgressException.class)
+      .hasMessageContaining("There is a game in progress");
+  }
 
 }
