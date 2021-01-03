@@ -13,6 +13,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+
 @Slf4j
 @Service
 public class GamePlayerService {
@@ -148,7 +150,6 @@ public class GamePlayerService {
     gameHelper.sendUpdatedGame();
   }
 
-  // Worker to avoid one @Transacation calling anther @Transactional
   private GamePlayer createGamePlayerWorker(GamePlayer gamePlayer, Game game) {
     if (gamePlayer.getFirstName() == null && gamePlayer.getLastName() == null) {
       Player player = getPlayerModule().get(gamePlayer.getPlayerId());
@@ -158,6 +159,9 @@ public class GamePlayerService {
     gamePlayer.setQSeasonId(game.getQSeasonId());
     gamePlayer.setSeasonId(game.getSeasonId());
 
+    if (game.getPlayers() == null) {
+      game.setPlayers(new ArrayList<>(1));
+    }
     game.getPlayers().add(gamePlayer);
     // TODO verify the game player id gets set by spring data jdbc
     gameRepository.save(game);
