@@ -1,6 +1,7 @@
 package com.texastoc.module.game.service;
 
 import com.google.common.collect.ImmutableSet;
+import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.repository.GameRepository;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -101,17 +104,14 @@ public class GamePlayerService {
     Game game = gameHelper.get(gameId);
     gameHelper.checkFinalized(game);
 
-    // TODO NotFoundException if not found
-    GamePlayer gamePlayer = game.getPlayers().stream()
+    Optional<GamePlayer> optionalGamePlayer = game.getPlayers().stream()
       .filter(gp -> gp.getId() == gamePlayerId)
-      .findFirst().get();
-    Boolean knockedOut = gamePlayer.isKnockedOut();
-    if (knockedOut == null) {
-      knockedOut = true;
-    } else {
-      knockedOut = !knockedOut;
+      .findFirst();
+    if (!optionalGamePlayer.isPresent()) {
+      throw new NotFoundException("Game player with id " + gamePlayerId + " not found");
     }
-    gamePlayer.setKnockedOut(knockedOut);
+    GamePlayer gamePlayer = optionalGamePlayer.get();
+    gamePlayer.setKnockedOut(!gamePlayer.isKnockedOut());
     gameRepository.save(game);
     gameHelper.recalculate(game);
     gameHelper.sendUpdatedGame();
@@ -123,10 +123,13 @@ public class GamePlayerService {
     Game game = gameHelper.get(gameId);
     gameHelper.checkFinalized(game);
 
-    // TODO NotFoundException if not found
-    GamePlayer gamePlayer = game.getPlayers().stream()
+    Optional<GamePlayer> optionalGamePlayer = game.getPlayers().stream()
       .filter(gp -> gp.getId() == gamePlayerId)
-      .findFirst().get();
+      .findFirst();
+    if (!optionalGamePlayer.isPresent()) {
+      throw new NotFoundException("Game player with id " + gamePlayerId + " not found");
+    }
+    GamePlayer gamePlayer = optionalGamePlayer.get();
     gamePlayer.setRebuyAddOnCollected(!gamePlayer.isRebuyAddOnCollected());
     gameRepository.save(game);
     gameHelper.recalculate(game);
@@ -139,15 +142,15 @@ public class GamePlayerService {
     Game game = gameHelper.get(gameId);
     gameHelper.checkFinalized(game);
 
-    // TODO NotFoundException if not found
-    GamePlayer gamePlayer = game.getPlayers().stream()
-      .filter(gp -> gp.getId() == gamePlayerId)
-      .findFirst().get();
-    game.getPlayers().remove(gamePlayer);
-    gameRepository.save(game);
-
-    gameHelper.recalculate(game);
-    gameHelper.sendUpdatedGame();
+    if (game.getPlayers() != null) {
+      // Remove the game player from the list of game players
+      game.setPlayers(game.getPlayers().stream()
+        .filter(gp -> gp.getId() != gamePlayerId)
+        .collect(Collectors.toList()));
+      gameRepository.save(game);
+      gameHelper.recalculate(game);
+      gameHelper.sendUpdatedGame();
+    }
   }
 
   private GamePlayer createGamePlayerWorker(GamePlayer gamePlayer, Game game) {
