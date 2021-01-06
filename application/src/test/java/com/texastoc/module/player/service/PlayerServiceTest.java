@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.texastoc.common.AuthorizationHelper;
 import com.texastoc.exception.NotFoundException;
-import com.texastoc.module.notification.connector.EmailConnector;
+import com.texastoc.module.notification.NotificationModule;
 import com.texastoc.module.player.exception.CannotRemoveRoleException;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
@@ -17,6 +17,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,23 +30,24 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.notNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class PlayerServiceTest {
 
   private PlayerService playerService;
   private PlayerRepository playerRepository;
   private BCryptPasswordEncoder bCryptPasswordEncoder;
-  private EmailConnector emailConnector;
   private AuthorizationHelper authorizationHelper;
 
   @Before
   public void before() {
     bCryptPasswordEncoder = mock(BCryptPasswordEncoder.class);
     playerRepository = mock(PlayerRepository.class);
-    emailConnector = mock(EmailConnector.class);
     authorizationHelper = mock(AuthorizationHelper.class);
-    playerService = new PlayerService(playerRepository, bCryptPasswordEncoder, emailConnector, authorizationHelper);
+    playerService = new PlayerService(playerRepository, bCryptPasswordEncoder, authorizationHelper);
   }
 
   @Test
@@ -61,8 +63,6 @@ public class PlayerServiceTest {
 
     when(playerRepository.save((Player) notNull())).thenReturn(Player.builder().id(1).build());
 
-    when(bCryptPasswordEncoder.encode("password")).thenReturn("encodedPassword");
-
     // Act
     Player actual = playerService.create(expected);
 
@@ -70,7 +70,6 @@ public class PlayerServiceTest {
     assertNotNull(actual);
     assertEquals(1, actual.getId());
     verify(playerRepository, Mockito.times(1)).save(any(Player.class));
-    verify(bCryptPasswordEncoder, Mockito.times(1)).encode("password");
 
     ArgumentCaptor<Player> argument = ArgumentCaptor.forClass(Player.class);
     verify(playerRepository).save(argument.capture());
@@ -79,7 +78,6 @@ public class PlayerServiceTest {
     assertEquals("youruncle", param.getLastName());
     assertEquals("1234567890", param.getPhone());
     assertEquals("abc@xyz.com", param.getEmail());
-    assertEquals("encodedPassword", param.getPassword());
     assertThat(param.getRoles()).containsExactly(Role.builder()
       .type(Role.Type.USER)
       .build());
@@ -310,11 +308,15 @@ public class PlayerServiceTest {
 
   @Test
   public void testForgotPassword() {
+    // Arrange
+    NotificationModule notificationModule = mock(NotificationModule.class);
+    ReflectionTestUtils.setField(playerService, "notificationModule", notificationModule);
+
     // Act
     playerService.forgotPassword("abc@def.com");
 
     // Assert
-    Mockito.verify(emailConnector, Mockito.times(1)).send(anyString(), anyString(), anyString());
+    Mockito.verify(notificationModule, Mockito.times(1)).sendEmail(any(), anyString(), anyString());
   }
 
   @Test
@@ -322,11 +324,15 @@ public class PlayerServiceTest {
     // Arrange
     String email = "abc@def.com";
     String password = "newPassword";
+    NotificationModule notificationModule = mock(NotificationModule.class);
+    ReflectionTestUtils.setField(playerService, "notificationModule", notificationModule);
 
+    // Act
     playerService.forgotPassword(email);
 
+    // Assert
     ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
-    verify(emailConnector).send(anyString(), anyString(), argument.capture());
+    verify(notificationModule).sendEmail(any(), anyString(), argument.capture());
     String code = argument.getValue();
     System.out.println(code);
 
@@ -337,7 +343,6 @@ public class PlayerServiceTest {
       .email(email)
       .build();
     when(playerRepository.findByEmail(email)).thenReturn(ImmutableList.of(player));
-
 
     // Act
     playerService.resetPassword(code, password);
@@ -353,11 +358,15 @@ public class PlayerServiceTest {
     // Arrange
     String email = "abc@def.com";
     String password = "newPassword";
+    NotificationModule notificationModule = mock(NotificationModule.class);
+    ReflectionTestUtils.setField(playerService, "notificationModule", notificationModule);
 
+    // Act
     playerService.forgotPassword(email);
 
+    // Assert
     ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
-    verify(emailConnector).send(anyString(), anyString(), argument.capture());
+    verify(notificationModule).sendEmail(any(), anyString(), argument.capture());
     String code = argument.getValue();
     System.out.println(code);
 

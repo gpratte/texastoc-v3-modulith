@@ -88,9 +88,9 @@ public class GamePlayerService {
     existingGamePlayer.setChop(gamePlayer.getChop());
 
     if (gamePlayer.getPlace() != null && gamePlayer.getPlace() <= 10) {
-      gamePlayer.setKnockedOut(true);
+      existingGamePlayer.setKnockedOut(true);
     } else {
-      gamePlayer.setKnockedOut(gamePlayer.isKnockedOut());
+      existingGamePlayer.setKnockedOut(gamePlayer.isKnockedOut());
     }
 
     gameRepository.save(game);

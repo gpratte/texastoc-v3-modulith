@@ -139,7 +139,7 @@ public class GameService {
     // TODO message season for it to recalculate season and quarter
     gameHelper.sendUpdatedGame();
     // TODO message clock to end
-    gameHelper.sendSummary(id);
+    gameHelper.sendGameSummary(id);
   }
 
   @CacheEvict(value = {"currentGame", "currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)

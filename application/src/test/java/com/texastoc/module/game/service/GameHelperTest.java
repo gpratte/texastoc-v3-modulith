@@ -8,7 +8,7 @@ import com.texastoc.module.game.connector.WebSocketConnector;
 import com.texastoc.module.game.exception.GameIsFinalizedException;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.repository.GameRepository;
-import com.texastoc.module.notification.connector.EmailConnector;
+import com.texastoc.module.player.PlayerModule;
 import com.texastoc.module.season.SeasonModule;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,30 +24,33 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class GameHelperTest {
 
   private GameHelper gameHelper;
   private GameRepository gameRepository;
-  private GameCalculator gameCalculator;
-  private PayoutCalculator payoutCalculator;
-  private PointsCalculator pointsCalculator;
+  private PlayerModule playerModule;
   private SeasonModule seasonModule;
-  private EmailConnector emailConnector = mock(EmailConnector.class);
+  private GameCalculator gameCalculator = mock(GameCalculator.class);
+  private PayoutCalculator payoutCalculator = mock(PayoutCalculator.class);
+  private PointsCalculator pointsCalculator = mock(PointsCalculator.class);
   private WebSocketConnector webSocketConnector = mock(WebSocketConnector.class);
+
 
   @Before
   public void init() {
     gameRepository = mock(GameRepository.class);
-    gameCalculator = mock(GameCalculator.class);
-    payoutCalculator = mock(PayoutCalculator.class);
+    playerModule = mock(PlayerModule.class);
     seasonModule = mock(SeasonModule.class);
-    gameHelper = new GameHelper(gameRepository, gameCalculator, payoutCalculator, pointsCalculator, emailConnector, webSocketConnector);
+    gameHelper = new GameHelper(gameRepository, gameCalculator, payoutCalculator, pointsCalculator, webSocketConnector);
+    ReflectionTestUtils.setField(gameHelper, "playerModule", playerModule);
+    ReflectionTestUtils.setField(gameHelper, "seasonModule", seasonModule);
   }
 
   @Test
-  public void getGame() {
+  public void testGetGame() {
     // Arrange
     LocalDate now = LocalDate.now();
     Game game = Game.builder()
@@ -60,13 +63,13 @@ public class GameHelperTest {
     Game actual = gameHelper.get(111);
 
     // Assert
-    Mockito.verify(gameRepository, Mockito.times(1)).findById(111);
+    verify(gameRepository, Mockito.times(1)).findById(111);
     assertEquals(111, actual.getId());
     assertEquals(now, actual.getDate());
   }
 
   @Test
-  public void getGameNotFound() {
+  public void testGetGameNotFound() {
     // Arrange
     when(gameRepository.findById(111)).thenReturn(Optional.empty());
 
@@ -78,9 +81,8 @@ public class GameHelperTest {
   }
 
   @Test
-  public void getCurrentUnfinalized() {
+  public void testGetCurrentUnfinalized() {
     // Arrange
-    ReflectionTestUtils.setField(gameHelper, "seasonModule", seasonModule);
     when(seasonModule.getCurrentSeasonId()).thenReturn(2);
 
     LocalDate now = LocalDate.now();
@@ -96,15 +98,14 @@ public class GameHelperTest {
     Game actual = gameHelper.getCurrent();
 
     // Assert
-    Mockito.verify(gameRepository, Mockito.times(1)).findUnfinalizedBySeasonId(2);
+    verify(gameRepository, Mockito.times(1)).findUnfinalizedBySeasonId(2);
     assertEquals(111, actual.getId());
     assertEquals(now, actual.getDate());
   }
 
   @Test
-  public void getCurrentMostRecent() {
+  public void testGetCurrentMostRecent() {
     // Arrange
-    ReflectionTestUtils.setField(gameHelper, "seasonModule", seasonModule);
     when(seasonModule.getCurrentSeasonId()).thenReturn(2);
     when(gameRepository.findUnfinalizedBySeasonId(2)).thenReturn(Collections.emptyList());
 
@@ -121,14 +122,14 @@ public class GameHelperTest {
     Game actual = gameHelper.getCurrent();
 
     // Assert
-    Mockito.verify(gameRepository, Mockito.times(1)).findUnfinalizedBySeasonId(2);
-    Mockito.verify(gameRepository, Mockito.times(1)).findMostRecentBySeasonId(2);
+    verify(gameRepository, Mockito.times(1)).findUnfinalizedBySeasonId(2);
+    verify(gameRepository, Mockito.times(1)).findMostRecentBySeasonId(2);
     assertEquals(112, actual.getId());
     assertEquals(now, actual.getDate());
   }
 
   @Test
-  public void checkNotFinalized() {
+  public void testCheckNotFinalized() {
     // Arrange
     LocalDate now = LocalDate.now();
     Game game = Game.builder()
@@ -141,7 +142,7 @@ public class GameHelperTest {
   }
 
   @Test
-  public void checkFinalized() {
+  public void testCheckFinalized() {
     // Arrange
     LocalDate now = LocalDate.now();
     Game game = Game.builder()
@@ -153,5 +154,22 @@ public class GameHelperTest {
       gameHelper.checkFinalized(game);
     }).isInstanceOf(GameIsFinalizedException.class)
       .hasMessageContaining("Game is finalized");
+  }
+
+  @Test
+  public void testRecalculate() {
+    // Arrange
+    Game game = new Game();
+    Game calculatgedGame = new Game();
+
+    when(gameCalculator.calculate(game)).thenReturn(calculatgedGame);
+
+    // Act
+    gameHelper.recalculate(game);
+
+    // Assert
+    verify(gameCalculator, Mockito.times(1)).calculate(game);
+    verify(payoutCalculator, Mockito.times(1)).calculate(calculatgedGame);
+    verify(pointsCalculator, Mockito.times(1)).calculate(calculatgedGame);
   }
 }

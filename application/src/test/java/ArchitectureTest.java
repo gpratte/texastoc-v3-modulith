@@ -6,6 +6,8 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 public class ArchitectureTest {
 
+  // TODO can get the modules programmatically instead of hard coded
+
   /**
    * Make sure the non-player modules (game, notification, season and supply) do not
    * access any classes in the following packages
@@ -55,7 +57,15 @@ public class ArchitectureTest {
   public void gameModuleInterfaceAndModel() {
     JavaClasses importedClasses = new ClassFileImporter().importPackages("com.texastoc.module");
     noClasses().that().resideInAnyPackage("..player..", "..settings..", "..notification..", "..season..")
-      .should().dependOnClassesThat().resideInAnyPackage("..game.config..", "..game.connector..", "..game.exception..", "..game.repository..", "..game.request..", "..game.service..")
+      .should().dependOnClassesThat().resideInAnyPackage("..game.config..", "..game.connector..", "..game.exception..", "..game.repository..", "..game.service..")
+      .check(importedClasses);
+  }
+
+  @Test
+  public void notificationModuleInterfaceAndModel() {
+    JavaClasses importedClasses = new ClassFileImporter().importPackages("com.texastoc.module");
+    noClasses().that().resideInAnyPackage("..player..", "..settings..", "..game..", "..season..")
+      .should().dependOnClassesThat().resideInAnyPackage("..notification.config..", "..notification.connector..", "..notification.exception..", "..notification.repository..", "..notification.service..")
       .check(importedClasses);
   }
 
