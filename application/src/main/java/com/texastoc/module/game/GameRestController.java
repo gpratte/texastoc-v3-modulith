@@ -58,7 +58,7 @@ public class GameRestController {
   // TODO this needs to go away
   @GetMapping(value = "/api/v2/games", consumes = "application/vnd.texastoc.clear-cache+json")
   public String getCurrentNoCacheGame() {
-    gameService.geClearCacheGame();
+    gameService.clearCacheGame();
     return "done";
   }
 

@@ -14,24 +14,36 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GamePlayer implements Comparable<GamePlayer> {
+  // Read-only id set when game player is created
   @Id
   private int id;
+
+  // Read/write fields from API
   private int playerId;
+  private int gameId;
+  private boolean boughtIn;
+  private boolean rebought;
+  private boolean annualTocParticipant;
+  private boolean quarterlyTocParticipant;
+  private boolean roundUpdates;
+  private Integer place;
+  private boolean knockedOut;
+  private Integer chop;
+
+  // Read-only fields set by the server
   private int qSeasonId;
   private int seasonId;
-  private int gameId;
   private String firstName;
   private String lastName;
   private String email;
   private Integer points;
-  private Integer place;
-  private boolean knockedOut;
-  private boolean roundUpdates;
-  private boolean buyInCollected;
-  private boolean rebuyAddOnCollected;
-  private boolean annualTocCollected;
-  private boolean quarterlyTocCollected;
-  private Integer chop;
+
+  // End with "Collected" for physical money collected.
+  // Read-only fields set by the server
+  private Integer buyInCollected;
+  private Integer rebuyAddOnCollected;
+  private Integer annualTocCollected;
+  private Integer quarterlyTocCollected;
 
   public String getName() {
     String name = null;

@@ -208,7 +208,7 @@ public class PopulationScheduler {
     List<GamePlayer> gamePlayers = game.getPlayers();
     for (GamePlayer gamePlayer : gamePlayers) {
       if (random.nextBoolean()) {
-        gamePlayer.setRebuyAddOnCollected(true);
+        gamePlayer.setRebought(true);
       }
     }
     gameService.update(game);
@@ -231,13 +231,13 @@ public class PopulationScheduler {
     GamePlayer gamePlayer = new GamePlayer();
     gamePlayer.setGameId(game.getId());
     gamePlayer.setPlayerId(existingPlayer.getId());
-    gamePlayer.setBuyInCollected(true);
+    gamePlayer.setBoughtIn(true);
     if (random.nextBoolean()) {
-      gamePlayer.setAnnualTocCollected(true);
+      gamePlayer.setAnnualTocParticipant(true);
     }
     // 20% in the quarterly
     if (random.nextInt(5) == 0) {
-      gamePlayer.setQuarterlyTocCollected(true);
+      gamePlayer.setQuarterlyTocParticipant(true);
     }
     gamePlayerService.createGamePlayer(gamePlayer);
   }
@@ -249,12 +249,12 @@ public class PopulationScheduler {
     gamePlayer.setFirstName(firstNames[firstNameIndex]);
     int lastNameIndex = random.nextInt(300);
     gamePlayer.setLastName(lastNames[lastNameIndex]);
-    gamePlayer.setBuyInCollected(true);
+    gamePlayer.setBoughtIn(true);
     if (random.nextBoolean()) {
-      gamePlayer.setAnnualTocCollected(true);
+      gamePlayer.setAnnualTocParticipant(true);
     }
     if (random.nextBoolean()) {
-      gamePlayer.setQuarterlyTocCollected(true);
+      gamePlayer.setQuarterlyTocParticipant(true);
     }
     gamePlayerService.createFirstTimeGamePlayer(gamePlayer);
   }

@@ -81,10 +81,10 @@ public class GamePlayerService {
 
     existingGamePlayer.setPlace(gamePlayer.getPlace());
     existingGamePlayer.setRoundUpdates(gamePlayer.isRoundUpdates());
-    existingGamePlayer.setBuyInCollected(gamePlayer.isBuyInCollected());
-    existingGamePlayer.setRebuyAddOnCollected(gamePlayer.isRebuyAddOnCollected());
-    existingGamePlayer.setAnnualTocCollected(gamePlayer.isAnnualTocCollected());
-    existingGamePlayer.setQuarterlyTocCollected(gamePlayer.isQuarterlyTocCollected());
+    existingGamePlayer.setBoughtIn(gamePlayer.isBoughtIn());
+    existingGamePlayer.setRebought(gamePlayer.isRebought());
+    existingGamePlayer.setAnnualTocParticipant(gamePlayer.isAnnualTocParticipant());
+    existingGamePlayer.setQuarterlyTocParticipant(gamePlayer.isQuarterlyTocParticipant());
     existingGamePlayer.setChop(gamePlayer.getChop());
 
     if (gamePlayer.getPlace() != null && gamePlayer.getPlace() <= 10) {
@@ -130,7 +130,7 @@ public class GamePlayerService {
       throw new NotFoundException("Game player with id " + gamePlayerId + " not found");
     }
     GamePlayer gamePlayer = optionalGamePlayer.get();
-    gamePlayer.setRebuyAddOnCollected(!gamePlayer.isRebuyAddOnCollected());
+    gamePlayer.setRebought(!gamePlayer.isRebought());
     gameRepository.save(game);
     gameHelper.recalculate(game);
     gameHelper.sendUpdatedGame();

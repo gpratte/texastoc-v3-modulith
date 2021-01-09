@@ -22,33 +22,37 @@ import java.util.List;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Game {
+  // Read-only id set when game is created
   @Id
   private int id;
-  private int seasonId;
-  private int qSeasonId;
 
+  // Read/write fields from API
   @Min(1)
   private int hostId;
-
   @Column("GAME_DATE")
   @NotNull
   private LocalDate date;
+  private boolean transportRequired;
 
-  // Denormalized fields
+  // Read-only fields set by the server
   private String hostName;
+  private int seasonId;
+  private int qSeasonId;
   private Quarter quarter;
+  private int seasonGameNum;
+  private int quarterlyGameNum;
 
   // Game setup variables. End with "Cost" or "Debit"
-  private boolean transportRequired;
+  // Read-only fields set by the server
   private int kittyCost;
   private int buyInCost;
   private int rebuyAddOnCost;
-  private int rebuyAddOnTocDebit;
+  private int rebuyAddOnTocDebitCost;
   private int annualTocCost;
   private int quarterlyTocCost;
 
-  // Game time variables. End with "Collected" for physical money in
-  // money in for game buy-in
+  // End with "Collected" for physical money collected
+  // Read-only fields set by the server
   private int buyInCollected;
   // money in for rebuy add on
   private int rebuyAddOnCollected;
@@ -59,8 +63,8 @@ public class Game {
   // all physical money collected which is buy-in, rebuy add on, annual toc, quarterly toc
   private int totalCollected;
 
-  // Game time variables. End with "Calculated" for the where the money goes
-  // rebuy add on that goes to annual TOC
+  // End with "Calculated" for the where the money goes.
+  // Read-only fields set by the server
   private int annualTocFromRebuyAddOnCalculated;
   // rebuy add on minus amount that goes to annual toc
   private int rebuyAddOnLessAnnualTocCalculated;
@@ -70,17 +74,17 @@ public class Game {
   private int kittyCalculated;
   // total collected minus total combined toc collected minus kitty
   private int prizePotCalculated;
-  private int numPaidPlayers;
-  private int seasonGameNum;
-  private int quarterlyGameNum;
 
   // Other game time variables
+  // Read-only fields set by the server
+  private int numPlayers;
+  private int numPaidPlayers;
   private int payoutDelta;
   private boolean finalized;
-  private LocalDateTime started;
-  private int numPlayers;
-  private LocalDateTime lastCalculated;
+  private boolean chopped;
   private boolean canRebuy = true;
+  private LocalDateTime started;
+  private LocalDateTime lastCalculated;
 
   @MappedCollection
   private List<GamePlayer> players;

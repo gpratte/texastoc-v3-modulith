@@ -58,7 +58,7 @@ public class SeatingService {
     // Players that are in the game and have a buy in
     List<GamePlayer> playersWithBuyin = new ArrayList<>(currentPlayers.size());
     for (GamePlayer gamePlayer : currentPlayers) {
-      if (gamePlayer.isBuyInCollected()) {
+      if (gamePlayer.isBoughtIn()) {
         playersWithBuyin.add(gamePlayer);
       }
     }

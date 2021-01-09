@@ -57,14 +57,14 @@ public class GameService {
     game.setKittyCost(currentSeason.getKittyPerGame());
     game.setBuyInCost(currentSeason.getBuyInCost());
     game.setRebuyAddOnCost(currentSeason.getRebuyAddOnCost());
-    game.setRebuyAddOnTocDebit(currentSeason.getRebuyAddOnTocDebit());
+    game.setRebuyAddOnTocDebitCost(currentSeason.getRebuyAddOnTocDebit());
     game.setAnnualTocCost(currentSeason.getTocPerGame());
     game.setQuarterlyTocCost(currentSeason.getQuarterlyTocPerGame());
     game.setSeasonGameNum(currentSeason.getNumGamesPlayed() + 1);
 
     game.setBuyInCost(currentSeason.getBuyInCost());
     game.setRebuyAddOnCost(currentSeason.getRebuyAddOnCost());
-    game.setRebuyAddOnTocDebit(currentSeason.getRebuyAddOnTocDebit());
+    game.setRebuyAddOnTocDebitCost(currentSeason.getRebuyAddOnTocDebit());
 
     QuarterlySeason currentQSeason = getSeasonModule().getQuarterlySeasonByDate(game.getDate());
     game.setQSeasonId(currentQSeason.getId());
@@ -103,7 +103,7 @@ public class GameService {
 
 
   @CacheEvict(value = "currentGame", allEntries = true)
-  public void geClearCacheGame() {
+  public void clearCacheGame() {
   }
 
   @Transactional(readOnly = true)

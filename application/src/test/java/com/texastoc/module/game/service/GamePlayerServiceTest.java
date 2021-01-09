@@ -1,6 +1,7 @@
 package com.texastoc.module.game.service;
 
 import com.texastoc.TestConstants;
+import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.repository.GameRepository;
@@ -18,6 +19,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -184,10 +186,10 @@ public class GamePlayerServiceTest implements TestConstants {
       .place(null)
       .points(null)
       .roundUpdates(false)
-      .buyInCollected(false)
-      .rebuyAddOnCollected(false)
-      .annualTocCollected(false)
-      .quarterlyTocCollected(false)
+      .boughtIn(false)
+      .rebought(false)
+      .annualTocParticipant(false)
+      .quarterlyTocParticipant(false)
       .knockedOut(false)
       .chop(null)
       .build();
@@ -213,10 +215,10 @@ public class GamePlayerServiceTest implements TestConstants {
       .place(10)
       .points(100)
       .roundUpdates(true)
-      .buyInCollected(true)
-      .rebuyAddOnCollected(true)
-      .annualTocCollected(true)
-      .quarterlyTocCollected(true)
+      .boughtIn(true)
+      .rebought(true)
+      .annualTocParticipant(true)
+      .quarterlyTocParticipant(true)
       .knockedOut(true)
       .chop(1000)
       .build();
@@ -235,11 +237,47 @@ public class GamePlayerServiceTest implements TestConstants {
     assertEquals("game player finish should be 10", 10, savedGamePlayer.getPlace().intValue());
     assertTrue("game player knocked out should be true", savedGamePlayer.isKnockedOut());
     assertTrue("game player round updates should be true", savedGamePlayer.isRoundUpdates());
-    assertTrue("game player buy-in collected should be true", savedGamePlayer.isBuyInCollected());
-    assertTrue("game player rebuy add on collected should be true", savedGamePlayer.isRebuyAddOnCollected());
-    assertTrue("game player annual toc collected should be true", savedGamePlayer.isAnnualTocCollected());
-    assertTrue("game player quarterly toc collected should be true", savedGamePlayer.isQuarterlyTocCollected());
+    assertTrue("game player buy-in collected should be true", savedGamePlayer.isBoughtIn());
+    assertTrue("game player rebuy add on collected should be true", savedGamePlayer.isRebought());
+    assertTrue("game player annual toc collected should be true", savedGamePlayer.isAnnualTocParticipant());
+    assertTrue("game player quarterly toc collected should be true", savedGamePlayer.isQuarterlyTocParticipant());
     assertEquals("game player chop should be 1000", 1000, savedGamePlayer.getChop().intValue());
+  }
+
+  @Test
+  public void testUpdateGamePlayerRetainKnockedOutStatus() {
+    // Arrange
+    GamePlayer existingGamePlayer = GamePlayer.builder()
+      .id(11)
+      .gameId(55)
+      .knockedOut(false)
+      .build();
+
+    Game currentGame = Game.builder()
+      .id(55)
+      .numPlayers(1)
+      .finalized(false)
+      .players(Arrays.asList(existingGamePlayer))
+      .build();
+
+    when(gameHelper.get(55)).thenReturn(currentGame);
+
+    doNothing().when(gameHelper).checkFinalized(any());
+
+    // Same as game player
+    GamePlayer gamePlayerToUpdate = GamePlayer.builder()
+      .id(11)
+      .gameId(55)
+      .build();
+    gamePlayerService.updateGamePlayer(gamePlayerToUpdate);
+
+    ArgumentCaptor<Game> gameArg = ArgumentCaptor.forClass(Game.class);
+    Mockito.verify(gameRepository).save(gameArg.capture());
+
+    Game savedGame = gameArg.getValue();
+    GamePlayer savedGamePlayer = savedGame.getPlayers().get(0);
+
+    assertFalse("game player knocked out should still be false", savedGamePlayer.isKnockedOut());
   }
 
   @Test
@@ -270,6 +308,32 @@ public class GamePlayerServiceTest implements TestConstants {
     Game savedGame = gameArg.getValue();
     GamePlayer savedGamePlayer = savedGame.getPlayers().get(0);
     assertTrue("game player knocked out should be true", savedGamePlayer.isKnockedOut());
+  }
+
+  @Test
+  public void testKnockOutNotFound() {
+    // Arrange
+    GamePlayer someOtherGamePlayer = GamePlayer.builder()
+      .id(999)
+      .gameId(55)
+      .knockedOut(false)
+      .build();
+
+    Game currentGame = Game.builder()
+      .id(55)
+      .numPlayers(1)
+      .finalized(false)
+      .players(Arrays.asList(someOtherGamePlayer))
+      .build();
+
+    when(gameHelper.get(55)).thenReturn(currentGame);
+
+    doNothing().when(gameHelper).checkFinalized(any());
+
+    assertThatThrownBy(() -> {
+      gamePlayerService.toggleGamePlayerKnockedOut(55, 11);
+    }).isInstanceOf(NotFoundException.class)
+      .hasMessageContaining("Game player with id 11 not found");
   }
 
   @Test
@@ -308,7 +372,7 @@ public class GamePlayerServiceTest implements TestConstants {
     GamePlayer existingGamePlayer = GamePlayer.builder()
       .id(11)
       .gameId(55)
-      .rebuyAddOnCollected(false)
+      .rebought(false)
       .build();
 
     Game currentGame = Game.builder()
@@ -329,7 +393,33 @@ public class GamePlayerServiceTest implements TestConstants {
 
     Game savedGame = gameArg.getValue();
     GamePlayer savedGamePlayer = savedGame.getPlayers().get(0);
-    assertTrue("game player rebuy should be true", savedGamePlayer.isRebuyAddOnCollected());
+    assertTrue("game player rebuy should be true", savedGamePlayer.isRebought());
+  }
+
+  @Test
+  public void testRebuyNotFound() {
+    // Arrange
+    GamePlayer someOtherGamePlayer = GamePlayer.builder()
+      .id(99)
+      .gameId(55)
+      .rebought(false)
+      .build();
+
+    Game currentGame = Game.builder()
+      .id(55)
+      .numPlayers(1)
+      .finalized(false)
+      .players(Arrays.asList(someOtherGamePlayer))
+      .build();
+
+    when(gameHelper.get(55)).thenReturn(currentGame);
+
+    doNothing().when(gameHelper).checkFinalized(any());
+
+    assertThatThrownBy(() -> {
+      gamePlayerService.toggleGamePlayerRebuy(55, 11);
+    }).isInstanceOf(NotFoundException.class)
+      .hasMessageContaining("Game player with id 11 not found");
   }
 
   @Test
@@ -338,7 +428,7 @@ public class GamePlayerServiceTest implements TestConstants {
     GamePlayer existingGamePlayer = GamePlayer.builder()
       .id(11)
       .gameId(55)
-      .rebuyAddOnCollected(true)
+      .rebought(true)
       .build();
 
     Game currentGame = Game.builder()
@@ -359,7 +449,7 @@ public class GamePlayerServiceTest implements TestConstants {
 
     Game savedGame = gameArg.getValue();
     GamePlayer savedGamePlayer = savedGame.getPlayers().get(0);
-    assertFalse("game player rebuy should be false", savedGamePlayer.isRebuyAddOnCollected());
+    assertFalse("game player rebuy should be false", savedGamePlayer.isRebought());
   }
 
   @Test
@@ -368,7 +458,7 @@ public class GamePlayerServiceTest implements TestConstants {
     GamePlayer existingGamePlayer = GamePlayer.builder()
       .id(11)
       .gameId(55)
-      .rebuyAddOnCollected(true)
+      .rebought(true)
       .build();
 
     Game currentGame = Game.builder()
@@ -396,10 +486,10 @@ public class GamePlayerServiceTest implements TestConstants {
     assertNull("game player finish should be null", gamePlayer.getPlace());
     assertFalse("game player knocked out should be false", gamePlayer.isKnockedOut());
     assertFalse("game player round updates should be false", gamePlayer.isRoundUpdates());
-    assertFalse("game player buy-in collected should be false", gamePlayer.isBuyInCollected());
-    assertFalse("game player rebuy add on collected should be false", gamePlayer.isRebuyAddOnCollected());
-    assertFalse("game player annual toc collected should be false", gamePlayer.isAnnualTocCollected());
-    assertFalse("game player quarterly toc collected should be false", gamePlayer.isQuarterlyTocCollected());
+    assertFalse("game player buy-in collected should be false", gamePlayer.isBoughtIn());
+    assertFalse("game player rebuy add on collected should be false", gamePlayer.isRebought());
+    assertFalse("game player annual toc collected should be false", gamePlayer.isAnnualTocParticipant());
+    assertFalse("game player quarterly toc collected should be false", gamePlayer.isQuarterlyTocParticipant());
     assertNull("game player chop should be null", gamePlayer.getChop());
   }
 

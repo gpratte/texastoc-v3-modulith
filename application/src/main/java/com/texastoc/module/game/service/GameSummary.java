@@ -1,7 +1,6 @@
 package com.texastoc.module.game.service;
 
 import com.texastoc.module.game.model.Game;
-import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.notification.NotificationModule;
 import com.texastoc.module.notification.NotificationModuleFactory;
 import com.texastoc.module.player.model.Player;
@@ -51,8 +50,8 @@ public class GameSummary implements Runnable {
       if (isAdmin && !StringUtils.isBlank(player.getEmail())) {
         emails.add(player.getEmail());
       }
-      getNotificationModule().sendEmail(emails, subject, body);
     }
+    getNotificationModule().sendEmail(emails, subject, body);
   }
 
   private static final VelocityEngine VELOCITY_ENGINE = new VelocityEngine();
@@ -69,24 +68,13 @@ public class GameSummary implements Runnable {
 
     context.put("game", game);
 
-    boolean chopped = false;
-    for (GamePlayer gamePlayer : game.getPlayers()) {
-      if (gamePlayer.getChop() != null && gamePlayer.getChop() > 0) {
-        chopped = true;
-        break;
-      }
-    }
-    context.put("gameChopped", chopped);
-
     context.put("season", season);
 
-    // TODO find the quarterly season
-    QuarterlySeason currentQSeason = null;
-    for (QuarterlySeason qs : season.getQuarterlySeasons()) {
-      if (qs.getId() == currentQSeason.getId()) {
-        currentQSeason = qs;
-      }
-    }
+    QuarterlySeason currentQSeason = season.getQuarterlySeasons().stream()
+      .filter(qs -> {
+        return !game.getDate().isAfter(qs.getEnd()) && !game.getDate().isBefore(qs.getStart());
+      })
+      .findFirst().get();
     context.put("qSeason", currentQSeason);
 
     StringWriter writer = new StringWriter();

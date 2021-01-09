@@ -153,7 +153,7 @@ public class GameServiceTest implements TestConstants {
 
     assertEquals("Buy in cost should be amount set for season", GAME_BUY_IN, (int) actual.getBuyInCost());
     assertEquals("Rebuy cost should be amount set for season", GAME_REBUY, (int) actual.getRebuyAddOnCost());
-    assertEquals("Rebuy Toc debit cost should be amount set for season", GAME_REBUY_TOC_DEBIT, (int) actual.getRebuyAddOnTocDebit());
+    assertEquals("Rebuy Toc debit cost should be amount set for season", GAME_REBUY_TOC_DEBIT, (int) actual.getRebuyAddOnTocDebitCost());
   }
 
   @Test
@@ -216,6 +216,36 @@ public class GameServiceTest implements TestConstants {
 
     // Assert
     assertEquals("expect two games", 2, games.size());
+  }
+
+  @Test
+  public void testGet() {
+    // Arrange
+    when(gameHelper.get(123)).thenReturn(Game.builder().id(123).build());
+
+    // Act
+    Game game = gameService.get(123);
+
+    // Assert
+    assertEquals(123, game.getId());
+  }
+
+  @Test
+  public void testGetCurrent() {
+    // Arrange
+    when(gameHelper.getCurrent()).thenReturn(Game.builder().id(123).build());
+
+    // Act
+    Game game = gameService.getCurrent();
+
+    // Assert
+    assertEquals(123, game.getId());
+  }
+
+  @Test
+  public void testClearCacheGame() {
+    // Act
+    gameService.clearCacheGame();
   }
 
   @Test
@@ -294,12 +324,12 @@ public class GameServiceTest implements TestConstants {
   @Test
   public void testUnfinalize() {
     // Arrange
-    Mockito.when(gameHelper.get(1))
-      .thenReturn(Game.builder()
-        .id(1)
-        .seasonId(16)
-        .finalized(true)
-        .build());
+    Game gameToUnfinalize = Game.builder()
+      .id(1)
+      .seasonId(16)
+      .finalized(true)
+      .build();
+    Mockito.when(gameHelper.get(1)).thenReturn(gameToUnfinalize);
 
     when(seasonModule.getSeasonById(16))
       .thenReturn(Season.builder()
@@ -311,7 +341,8 @@ public class GameServiceTest implements TestConstants {
     when(gameRepository.findBySeasonId(16))
       .thenReturn(ImmutableList.of(Game.builder()
         .finalized(true)
-        .build()));
+        .build(),
+        gameToUnfinalize));
 
     // Act
     gameService.unfinalize(1);
@@ -322,6 +353,23 @@ public class GameServiceTest implements TestConstants {
     Game actual = gameArg.getValue();
 
     assertFalse("game should be unfinalized", actual.isFinalized());
+  }
+
+  @Test
+  public void testAlreadyUnfinalize() {
+    // Arrange
+    Mockito.when(gameHelper.get(1))
+      .thenReturn(Game.builder()
+        .id(1)
+        .seasonId(16)
+        .finalized(false)
+        .build());
+
+    // Act
+    gameService.unfinalize(1);
+
+    // Assert
+    verify(gameRepository, times(0)).save(any());
   }
 
   @Test

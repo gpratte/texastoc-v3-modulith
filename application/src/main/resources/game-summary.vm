@@ -42,7 +42,7 @@
   </tr>
   <tr>
     <td>Total Annual TOC:</td>
-    #set($totalAnnualToc = $game.annualTocCollected + $game.annualTocFromRebuyAddOnCalculated)
+#set($totalAnnualToc = $game.annualTocCollected + $game.annualTocFromRebuyAddOnCalculated)
     <td>${d}$totalAnnualToc</td>
   </tr>
   <tr>
@@ -61,12 +61,12 @@
     <td align="center"><b>Place</b></td>
     <th align="center"><b>Payout</b></th>
   </tr>
-  #foreach($payout in $game.payouts)
+#foreach($payout in $game.payouts)
   <tr>
     <td align="center">$payout.place</td>
     <td align="center">${d}$payout.amount</td>
   </tr>
-  #end
+#end
 </table>
 
 <table>
@@ -74,45 +74,45 @@
     <th>Fin</th>
     <th>Name</th>
     <th>Pts</th>
-    #if($gameChopped)
+#if($game.chopped)
     <th>Chp</th>
-    #end
+#end
     <th>Buy<br/>In</th>
     <th>Re<br/>Buy</th>
     <th>TOC</th>
     <th>QTOC</th>
   </tr>
-  #foreach($player in $game.players)
+#foreach($player in $game.players)
   <tr>
     <td align="center">$!player.place</td>
     <td>$player.name</td>
     <td align="center">$!player.points</td>
-    #if($gameChopped)
+#if($game.chopped)
     <td align="center">$!player.chop</td>
-    #end
+#end
     <td align="center">${d}$!player.buyInCollected</td>
     <td align="center">
-      #if($player.rebuyAddOnCollected)
-        #set($rebuyMinusDebt = $player.rebuyAddOnCollected - $game.rebuyAddOnTocDebit)
-        #if($player.annualTocCollected)
-          ${d}$rebuyMinusDebt/$game.rebuyAddOnTocDebit
-        #else
-          ${d}$player.rebuyAddOnCollected
-        #end
-      #end
+#if($player.rebought)
+#set($rebuyMinusDebt = $player.rebuyAddOnCollected - $game.rebuyAddOnTocDebitCost)
+#if($player.annualTocParticipant)
+      ${d}$rebuyMinusDebt/$game.rebuyAddOnTocDebitCost
+#else
+      ${d}$player.rebuyAddOnCollected
+#end
+#end
     </td>
     <td align="center">
-      #if($player.annualTocCollected)
-        ${d}$player.annualTocCollected
-      #end
+#if($player.annualTocParticipant)
+      ${d}$player.annualTocCollected
+#end
     </td>
     <td align="center">
-      #if($player.quarterlyTocCollected)
-        ${d}$player.quarterlyTocCollected
-      #end
+#if($player.quarterlyTocParticipant)
+      ${d}$player.quarterlyTocCollected
+#end
     </td>
   </tr>
-  #end
+#end
 </table>
 
 <hr/>
@@ -156,22 +156,22 @@
     <th>Points</th>
     <th>Entries</th>
   </tr>
-  #foreach($seasonPlayer in $season.players)
+#foreach($seasonPlayer in $season.players)
   <tr>
     <td align="center">
-      #if($seasonPlayer.place && $seasonPlayer.place > 0)
-        $!seasonPlayer.place
-      #end
+#if($seasonPlayer.place && $seasonPlayer.place > 0)
+      $!seasonPlayer.place
+#end
     </td>
     <td>$seasonPlayer.name</td>
     <td align="center">
-      #if($seasonPlayer.points && $seasonPlayer.points > 0)
-        $!seasonPlayer.points
-      #end
+#if($seasonPlayer.points && $seasonPlayer.points > 0)
+      $!seasonPlayer.points
+#end
     </td>
     <td align="center">$!seasonPlayer.entries</td>
   </tr>
-  #end
+#end
 </table>
 
 <hr/>
@@ -212,22 +212,22 @@
     <th>Points</th>
     <th>Entries</th>
   </tr>
-  #foreach($qSeasonPlayer in $qSeason.players)
+#foreach($qSeasonPlayer in $qSeason.players)
   <tr>
     <td align="center">
-      #if($qSeasonPlayer.place && $qSeasonPlayer.place > 0)
-        $!qSeasonPlayer.place
-      #end
+#if($qSeasonPlayer.place && $qSeasonPlayer.place > 0)
+      $!qSeasonPlayer.place
+#end
     </td>
     <td>$qSeasonPlayer.name</td>
     <td align="center">
-      #if($qSeasonPlayer.points && $qSeasonPlayer.points > 0)
-        $!qSeasonPlayer.points
-      #end
+#if($qSeasonPlayer.points && $qSeasonPlayer.points > 0)
+      $!qSeasonPlayer.points
+#end
     </td>
     <td align="center">$!qSeasonPlayer.entries</td>
   </tr>
-  #end
+#end
 </table>
 
 </body>

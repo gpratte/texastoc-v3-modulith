@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,19 +32,18 @@ public class GameHelperTest {
 
   private GameHelper gameHelper;
   private GameRepository gameRepository;
-  private PlayerModule playerModule;
   private SeasonModule seasonModule;
-  private GameCalculator gameCalculator = mock(GameCalculator.class);
-  private PayoutCalculator payoutCalculator = mock(PayoutCalculator.class);
-  private PointsCalculator pointsCalculator = mock(PointsCalculator.class);
-  private WebSocketConnector webSocketConnector = mock(WebSocketConnector.class);
-
+  private WebSocketConnector webSocketConnector;
+  private final GameCalculator gameCalculator = mock(GameCalculator.class);
+  private final PayoutCalculator payoutCalculator = mock(PayoutCalculator.class);
+  private final PointsCalculator pointsCalculator = mock(PointsCalculator.class);
 
   @Before
   public void init() {
     gameRepository = mock(GameRepository.class);
-    playerModule = mock(PlayerModule.class);
+    PlayerModule playerModule = mock(PlayerModule.class);
     seasonModule = mock(SeasonModule.class);
+    webSocketConnector = mock(WebSocketConnector.class);
     gameHelper = new GameHelper(gameRepository, gameCalculator, payoutCalculator, pointsCalculator, webSocketConnector);
     ReflectionTestUtils.setField(gameHelper, "playerModule", playerModule);
     ReflectionTestUtils.setField(gameHelper, "seasonModule", seasonModule);
@@ -171,5 +171,28 @@ public class GameHelperTest {
     verify(gameCalculator, Mockito.times(1)).calculate(game);
     verify(payoutCalculator, Mockito.times(1)).calculate(calculatgedGame);
     verify(pointsCalculator, Mockito.times(1)).calculate(calculatgedGame);
+  }
+
+  @Test
+  public void testSendUpdate() throws InterruptedException {
+    // Arrange (same as the getCurrent test above)
+    when(seasonModule.getCurrentSeasonId()).thenReturn(2);
+
+    LocalDate now = LocalDate.now();
+    Game game = Game.builder()
+      .id(111)
+      .date(now)
+      .build();
+    List<Game> games = new ArrayList<>();
+    games.add(game);
+    when(gameRepository.findUnfinalizedBySeasonId(2)).thenReturn(games);
+
+    // Act
+    gameHelper.sendUpdatedGame();
+
+    // Assert
+    // Since this is a thread call, sleep for a half a second first
+    Thread.sleep(500l);
+    verify(webSocketConnector, Mockito.times(1)).sendGame(any(Game.class));
   }
 }

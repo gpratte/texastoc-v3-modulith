@@ -47,7 +47,7 @@ public class SeatingServiceTest implements TestConstants {
     for (int i = 0; i < 2; i++) {
       gamePlayers.add(GamePlayer.builder()
         .id(i+1)
-        .buyInCollected(true)
+        .boughtIn(true)
         .build());
     }
 
@@ -111,12 +111,12 @@ public class SeatingServiceTest implements TestConstants {
     for (int i = 0; i < 8; i++) {
       gamePlayers.add(GamePlayer.builder()
         .id(i+1)
-        .buyInCollected(true)
+        .boughtIn(true)
         .build());
     }
     // 1 players with no buy-in
     gamePlayers.add(GamePlayer.builder()
-      .buyInCollected(false)
+      .boughtIn(false)
       .build());
 
     LocalDate now = LocalDate.now();
@@ -216,15 +216,15 @@ public class SeatingServiceTest implements TestConstants {
     for (int i = 0; i < 10; i++) {
       gamePlayers.add(GamePlayer.builder()
         .id(i+1)
-        .buyInCollected(true)
+        .boughtIn(true)
         .build());
     }
     // 2 players with no buy-in
     gamePlayers.add(GamePlayer.builder()
-      .buyInCollected(false)
+      .boughtIn(false)
       .build());
     gamePlayers.add(GamePlayer.builder()
-      .buyInCollected(false)
+      .boughtIn(false)
       .build());
 
     LocalDate now = LocalDate.now();
