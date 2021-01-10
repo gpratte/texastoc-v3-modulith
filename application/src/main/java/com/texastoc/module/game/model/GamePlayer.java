@@ -31,8 +31,8 @@ public class GamePlayer implements Comparable<GamePlayer> {
   private Integer chop;
 
   // Read-only fields set by the server
-  private int qSeasonId;
   private int seasonId;
+  private int qSeasonId;
   private String firstName;
   private String lastName;
   private String email;

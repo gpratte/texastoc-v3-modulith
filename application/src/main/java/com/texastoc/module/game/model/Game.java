@@ -79,12 +79,12 @@ public class Game {
   // Read-only fields set by the server
   private int numPlayers;
   private int numPaidPlayers;
-  private int payoutDelta;
-  private boolean finalized;
-  private boolean chopped;
-  private boolean canRebuy = true;
   private LocalDateTime started;
   private LocalDateTime lastCalculated;
+  private boolean chopped;
+  private boolean canRebuy = true;
+  private boolean finalized;
+  private int payoutDelta;
 
   @MappedCollection
   private List<GamePlayer> players;
