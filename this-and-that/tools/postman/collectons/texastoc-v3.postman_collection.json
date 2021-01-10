@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "b89f414c-0771-46e1-bfb6-e637f6f7d848",
-		"name": "texastoc-v2",
+		"_postman_id": "66b7ddad-e9bb-4b35-9d2c-afac914775f1",
+		"name": "texastoc-v3",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -14,7 +14,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "ede3ec72-6e71-43fb-931b-5f000b3c047b",
 								"exec": [
 									"",
 									"var jsonData = pm.response.json();",
@@ -30,7 +29,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"gilpratte@texastoc.com\", \n  \"password\": \"password\"\n}"
+							"raw": "{\n  \"email\": \"admin@texastoc.com\", \n  \"password\": \"password\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/login",
@@ -50,7 +49,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "ede3ec72-6e71-43fb-931b-5f000b3c047b",
 								"exec": [
 									"",
 									"var jsonData = pm.response.json();",
@@ -93,7 +91,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "ede3ec72-6e71-43fb-931b-5f000b3c047b",
 								"exec": [
 									"",
 									"var jsonData = pm.response.json();",
@@ -130,8 +127,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Seasons",
@@ -181,7 +177,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e1cd9cfa-84c0-431f-be8d-49c0e51f6714",
 								"exec": [
 									"var jsonData = pm.response.json();",
 									"pm.environment.set(\"seasonId\", jsonData[0].id);",
@@ -275,7 +270,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "862e4955-3d09-404a-95ca-78dffd280da4",
 								"exec": [
 									"var jsonData = pm.response.json();",
 									"pm.environment.set(\"seasonId\", jsonData.id);",
@@ -449,8 +443,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Games",
@@ -709,9 +702,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Seats",
@@ -798,9 +789,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "create game",
@@ -825,7 +814,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"hostId\": 1,\n    \"date\": \"2018-12-28\",\n    \"doubleBuyIn\": false,\n    \"transportRequired\": false\n}"
+							"raw": "{\n    \"hostId\": 1,\n    \"date\": \"2020-12-28\",\n    \"doubleBuyIn\": false,\n    \"transportRequired\": false\n}"
 						},
 						"url": {
 							"raw": "{{url}}/api/v2/games",
@@ -847,7 +836,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e86a4b9d-67cd-4339-80ee-df302afd8cac",
 								"exec": [
 									"var jsonData = pm.response.json();",
 									"pm.environment.set(\"gameId\", jsonData[0].id);",
@@ -954,7 +942,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "80d5690a-3e81-4dc7-b6ae-2ee46f988ffa",
 								"exec": [
 									"var jsonData = pm.response.json();",
 									"pm.environment.set(\"gameId\", jsonData.id);",
@@ -1031,7 +1018,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"hostId\": 2,\n    \"date\": \"2020-10-01\",\n    \"doubleBuyIn\": false,\n    \"transportRequired\": true\n}"
+							"raw": "{\n    \"hostId\": 9,\n    \"date\": \"2020-12-17\",\n    \"transportRequired\": false\n}"
 						},
 						"url": {
 							"raw": "{{url}}/api/v2/games/{{gameId}}",
@@ -1128,8 +1115,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Players",
@@ -1140,7 +1126,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "150614d1-0498-42d3-b8f4-86bfe1f28098",
 								"exec": [
 									"var jsonData = pm.response.json();",
 									"pm.environment.set(\"playerId\", jsonData.id);",
@@ -1186,35 +1171,6 @@
 					},
 					"response": [
 						{
-							"name": "Forbidden",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/v2/players",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"v2",
-										"players"
-									]
-								}
-							},
-							"status": "Forbidden",
-							"code": 403,
-							"_postman_previewlanguage": "text",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "text/plain"
-								}
-							],
-							"cookie": [],
-							"body": ""
-						},
-						{
 							"name": "Unauthorized",
 							"originalRequest": {
 								"method": "POST",
@@ -1233,6 +1189,35 @@
 							},
 							"status": "Unauthorized",
 							"code": 401,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "text/plain"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						},
+						{
+							"name": "Forbidden",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v2/players",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"players"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
 							"_postman_previewlanguage": "text",
 							"header": [
 								{
@@ -1273,35 +1258,6 @@
 							"body": ""
 						},
 						{
-							"name": "Not Found",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/v2/players",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"v2",
-										"players"
-									]
-								}
-							},
-							"status": "Not Found",
-							"code": 404,
-							"_postman_previewlanguage": "text",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "text/plain"
-								}
-							],
-							"cookie": [],
-							"body": ""
-						},
-						{
 							"name": "OK",
 							"originalRequest": {
 								"method": "POST",
@@ -1329,6 +1285,35 @@
 							],
 							"cookie": [],
 							"body": ""
+						},
+						{
+							"name": "Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v2/players",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"players"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "text/plain"
+								}
+							],
+							"cookie": [],
+							"body": ""
 						}
 					]
 				},
@@ -1338,7 +1323,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "338ee165-124e-482a-91c3-ff52ac9e8b56",
 								"exec": [
 									"var jsonData = pm.response.json();",
 									"pm.environment.set(\"playerId\", jsonData[0].id);",
@@ -1458,7 +1442,7 @@
 					},
 					"response": [
 						{
-							"name": "Not Found",
+							"name": "Created",
 							"originalRequest": {
 								"method": "PUT",
 								"header": [],
@@ -1480,8 +1464,8 @@
 									]
 								}
 							},
-							"status": "Not Found",
-							"code": 404,
+							"status": "Created",
+							"code": 201,
 							"_postman_previewlanguage": "text",
 							"header": [
 								{
@@ -1528,7 +1512,7 @@
 							"body": ""
 						},
 						{
-							"name": "Created",
+							"name": "Unauthorized",
 							"originalRequest": {
 								"method": "PUT",
 								"header": [],
@@ -1550,8 +1534,43 @@
 									]
 								}
 							},
-							"status": "Created",
-							"code": 201,
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "text/plain"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						},
+						{
+							"name": "Not Found",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v2/players/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"players",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
 							"_postman_previewlanguage": "text",
 							"header": [
 								{
@@ -1587,41 +1606,6 @@
 							},
 							"status": "OK",
 							"code": 200,
-							"_postman_previewlanguage": "text",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "text/plain"
-								}
-							],
-							"cookie": [],
-							"body": ""
-						},
-						{
-							"name": "Unauthorized",
-							"originalRequest": {
-								"method": "PUT",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/v2/players/:id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"v2",
-										"players",
-										":id"
-									],
-									"variable": [
-										{
-											"key": "id"
-										}
-									]
-								}
-							},
-							"status": "Unauthorized",
-							"code": 401,
 							"_postman_previewlanguage": "text",
 							"header": [
 								{
@@ -1673,7 +1657,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "c176e88c-5921-4269-b8df-694348f38d41",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -1683,21 +1666,19 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "8d199fcb-cf97-408b-ad5a-4d628577e941",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
-			"name": "System",
+			"name": "Settings",
 			"item": [
 				{
-					"name": "get versions",
+					"name": "get settings",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -1719,72 +1700,20 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/versions?env={{env}}",
+							"raw": "{{url}}/api/v2/settings",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
 								"v2",
-								"versions"
-							],
-							"query": [
-								{
-									"key": "env",
-									"value": "{{env}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get points",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"type": "text",
-								"value": "application/json",
-								"disabled": true
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{url}}/api/v2/league/points",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"v2",
-								"league",
-								"points"
+								"settings"
 							]
 						}
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }

@@ -1,7 +1,6 @@
 package com.texastoc.cucumber;
 
 import com.texastoc.module.game.model.Game;
-import com.texastoc.module.game.request.CreateGameRequest;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -11,20 +10,24 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.springframework.web.client.HttpClientErrorException;
 
-import java.time.LocalDate;
-
 // Tests are run from SpringBootBaseIntegrationTest so must Ignore here
 @Ignore
 public class GameStepdefs extends SpringBootBaseIntegrationTest {
 
-  private CreateGameRequest createGameRequest;
+  @When("^the game is created$")
+  public void the_game_is_created() throws Exception {
+//    String token = login(USER_EMAIL, USER_PASSWORD);
+//    gameCreated = createGame(createGameRequest, token);
+  }
+
+//  private CreateGameRequest createGameRequest;
   private Game gameCreated;
   private Game gameRetrieved;
   private HttpClientErrorException exception;
 
   @Before
   public void before() {
-    createGameRequest = null;
+//    createGameRequest = null;
     gameCreated = null;
     gameRetrieved = null;
     exception = null;
@@ -40,26 +43,20 @@ public class GameStepdefs extends SpringBootBaseIntegrationTest {
   @Given("^the game starts now$")
   public void the_game_starts_now() throws Exception {
     // Arrange
-    createGameRequest = CreateGameRequest.builder()
-      .date(LocalDate.now())
-      .hostId(1)
-      .transportRequired(false)
-      .build();
+//    createGameRequest = CreateGameRequest.builder()
+//      .date(LocalDate.now())
+//      .hostId(1)
+//      .transportRequired(false)
+//      .build();
   }
 
   @Given("^the game supplies need to be moved$")
   public void the_game_supplies_need_to_be_moved() throws Exception {
-    createGameRequest = CreateGameRequest.builder()
-      .date(LocalDate.now())
-      .hostId(1)
-      .transportRequired(true)
-      .build();
-  }
-
-  @When("^the game is created$")
-  public void the_game_is_created() throws Exception {
-//    String token = login(USER_EMAIL, USER_PASSWORD);
-//    gameCreated = createGame(createGameRequest, token);
+//    createGameRequest = CreateGameRequest.builder()
+//      .date(LocalDate.now())
+//      .hostId(1)
+//      .transportRequired(true)
+//      .build();
   }
 
   @When("^another game is created$")
@@ -150,7 +147,7 @@ public class GameStepdefs extends SpringBootBaseIntegrationTest {
     Assert.assertEquals("kitty cost should come from season", KITTY_PER_GAME, (int) game.getKittyCost());
     Assert.assertEquals("buy in cost should come from season", GAME_BUY_IN, (int) game.getBuyInCost());
     Assert.assertEquals("re buy cost should come from season", GAME_REBUY, (int) game.getRebuyAddOnCost());
-    Assert.assertEquals("re buy toc debit cost should come from season", GAME_REBUY_TOC_DEBIT, (int) game.getRebuyAddOnTocDebit());
+    Assert.assertEquals("re buy toc debit cost should come from season", GAME_REBUY_TOC_DEBIT, (int) game.getRebuyAddOnTocDebitCost());
     Assert.assertEquals("toc cost should come from season", TOC_PER_GAME, (int) game.getAnnualTocCost());
     Assert.assertEquals("quarterly toc cost should come from season", QUARTERLY_TOC_PER_GAME, (int) game.getQuarterlyTocCost());
 

@@ -162,5 +162,13 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 18-settings-integration-tests
-Cucumber integration tests for the settings module.
+## Current Branch: 19-game-module
+A ton of changes to create the game module.
+* Updated ArchUnit for isolating the GameModule from the rest of the modules
+* a pair of fields (boolean and Integer) for bought in, rebought, annual toc participant and quarterly toc participant
+* Added seating during the popluation of a season 
+* Broke out code into GameHelper and GameSummary for better single purpose classes
+* 95% plus unit test coverage
+* New Game and GamePlayer fields (and corresponding database changes)
+
+

@@ -3,7 +3,11 @@ package com.texastoc.cucumber;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePayout;
 import com.texastoc.module.game.model.GamePlayer;
-import com.texastoc.module.season.model.*;
+import com.texastoc.module.season.model.QuarterlySeason;
+import com.texastoc.module.season.model.QuarterlySeasonPayout;
+import com.texastoc.module.season.model.QuarterlySeasonPlayer;
+import com.texastoc.module.season.model.Season;
+import com.texastoc.module.season.model.SeasonPlayer;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -228,8 +232,8 @@ public class CalculationsStepdefs extends SpringBootBaseIntegrationTest {
 
     int totalPaidOut = 0;
 
-    for (int i = 0; i < gamePayouts.size(); ++i) {
-      GamePayout gamePayout = gamePayouts.get(i);
+    int i = 0;
+    for (GamePayout gamePayout : gamePayouts) {
       int amount = amounts.get(i);
       int place = i + 1;
 
@@ -238,6 +242,7 @@ public class CalculationsStepdefs extends SpringBootBaseIntegrationTest {
       Assert.assertNull("payout chop amount should be null", gamePayout.getChopAmount());
       Assert.assertNull("payout chop percentage should be null", gamePayout.getChopPercent());
       totalPaidOut += gamePayout.getAmount();
+      ++i;
     }
 
     Assert.assertEquals("sum of payouts for 10 players should be " + prizePot, prizePot, totalPaidOut);

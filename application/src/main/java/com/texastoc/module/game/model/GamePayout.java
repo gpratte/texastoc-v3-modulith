@@ -1,7 +1,13 @@
 package com.texastoc.module.game.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.data.annotation.Id;
 
 import java.util.Objects;
 
@@ -13,7 +19,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GamePayout {
-
+  @Id
   private int id;
   private int gameId;
   private int place;

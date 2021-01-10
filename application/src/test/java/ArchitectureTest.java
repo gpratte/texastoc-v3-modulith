@@ -6,10 +6,16 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 public class ArchitectureTest {
 
+  // TODO can get the modules programmatically instead of hard coded
+
   /**
    * Make sure the non-player modules (game, notification, season and supply) do not
-   * access any classes in the player.exception, player.repository and player.service
-   * packages.
+   * access any classes in the following packages
+   * <ul>
+   *   <li>player.exception</li>
+   *   <li>player.repository</li>
+   *   <li>player.service</li>
+   * </ul>
    */
   @Test
   public void playerModuleInterfaceAndModel() {
@@ -21,7 +27,11 @@ public class ArchitectureTest {
 
   /**
    * Make sure the non-settings modules (player, game, notification and season) do not
-   * access any classes in the settings.repository and settings.service packages.
+   * access any classes in the following packages
+   * <ul>
+   *   <li>settings.repository</li>
+   *   <li>settings.service</li>
+   * </ul>
    */
   @Test
   public void settingsModuleInterfaceAndModel() {
@@ -30,4 +40,33 @@ public class ArchitectureTest {
       .should().dependOnClassesThat().resideInAnyPackage("..settings.repository..", "..settings.service..")
       .check(importedClasses);
   }
+
+  /**
+   * Make sure the non-game modules (player, settings, notification and season) do not access any classes in the following packages
+   * <ul>
+   *   <li>game.calculator</li>
+   *   <li>game.config</li>
+   *   <li>game.connector</li>
+   *   <li>game.exception</li>
+   *   <li>game.repository</li>
+   *   <li>game.request</li>
+   *   <li>game.service</li>
+   * </ul>
+   */
+  @Test
+  public void gameModuleInterfaceAndModel() {
+    JavaClasses importedClasses = new ClassFileImporter().importPackages("com.texastoc.module");
+    noClasses().that().resideInAnyPackage("..player..", "..settings..", "..notification..", "..season..")
+      .should().dependOnClassesThat().resideInAnyPackage("..game.config..", "..game.connector..", "..game.exception..", "..game.repository..", "..game.service..")
+      .check(importedClasses);
+  }
+
+  @Test
+  public void notificationModuleInterfaceAndModel() {
+    JavaClasses importedClasses = new ClassFileImporter().importPackages("com.texastoc.module");
+    noClasses().that().resideInAnyPackage("..player..", "..settings..", "..game..", "..season..")
+      .should().dependOnClassesThat().resideInAnyPackage("..notification.config..", "..notification.connector..", "..notification.exception..", "..notification.repository..", "..notification.service..")
+      .check(importedClasses);
+  }
+
 }

@@ -3,7 +3,8 @@ package com.texastoc.module.player.service;
 import com.google.common.collect.ImmutableSet;
 import com.texastoc.common.AuthorizationHelper;
 import com.texastoc.exception.NotFoundException;
-import com.texastoc.module.notification.connector.EmailConnector;
+import com.texastoc.module.notification.NotificationModule;
+import com.texastoc.module.notification.NotificationModuleFactory;
 import com.texastoc.module.player.PlayerModule;
 import com.texastoc.module.player.exception.CannotRemoveRoleException;
 import com.texastoc.module.player.model.Player;
@@ -16,7 +17,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -26,16 +34,16 @@ public class PlayerService implements PlayerModule {
 
   private final PlayerRepository playerRepository;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
-  private final EmailConnector emailConnector;
   private final AuthorizationHelper authorizationHelper;
+
+  private NotificationModule notificationModule;
 
   // Only one server so cache the forgot password codes here
   private Map<String, String> forgotPasswordCodes = new HashMap<>();
 
-  public PlayerService(PlayerRepository playerRepository, BCryptPasswordEncoder bCryptPasswordEncoder, EmailConnector emailConnector, AuthorizationHelper authorizationHelper) {
+  public PlayerService(PlayerRepository playerRepository, BCryptPasswordEncoder bCryptPasswordEncoder, AuthorizationHelper authorizationHelper) {
     this.playerRepository = playerRepository;
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    this.emailConnector = emailConnector;
     this.authorizationHelper = authorizationHelper;
   }
 
@@ -116,7 +124,7 @@ public class PlayerService implements PlayerModule {
     String generatedString = RandomStringUtils.random(5, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
     forgotPasswordCodes.put(email, generatedString);
     log.info("reset code: {}", generatedString);
-    emailConnector.send(email, "Reset Code", generatedString);
+    getNotificaionModule().sendEmail(Arrays.asList(email), "Reset Code", generatedString);
   }
 
   @Override
@@ -209,5 +217,12 @@ public class PlayerService implements PlayerModule {
         throw new AccessDeniedException("A player that is not an admin cannot update another player");
       }
     }
+  }
+
+  private NotificationModule getNotificaionModule() {
+    if (notificationModule == null) {
+      notificationModule = NotificationModuleFactory.getNotificationModule();
+    }
+    return notificationModule;
   }
 }

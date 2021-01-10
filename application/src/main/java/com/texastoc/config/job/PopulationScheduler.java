@@ -1,16 +1,21 @@
 package com.texastoc.config.job;
 
-import com.texastoc.module.game.GameService;
-import com.texastoc.module.game.model.FirstTimeGamePlayer;
+import com.google.common.collect.ImmutableList;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
-import com.texastoc.module.game.request.CreateGamePlayerRequest;
-import com.texastoc.module.game.request.UpdateGamePlayerRequest;
+import com.texastoc.module.game.model.Seating;
+import com.texastoc.module.game.model.SeatsPerTable;
+import com.texastoc.module.game.model.TableRequest;
+import com.texastoc.module.game.service.GamePlayerService;
+import com.texastoc.module.game.service.GameService;
+import com.texastoc.module.game.service.SeatingService;
 import com.texastoc.module.player.PlayerModule;
-import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.PlayerModuleFactory;
+import com.texastoc.module.player.model.Player;
 import com.texastoc.module.season.SeasonService;
 import com.texastoc.module.season.model.Season;
+import com.texastoc.module.settings.SettingsModule;
+import com.texastoc.module.settings.SettingsModuleFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,6 +24,7 @@ import org.springframework.stereotype.Component;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -32,16 +38,22 @@ public class PopulationScheduler {
 
   private final SeasonService seasonService;
   private final GameService gameService;
+  private final GamePlayerService gamePlayerService;
+  private final SeatingService seatingService;
   private final Random random = new Random(System.currentTimeMillis());
   private PlayerModule playerModule;
+  private SettingsModule settingsModule;
 
-  public PopulationScheduler(SeasonService seasonService, GameService gameService) {
+  public PopulationScheduler(SeasonService seasonService, GameService gameService, GamePlayerService gamePlayerService, SeatingService seatingService) {
     this.seasonService = seasonService;
     this.gameService = gameService;
+    this.gamePlayerService = gamePlayerService;
+    this.seatingService = seatingService;
   }
 
   // delay one minute then run every hour
-  @Scheduled(fixedDelay = 3600000, initialDelay = 60000)
+  //@Scheduled(fixedDelay = 3600000, initialDelay = 60000)
+  @Scheduled(fixedDelay = 3600000, initialDelay = 5000)
   public void populate() {
     createSeason();
   }
@@ -92,13 +104,14 @@ public class PopulationScheduler {
         player = players.get(random.nextInt(numPlayers));
       }
 
-      Game game = gameService.createGame(Game.builder()
+      Game game = gameService.create(Game.builder()
         .hostId(player.getId())
         .date(gameDate)
         .transportRequired(false)
         .build());
 
       addGamePlayers(game.getId());
+      seatGamePlayers(game.getId());
       addGamePlayersRebuy(game.getId());
       addGamePlayersFinish(game.getId());
 
@@ -106,14 +119,14 @@ public class PopulationScheduler {
       LocalDate nextGameDate = findNextThursday(gameDate.plusDays(1));
       if (!nextGameDate.isAfter(now)) {
         // finalize the game
-        gameService.endGame(game.getId());
+        gameService.finalize(game.getId());
       }
       gameDate = findNextThursday(gameDate.plusDays(1));
     }
   }
 
   private void addGamePlayers(int gameId) {
-    Game game = gameService.getGame(gameId);
+    Game game = gameService.get(gameId);
 
     int numPlayersToAddToGame = game.getDate().getDayOfMonth();
     if (numPlayersToAddToGame < 2) {
@@ -156,76 +169,94 @@ public class PopulationScheduler {
     }
   }
 
+  private void seatGamePlayers(int gameId) {
+    Game game = gameService.get(gameId);
+
+    // one table for every 8 players
+    int numPlayers = game.getNumPlayers();
+    int numTables = numPlayers / 8;
+    boolean remainder = (game.getNumPlayers() % 8) > 0;
+    numTables = remainder ? ++numTables : numTables;
+
+    List<SeatsPerTable> seatsPerTables = new LinkedList<>();
+    for (int i = 1; i <= numTables; i++) {
+      SeatsPerTable seatsPerTable = new SeatsPerTable();
+      seatsPerTables.add(seatsPerTable);
+      seatsPerTable.setNumSeats(8);
+      seatsPerTable.setTableNum(i);
+    }
+
+    Seating seating = new Seating();
+    seating.setSeatsPerTables(seatsPerTables);
+
+    // One table request
+    GamePlayer gamePlayer = game.getPlayers().stream()
+      .findAny().get();
+    TableRequest tableRequest = new TableRequest();
+    tableRequest.setGamePlayerId(gamePlayer.getId());
+    tableRequest.setGamePlayerName(gamePlayer.getName());
+    tableRequest.setTableNum(1);
+    seating.setTableRequests(ImmutableList.of(tableRequest));
+
+    seating.setGameId(game.getId());
+    seatingService.seatGamePlayers(seating);
+  }
+
   private void addGamePlayersRebuy(int gameId) {
-    Game game = gameService.getGame(gameId);
+    Game game = gameService.get(gameId);
 
     List<GamePlayer> gamePlayers = game.getPlayers();
     for (GamePlayer gamePlayer : gamePlayers) {
       if (random.nextBoolean()) {
-        UpdateGamePlayerRequest ugpr = new UpdateGamePlayerRequest();
-        ugpr.setBuyInCollected(true);
-        ugpr.setRebuyAddOnCollected(true);
-        Integer annualTocCollect = gamePlayer.getAnnualTocCollected();
-        if (annualTocCollect != null && annualTocCollect > 0) {
-          ugpr.setAnnualTocCollected(true);
-        }
-        Integer qAnnualTocCollect = gamePlayer.getQuarterlyTocCollected();
-        if (qAnnualTocCollect != null && qAnnualTocCollect > 0) {
-          ugpr.setQuarterlyTocCollected(true);
-        }
-        gameService.updateGamePlayer(game.getId(), gamePlayer.getId(), ugpr);
+        gamePlayer.setRebought(true);
       }
     }
+    gameService.update(game);
   }
 
   private void addGamePlayersFinish(int gameId) {
-    Game game = gameService.getGame(gameId);
+    Game game = gameService.get(gameId);
 
-    List<GamePlayer> gamePlayers = game.getPlayers();
+    // Make a copy of the list
+    List<GamePlayer> gamePlayers = new ArrayList<>(game.getPlayers());
 
     for (int place = 1; place <= 10 && gamePlayers.size() > 0; ++place) {
       GamePlayer gamePlayer = gamePlayers.remove(random.nextInt(gamePlayers.size()));
-      UpdateGamePlayerRequest ugpr = new UpdateGamePlayerRequest();
-      ugpr.setBuyInCollected(true);
-      Integer rebuy = gamePlayer.getRebuyAddOnCollected();
-      if (rebuy != null && rebuy > 0) {
-        ugpr.setRebuyAddOnCollected(true);
-      }
-      Integer annualTocCollect = gamePlayer.getAnnualTocCollected();
-      if (annualTocCollect != null && annualTocCollect > 0) {
-        ugpr.setAnnualTocCollected(true);
-      }
-      Integer qAnnualTocCollect = gamePlayer.getQuarterlyTocCollected();
-      if (qAnnualTocCollect != null && qAnnualTocCollect > 0) {
-        ugpr.setQuarterlyTocCollected(true);
-      }
-      ugpr.setPlace(place);
-      gameService.updateGamePlayer(game.getId(), gamePlayer.getId(), ugpr);
+      gamePlayer.setPlace(place);
+      gamePlayerService.updateGamePlayer(gamePlayer);
     }
   }
 
   private void addExistingPlayer(Game game, Player existingPlayer) {
-    CreateGamePlayerRequest cgpr = new CreateGamePlayerRequest();
-    cgpr.setPlayerId(existingPlayer.getId());
-    cgpr.setBuyInCollected(true);
-    cgpr.setAnnualTocCollected(random.nextBoolean());
+    GamePlayer gamePlayer = new GamePlayer();
+    gamePlayer.setGameId(game.getId());
+    gamePlayer.setPlayerId(existingPlayer.getId());
+    gamePlayer.setBoughtIn(true);
+    if (random.nextBoolean()) {
+      gamePlayer.setAnnualTocParticipant(true);
+    }
     // 20% in the quarterly
     if (random.nextInt(5) == 0) {
-      cgpr.setQuarterlyTocCollected(random.nextBoolean());
+      gamePlayer.setQuarterlyTocParticipant(true);
     }
-    gameService.createGamePlayer(game.getId(), cgpr);
+    gamePlayerService.createGamePlayer(gamePlayer);
   }
 
   private void addNewPlayer(Game game) {
-    FirstTimeGamePlayer ftgp = new FirstTimeGamePlayer();
+    GamePlayer gamePlayer = new GamePlayer();
+    gamePlayer.setGameId(game.getId());
     int firstNameIndex = random.nextInt(300);
-    ftgp.setFirstName(firstNames[firstNameIndex]);
+    gamePlayer.setFirstName(firstNames[firstNameIndex]);
     int lastNameIndex = random.nextInt(300);
-    ftgp.setLastName(lastNames[lastNameIndex]);
-    ftgp.setBuyInCollected(true);
-    ftgp.setAnnualTocCollected(random.nextBoolean());
-    ftgp.setQuarterlyTocCollected(random.nextBoolean());
-    gameService.createFirstTimeGamePlayer(game.getId(), ftgp);
+    gamePlayer.setLastName(lastNames[lastNameIndex]);
+    gamePlayer.setBoughtIn(true);
+    if (random.nextBoolean()) {
+      gamePlayer.setAnnualTocParticipant(true);
+    }
+    if (random.nextBoolean()) {
+      gamePlayer.setQuarterlyTocParticipant(true);
+    }
+    gamePlayerService.createFirstTimeGamePlayer(gamePlayer);
   }
 
   private LocalDate findNextThursday(LocalDate date) {
@@ -240,6 +271,13 @@ public class PopulationScheduler {
       playerModule = PlayerModuleFactory.getPlayerModule();
     }
     return playerModule;
+  }
+
+  private SettingsModule getSettingsModule() {
+    if (settingsModule == null) {
+      settingsModule = SettingsModuleFactory.getSettingsModule();
+    }
+    return settingsModule;
   }
 
   static final String[] firstNames = {"James", "John", "Robert", "Michael", "Mary", "William", "David", "Joseph", "Richard", "Charles", "Thomas", "Christopher", "Daniel", "Elizabeth", "Matthew", "Patricia", "George", "Jennifer", "Linda", "Anthony", "Barbara", "Donald", "Paul", "Mark", "Andrew", "Edward", "Steven", "Kenneth", "Margaret", "Joshua", "Kevin", "Brian", "Susan", "Dorothy", "Ronald", "Sarah", "Timothy", "Jessica", "Jason", "Helen", "Nancy", "Betty", "Karen", "Jeffrey", "Lisa", "Ryan", "Jacob", "Frank", "Gary", "Nicholas", "Anna", "Eric", "Sandra", "Stephen", "Emily", "Ashley", "Jonathan", "Kimberly", "Donna", "Ruth", "Carol", "Michelle", "Larry", "Laura", "Amanda", "Justin", "Raymond", "Scott", "Samuel", "Brandon", "Melissa", "Benjamin", "Rebecca", "Deborah", "Stephanie", "Sharon", "Kathleen", "Cynthia", "Gregory", "Jack", "Amy", "Henry", "Shirley", "Patrick", "Alexander", "Emma", "Angela", "Catherine", "Virginia", "Katherine", "Walter", "Dennis", "Jerry", "Brenda", "Pamela", "Frances", "Tyler", "Nicole", "Christine", "Aaron", "Peter", "Samantha", "Evelyn", "Jose", "Rachel", "Alice", "Douglas", "Janet", "Carolyn", "Adam", "Debra", "Harold", "Nathan", "Martha", "Maria", "Marie", "Zachary", "Arthur", "Heather", "Diane", "Julie", "Joyce", "Carl", "Grace", "Victoria", "Albert", "Rose", "Joan", "Kyle", "Christina", "Kelly", "Ann", "Lauren", "Doris", "Julia", "Jean", "Lawrence", "Judith", "Olivia", "Kathryn", "Joe", "Mildred", "Willie", "Gerald", "Lillian", "Roger", "Cheryl", "Megan", "Jeremy", "Keith", "Hannah", "Andrea", "Ethan", "Sara", "Terry", "Jacqueline", "Christian", "Harry", "Jesse", "Sean", "Teresa", "Ralph", "Austin", "Gloria", "Janice", "Roy", "Theresa", "Louis", "Noah", "Bruce", "Billy", "Judy", "Bryan", "Madison", "Eugene", "Beverly", "Jordan", "Denise", "Jane", "Marilyn", "Amber", "Dylan", "Danielle", "Abigail", "Charlotte", "Diana", "Brittany", "Russell", "Natalie", "Wayne", "Irene", "Ruby", "Annie", "Sophia", "Alan", "Juan", "Gabriel", "Howard", "Fred", "Vincent", "Lori", "Philip", "Kayla", "Alexis", "Tiffany", "Florence", "Isabella", "Kathy", "Louise", "Logan", "Lois", "Tammy", "Crystal", "Randy", "Bonnie", "Phyllis", "Anne", "Taylor", "Victor", "Bobby", "Erin", "Johnny", "Phillip", "Martin", "Josephine", "Alyssa", "Bradley", "Ella", "Shawn", "Clarence", "Travis", "Ernest", "Stanley", "Allison", "Craig", "Shannon", "Elijah", "Edna", "Peggy", "Tina", "Leonard", "Robin", "Dawn", "Carlos", "Earl", "Eleanor", "Jimmy", "Francis", "Cody", "Caleb", "Mason", "Rita", "Danny", "Isaac", "Audrey", "Todd", "Wanda", "Clara", "Ethel", "Paula", "Cameron", "Norma", "Dale", "Ellen", "Luis", "Alex", "Marjorie", "Luke", "Jamie", "Nathaniel", "Allen", "Leslie", "Joel", "Evan", "Edith", "Connie", "Eva", "Gladys", "Carrie", "Ava", "Frederick", "Wendy", "Hazel", "Valerie", "Curtis", "Elaine", "Courtney", "Esther", "Cindy", "Vanessa", "Brianna", "Lucas", "Norman", "Marvin", "Tracy", "Tony", "Monica", "Antonio", "Glenn", "Melanie"};

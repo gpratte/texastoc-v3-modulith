@@ -4,18 +4,23 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.texastoc.exception.NotFoundException;
-import com.texastoc.module.game.exception.GameInProgressException;
+import com.texastoc.module.game.GameModule;
+import com.texastoc.module.game.GameModuleFactory;
 import com.texastoc.module.game.model.Game;
-import com.texastoc.module.game.repository.GamePayoutRepository;
-import com.texastoc.module.game.repository.GamePlayerRepository;
-import com.texastoc.module.game.repository.GameRepository;
 import com.texastoc.module.season.exception.DuplicateSeasonException;
+import com.texastoc.module.season.exception.GameInProgressException;
 import com.texastoc.module.season.exception.SeasonInProgressException;
 import com.texastoc.module.season.model.HistoricalSeason;
 import com.texastoc.module.season.model.Quarter;
 import com.texastoc.module.season.model.QuarterlySeason;
 import com.texastoc.module.season.model.Season;
-import com.texastoc.module.season.repository.*;
+import com.texastoc.module.season.repository.QuarterlySeasonPayoutRepository;
+import com.texastoc.module.season.repository.QuarterlySeasonPlayerRepository;
+import com.texastoc.module.season.repository.QuarterlySeasonRepository;
+import com.texastoc.module.season.repository.SeasonHistoryRepository;
+import com.texastoc.module.season.repository.SeasonPayoutRepository;
+import com.texastoc.module.season.repository.SeasonPlayerRepository;
+import com.texastoc.module.season.repository.SeasonRepository;
 import com.texastoc.module.settings.SettingsModuleFactory;
 import com.texastoc.module.settings.model.Settings;
 import com.texastoc.module.settings.model.TocConfig;
@@ -42,35 +47,40 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class SeasonService {
+public class SeasonService implements SeasonModule {
 
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   private final SeasonRepository seasonRepository;
   private final QuarterlySeasonRepository qSeasonRepository;
-  private final GameRepository gameRepository;
-  private final GamePlayerRepository gamePlayerRepository;
-  private final GamePayoutRepository gamePayoutRepository;
   private final SeasonPlayerRepository seasonPlayerRepository;
   private final SeasonPayoutRepository seasonPayoutRepository;
   private final SeasonHistoryRepository seasonHistoryRepository;
   private final QuarterlySeasonPlayerRepository qSeasonPlayerRepository;
   private final QuarterlySeasonPayoutRepository qSeasonPayoutRepository;
 
+  private GameModule gameModule;
   private String pastSeasonsAsJson = null;
 
   @Autowired
-  public SeasonService(SeasonRepository seasonRepository, QuarterlySeasonRepository qSeasonRepository, GameRepository gameRepository, GamePlayerRepository gamePlayerRepository, GamePayoutRepository gamePayoutRepository, SeasonPlayerRepository seasonPlayerRepository, SeasonPayoutRepository seasonPayoutRepository, SeasonHistoryRepository seasonHistoryRepository, QuarterlySeasonPlayerRepository qSeasonPlayerRepository, QuarterlySeasonPayoutRepository qSeasonPayoutRepository) {
+  public SeasonService(SeasonRepository seasonRepository, QuarterlySeasonRepository qSeasonRepository, SeasonPlayerRepository seasonPlayerRepository, SeasonPayoutRepository seasonPayoutRepository, SeasonHistoryRepository seasonHistoryRepository, QuarterlySeasonPlayerRepository qSeasonPlayerRepository, QuarterlySeasonPayoutRepository qSeasonPayoutRepository) {
     this.seasonRepository = seasonRepository;
     this.qSeasonRepository = qSeasonRepository;
-    this.gameRepository = gameRepository;
-    this.gamePlayerRepository = gamePlayerRepository;
-    this.gamePayoutRepository = gamePayoutRepository;
     this.seasonPlayerRepository = seasonPlayerRepository;
     this.seasonPayoutRepository = seasonPayoutRepository;
     this.seasonHistoryRepository = seasonHistoryRepository;
     this.qSeasonPlayerRepository = qSeasonPlayerRepository;
     this.qSeasonPayoutRepository = qSeasonPayoutRepository;
+  }
+
+  @Override
+  public int getCurrentSeasonId() {
+    return getCurrentSeason().getId();
+  }
+
+  @Override
+  public QuarterlySeason getQuarterlySeasonByDate(LocalDate date) {
+    return qSeasonRepository.getByDate(date);
   }
 
   @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
@@ -138,6 +148,12 @@ public class SeasonService {
     return newSeason;
   }
 
+  @Override
+  public Season getSeasonById(int id) {
+    return getSeason(id);
+  }
+
+
   @Cacheable("currentSeasonById")
   @Transactional(readOnly = true)
   public Season getSeason(int id) {
@@ -147,7 +163,7 @@ public class SeasonService {
     season.setEstimatedPayouts(seasonPayoutRepository.getEstimatedBySeasonId(id));
 
     season.setQuarterlySeasons(qSeasonRepository.getBySeasonId(id));
-    season.setGames(gameRepository.getBySeasonId(id));
+    season.setGames(getGameModule().getBySeasonId(id));
 
     for (QuarterlySeason qSeason : season.getQuarterlySeasons()) {
       qSeason.setPlayers(qSeasonPlayerRepository.getByQSeasonId(qSeason.getId()));
@@ -155,8 +171,8 @@ public class SeasonService {
     }
 
     for (Game game : season.getGames()) {
-      game.setPlayers(gamePlayerRepository.selectByGameId(game.getId()));
-      game.setPayouts(gamePayoutRepository.getByGameId(game.getId()));
+      game.setPlayers(getGameModule().get(game.getId()).getPlayers());
+      game.setPayouts(getGameModule().get(game.getId()).getPayouts());
     }
 
     return season;
@@ -167,6 +183,7 @@ public class SeasonService {
     return seasonRepository.getAll();
   }
 
+  @Override
   @Cacheable("currentSeason")
   @Transactional(readOnly = true)
   public Season getCurrentSeason() {
@@ -198,7 +215,7 @@ public class SeasonService {
   public void endSeason(int seasonId) {
     Season season = seasonRepository.get(seasonId);
     // Make sure no games are open
-    List<Game> games = gameRepository.getBySeasonId(seasonId);
+    List<Game> games = getGameModule().getBySeasonId(seasonId);
     for (Game game : games) {
       if (!game.isFinalized()) {
         throw new GameInProgressException("There is a game in progress.");
@@ -334,4 +351,12 @@ public class SeasonService {
       return null;
     }
   }
+
+  private GameModule getGameModule() {
+    if (gameModule == null) {
+      gameModule = GameModuleFactory.getGameModule();
+    }
+    return gameModule;
+  }
+
 }

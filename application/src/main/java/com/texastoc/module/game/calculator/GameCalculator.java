@@ -11,7 +11,6 @@ import com.texastoc.module.settings.model.TocConfig;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Component
 public class GameCalculator {
@@ -25,33 +24,25 @@ public class GameCalculator {
     this.seasonService = seasonService;
   }
 
-  // TODO
-  //public Game calculate(int gameId) {
-
-  @SuppressWarnings("Duplicates")
-  public Game calculate(Game game, List<GamePlayer> gamePlayers) {
-
+  public Game calculate(Game game) {
     int numPlayers = 0;
-
     int buyInCollected = 0;
     int rebuyAddOnCollected = 0;
     int annualTocCollected = 0;
     int quarterlyTocCollected = 0;
     int totalCollected = 0;
-
     int kittyCalculated = 0;
     int annualTocFromRebuyAddOnCalculated = 0;
 
-    for (GamePlayer gamePlayer : gamePlayers) {
+    for (GamePlayer gamePlayer : game.getPlayers()) {
       ++numPlayers;
+      buyInCollected += gamePlayer.isBoughtIn() ? 0 : game.getBuyInCost();
+      rebuyAddOnCollected += gamePlayer.isRebought() ? 0 : game.getRebuyAddOnCost();
+      annualTocCollected += gamePlayer.isAnnualTocParticipant() ? 0 : game.getAnnualTocCost();
+      quarterlyTocCollected += gamePlayer.isQuarterlyTocParticipant() ? 0 : game.getQuarterlyTocCost();
 
-      buyInCollected += gamePlayer.getBuyInCollected() == null ? 0 : gamePlayer.getBuyInCollected();
-      rebuyAddOnCollected += gamePlayer.getRebuyAddOnCollected() == null ? 0 : gamePlayer.getRebuyAddOnCollected();
-      annualTocCollected += gamePlayer.getAnnualTocCollected() == null ? 0 : gamePlayer.getAnnualTocCollected();
-      quarterlyTocCollected += gamePlayer.getQuarterlyTocCollected() == null ? 0 : gamePlayer.getQuarterlyTocCollected();
-
-      boolean isAnnualToc = gamePlayer.getAnnualTocCollected() != null && gamePlayer.getAnnualTocCollected() > 0;
-      boolean isRebuyAddOn = gamePlayer.getRebuyAddOnCollected() != null && gamePlayer.getRebuyAddOnCollected() > 0;
+      boolean isAnnualToc = gamePlayer.isAnnualTocParticipant();
+      boolean isRebuyAddOn = gamePlayer.isRebought();
       if (isAnnualToc && isRebuyAddOn) {
         annualTocFromRebuyAddOnCalculated += getTocConfig(game.getSeasonId()).getRegularRebuyTocDebit();
       }
@@ -62,7 +53,6 @@ public class GameCalculator {
     }
 
     game.setNumPlayers(numPlayers);
-
     game.setBuyInCollected(buyInCollected);
     game.setRebuyAddOnCollected(rebuyAddOnCollected);
     game.setAnnualTocCollected(annualTocCollected);
@@ -70,7 +60,6 @@ public class GameCalculator {
 
     totalCollected += buyInCollected + rebuyAddOnCollected + annualTocCollected + quarterlyTocCollected;
     game.setTotalCollected(totalCollected);
-
     game.setKittyCalculated(kittyCalculated);
     game.setAnnualTocFromRebuyAddOnCalculated(annualTocFromRebuyAddOnCalculated);
     game.setRebuyAddOnLessAnnualTocCalculated(rebuyAddOnCollected - annualTocFromRebuyAddOnCalculated);
@@ -79,11 +68,8 @@ public class GameCalculator {
 
     // prizePot = total collected minus total toc minus kitty
     game.setPrizePotCalculated(totalCollected - totalTocCalculated - kittyCalculated);
-
     game.setLastCalculated(LocalDateTime.now());
-
-    gameRepository.update(game);
-
+    gameRepository.save(game);
     return game;
   }
 

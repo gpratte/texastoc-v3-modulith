@@ -1,135 +1,125 @@
 package com.texastoc.module.game;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.game.exception.GameInProgressException;
 import com.texastoc.module.game.exception.GameIsFinalizedException;
-import com.texastoc.module.game.model.FirstTimeGamePlayer;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.model.Seating;
-import com.texastoc.module.game.request.*;
+import com.texastoc.module.game.service.GameService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
 @RestController
 public class GameRestController {
 
+  private final GameModule gameModule;
   private final GameService gameService;
-  private final SeatingService seatingService;
-  private final ClockService clockService;
 
-  public GameRestController(GameService gameService, SeatingService seatingService, ClockService clockService) {
+  public GameRestController(GameModuleImpl gameModuleImpl, GameService gameService) {
+    gameModule = gameModuleImpl;
     this.gameService = gameService;
-    this.seatingService = seatingService;
-    this.clockService = clockService;
   }
 
   @PostMapping(value = "/api/v2/games", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public Game createGame(@RequestBody @Valid CreateGameRequest createGameRequest) {
-    return gameService.createGame(Game.builder()
-      .hostId(createGameRequest.getHostId())
-      .date(createGameRequest.getDate())
-      .transportRequired(createGameRequest.getTransportRequired())
-      .build());
+  public Game createGame(@RequestBody Game game) {
+    return gameModule.create(game);
   }
 
-  @PutMapping(value = "/api/v2/games/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public void updateGame(@PathVariable("id") int id, @RequestBody @Valid UpdateGameRequest updateGameRequest) {
-    Game game = gameService.getGame(id);
-    game.setHostId(updateGameRequest.getHostId());
-    game.setDate(updateGameRequest.getDate());
-    game.setTransportRequired(updateGameRequest.getTransportRequired());
-    game.setPayoutDelta(updateGameRequest.getPayoutDelta() == null ? 0 : updateGameRequest.getPayoutDelta());
-
-    gameService.updateGame(game);
+  @PatchMapping(value = "/api/v2/games/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+  public void updateGame(@PathVariable("id") int id, @RequestBody Game game) {
+    game.setId(id);
+    gameModule.update(game);
   }
 
   @GetMapping("/api/v2/games/{id}")
   public Game getGame(@PathVariable("id") int id) {
-    return gameService.getGame(id);
+    return gameModule.get(id);
   }
 
   @GetMapping(value = "/api/v2/games", consumes = "application/vnd.texastoc.current+json")
   public Game getCurrentGame() {
-    Game game = gameService.getCurrentGame();
-    if (game != null) {
-      return game;
-    }
-    throw new NotFoundException("Current game not found");
+    return gameModule.getCurrent();
   }
 
-  // TODO PUT not GET
+  // TODO this needs to go away
   @GetMapping(value = "/api/v2/games", consumes = "application/vnd.texastoc.clear-cache+json")
   public String getCurrentNoCacheGame() {
-    gameService.geClearCacheGame();
+    gameService.clearCacheGame();
     return "done";
   }
 
   @GetMapping("/api/v2/games")
-  public List<Game> getGames(@RequestParam(required = false) Integer seasonId) {
-    return gameService.getGames(seasonId);
+  public List<Game> getGamesBySeasonId(@RequestParam(required = false) Integer seasonId) {
+    return gameModule.getBySeasonId(seasonId);
   }
 
   @PutMapping(value = "/api/v2/games/{id}", consumes = "application/vnd.texastoc.finalize+json")
   public void finalizeGame(@PathVariable("id") int id) {
-    clockService.endClock(id);
-    gameService.endGame(id);
-    gameService.sendSummary(id);
+    gameModule.finalize(id);
   }
 
-  @PreAuthorize("hasRole('ADMIN')")
   @PutMapping(value = "/api/v2/games/{id}", consumes = "application/vnd.texastoc.unfinalize+json")
   public void unfinalizeGame(@PathVariable("id") int id) {
-    gameService.openGame(id);
+    gameModule.unfinalize(id);
   }
 
-
   @PostMapping(value = "/api/v2/games/{id}/players", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public GamePlayer createGamePlayer(@PathVariable("id") int id, @RequestBody @Valid CreateGamePlayerRequest cgpr) {
-    return gameService.createGamePlayer(id, cgpr);
+  public GamePlayer createGamePlayer(@PathVariable("id") int id, @RequestBody GamePlayer gamePlayer) {
+    gamePlayer.setGameId(id);
+    return gameModule.createGamePlayer(gamePlayer);
   }
 
   @PostMapping(value = "/api/v2/games/{id}/players", consumes = "application/vnd.texastoc.new-player+json")
-  public GamePlayer createGamePlayer(@PathVariable("id") int id, @RequestBody @Valid FirstTimeGamePlayer firstTimeGamePlayer) {
-    return gameService.createFirstTimeGamePlayer(id, firstTimeGamePlayer);
+  public GamePlayer createFirstTimeGamePlayer(@PathVariable("id") int id, @RequestBody GamePlayer gamePlayer) {
+    gamePlayer.setGameId(id);
+    return gameModule.createFirstTimeGamePlayer(gamePlayer);
   }
 
-  @PutMapping(value = "/api/v2/games/{gameId}/players/{gamePlayerId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public GamePlayer updateGamePlayer(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, @RequestBody @Valid UpdateGamePlayerRequest ugpr) {
-    return gameService.updateGamePlayer(gameId, gamePlayerId, ugpr);
+  @PatchMapping(value = "/api/v2/games/{gameId}/players/{gamePlayerId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+  public void updateGamePlayer(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, @RequestBody GamePlayer gamePlayer) {
+    gamePlayer.setGameId(gameId);
+    gamePlayer.setPlayerId(gamePlayerId);
+    gameModule.updateGamePlayer(gamePlayer);
   }
 
   @PutMapping(value = "/api/v2/games/{gameId}/players/{gamePlayerId}", consumes = "application/vnd.texastoc.knockout+json")
-  public GamePlayer toggleKnockedOut(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId) {
-    return gameService.toogleGamePlayerKnockedOut(gameId, gamePlayerId);
+  public void toggleKnockedOut(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId) {
+    gameModule.toggleGamePlayerKnockedOut(gameId, gamePlayerId);
   }
 
   @PutMapping(value = "/api/v2/games/{gameId}/players/{gamePlayerId}", consumes = "application/vnd.texastoc.rebuy+json")
-  public GamePlayer toggleRebuy(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId) {
-    return gameService.toogleGamePlayerRebuy(gameId, gamePlayerId);
+  public void toggleRebuy(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId) {
+    gameModule.toggleGamePlayerRebuy(gameId, gamePlayerId);
   }
 
   @DeleteMapping("/api/v2/games/{gameId}/players/{gamePlayerId}")
   public void deleteGamePlayer(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId) {
-    gameService.deleteGamePlayer(gameId, gamePlayerId);
+    gameModule.deleteGamePlayer(gameId, gamePlayerId);
   }
 
   @PostMapping(value = "/api/v2/games/{gameId}/seats", consumes = "application/vnd.texastoc.assign-seats+json")
-  public Seating seating(@PathVariable("gameId") int gameId, @RequestBody SeatingRequest seatingRequest) throws JsonProcessingException {
-    return seatingService.seat(gameId, seatingRequest.getNumSeatsPerTable(), seatingRequest.getTableRequests());
+  public Seating seating(@PathVariable("gameId") int gameId, @RequestBody Seating seating) {
+    seating.setGameId(gameId);
+    return gameModule.seatGamePlayers(seating);
   }
 
   @PostMapping(value = "/api/v2/games/{gameId}/seats", consumes = "application/vnd.texastoc.notify-seats+json")
-  public void notifySeating(@PathVariable("gameId") int gameId) throws JsonProcessingException {
-    gameService.notifySeating(gameId);
+  public void notifySeating(@PathVariable("gameId") int gameId) {
+    gameModule.notifySeating(gameId);
   }
 
   @ExceptionHandler(value = {GameInProgressException.class})

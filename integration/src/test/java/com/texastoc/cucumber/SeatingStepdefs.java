@@ -1,8 +1,8 @@
 package com.texastoc.cucumber;
 
+import com.texastoc.module.game.model.GameTable;
 import com.texastoc.module.game.model.Seat;
 import com.texastoc.module.game.model.Seating;
-import com.texastoc.module.game.model.Table;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -84,8 +84,8 @@ public class SeatingStepdefs extends SpringBootBaseIntegrationTest {
 
   @And("^table (\\d+) has (\\d+) dead stacks$")
   public void tableHasDeadStacks(int tableNum, int numDeadStacks) throws Exception {
-    List<Table> tables = seating.getTables();
-    Table table = tables.get(tableNum - 1);
+    List<GameTable> tables = seating.getGameTables();
+    GameTable table = tables.get(tableNum - 1);
     List<Seat> seats = table.getSeats();
     int numEmptySeats = (int) seats.stream()
       .filter((seat) -> seat == null)

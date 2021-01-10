@@ -4,28 +4,61 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.annotation.Id;
+
+import java.util.Objects;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class GamePlayer implements Comparable<GamePlayer> {
-
+  // Read-only id set when game player is created
+  @Id
   private int id;
+
+  // Read/write fields from API
   private int playerId;
-  private int qSeasonId;
-  private int seasonId;
   private int gameId;
-  private String name;
-  private Integer points;
+  private boolean boughtIn;
+  private boolean rebought;
+  private boolean annualTocParticipant;
+  private boolean quarterlyTocParticipant;
+  private boolean roundUpdates;
   private Integer place;
-  private Boolean knockedOut;
-  private Boolean roundUpdates;
+  private boolean knockedOut;
+  private Integer chop;
+
+  // Read-only fields set by the server
+  private int seasonId;
+  private int qSeasonId;
+  private String firstName;
+  private String lastName;
+  private String email;
+  private Integer points;
+
+  // End with "Collected" for physical money collected.
+  // Read-only fields set by the server
   private Integer buyInCollected;
   private Integer rebuyAddOnCollected;
   private Integer annualTocCollected;
   private Integer quarterlyTocCollected;
-  private Integer chop;
+
+  public String getName() {
+    String name = null;
+
+    if (firstName != null) {
+      name = firstName;
+      if (lastName != null) {
+        name += " " + lastName;
+      }
+    } else if (lastName != null) {
+      name = lastName;
+    }
+
+    return name == null ? "Unknown" : name;
+  }
 
   @Override
   public int compareTo(GamePlayer other) {
@@ -56,18 +89,47 @@ public class GamePlayer implements Comparable<GamePlayer> {
       }
     }
 
-    // If I don't have a name
-    if (name == null) {
+    // If I don't have a first or a last
+    if (firstName == null && lastName == null) {
       // then I come after other
       return 1;
     }
 
-    // If other doesn't have a name
-    if (other.name == null) {
+    // If other doesn't have a first or a last
+    if (other.firstName == null && other.lastName == null) {
       // then I come before other
       return -1;
     }
 
-    return name.toLowerCase().compareTo(other.name.toLowerCase());
+    return makeFullName(this).compareTo(makeFullName(other));
+  }
+
+  private String makeFullName(GamePlayer player) {
+    // Combine the first and last into a full name
+    StringBuffer fullName = new StringBuffer();
+    if (!StringUtils.isBlank(player.firstName)) {
+      fullName.append(player.firstName);
+    }
+    if (!StringUtils.isBlank(player.firstName) && !StringUtils.isBlank(player.lastName)) {
+      fullName.append(" ");
+    }
+    if (!StringUtils.isBlank(player.lastName)) {
+      fullName.append(player.lastName);
+    }
+    return fullName.toString().toLowerCase();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    GamePlayer that = (GamePlayer) o;
+    return playerId == that.playerId &&
+      gameId == that.gameId;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(playerId, gameId);
   }
 }

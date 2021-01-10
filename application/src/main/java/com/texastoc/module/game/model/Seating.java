@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 
 import java.util.List;
 
@@ -14,8 +16,13 @@ import java.util.List;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Seating {
+  @Id
+  private int id;
   private int gameId;
-  private List<Integer> numSeatsPerTable;
+  @MappedCollection
+  private List<SeatsPerTable> seatsPerTables;
+  @MappedCollection
   private List<TableRequest> tableRequests;
-  private List<Table> tables;
+  @MappedCollection
+  private List<GameTable> gameTables;
 }

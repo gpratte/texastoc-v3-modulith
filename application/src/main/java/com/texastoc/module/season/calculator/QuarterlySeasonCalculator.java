@@ -1,9 +1,8 @@
 package com.texastoc.module.season.calculator;
 
+import com.texastoc.module.game.GameModule;
+import com.texastoc.module.game.GameModuleFactory;
 import com.texastoc.module.game.model.Game;
-import com.texastoc.module.game.model.GamePlayer;
-import com.texastoc.module.game.repository.GamePlayerRepository;
-import com.texastoc.module.game.repository.GameRepository;
 import com.texastoc.module.season.model.QuarterlySeason;
 import com.texastoc.module.season.model.QuarterlySeasonPayout;
 import com.texastoc.module.season.model.QuarterlySeasonPlayer;
@@ -14,22 +13,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
 public class QuarterlySeasonCalculator {
 
-  private final GameRepository gameRepository;
-  private final GamePlayerRepository gamePlayerRepository;
   private final QuarterlySeasonRepository qSeasonRepository;
   private final QuarterlySeasonPlayerRepository qSeasonPlayerRepository;
   private final QuarterlySeasonPayoutRepository qSeasonPayoutRepository;
 
-  public QuarterlySeasonCalculator(QuarterlySeasonRepository qSeasonRepository, GamePlayerRepository gamePlayerRepository, GameRepository gameRepository, QuarterlySeasonPlayerRepository qSeasonPlayerRepository, QuarterlySeasonPayoutRepository qSeasonPayoutRepository) {
+  private GameModule gameModule;
+
+  public QuarterlySeasonCalculator(QuarterlySeasonRepository qSeasonRepository, QuarterlySeasonPlayerRepository qSeasonPlayerRepository, QuarterlySeasonPayoutRepository qSeasonPayoutRepository) {
     this.qSeasonRepository = qSeasonRepository;
-    this.gamePlayerRepository = gamePlayerRepository;
-    this.gameRepository = gameRepository;
     this.qSeasonPlayerRepository = qSeasonPlayerRepository;
     this.qSeasonPayoutRepository = qSeasonPayoutRepository;
   }
@@ -38,7 +38,7 @@ public class QuarterlySeasonCalculator {
     QuarterlySeason qSeason = qSeasonRepository.getById(id);
 
     // Calculate quarterly season
-    List<Game> games = gameRepository.getByQuarterlySeasonId(id);
+    List<Game> games = getGameModule().getByQuarterlySeasonId(id);
 
     qSeason.setNumGamesPlayed(games.size());
 
@@ -76,55 +76,55 @@ public class QuarterlySeasonCalculator {
     return qSeason;
   }
 
-  @SuppressWarnings("Duplicates")
   private List<QuarterlySeasonPlayer> calculatePlayers(int seasonId, int qSeasonId) {
-
     Map<Integer, QuarterlySeasonPlayer> seasonPlayerMap = new HashMap<>();
 
-    List<GamePlayer> gamePlayers = gamePlayerRepository.selectQuarterlyTocPlayersByQuarterlySeasonId(qSeasonId);
-
-    for (GamePlayer gamePlayer : gamePlayers) {
-      QuarterlySeasonPlayer player = seasonPlayerMap.get(gamePlayer.getPlayerId());
-      if (player == null) {
-        player = QuarterlySeasonPlayer.builder()
-          .playerId(gamePlayer.getPlayerId())
-          .seasonId(seasonId)
-          .qSeasonId(qSeasonId)
-          .name(gamePlayer.getName())
-          .build();
-        seasonPlayerMap.put(gamePlayer.getPlayerId(), player);
-      }
-
-      if (gamePlayer.getPoints() != null && gamePlayer.getPoints() > 0) {
-        player.setPoints(player.getPoints() + gamePlayer.getPoints());
-      }
-
-      player.setEntries(player.getEntries() + 1);
-    }
-
-    List<QuarterlySeasonPlayer> players = new ArrayList<>(seasonPlayerMap.values());
-    Collections.sort(players);
-
-    int place = 0;
-    int lastPoints = -1;
-    int numTied = 0;
-    for (QuarterlySeasonPlayer player : players) {
-      if (player.getPoints() > 0) {
-        // check for a tie
-        if (player.getPoints() == lastPoints) {
-          // tie for points so same player
-          player.setPlace(place);
-          ++numTied;
-        } else {
-          place = ++place + numTied;
-          player.setPlace(place);
-          lastPoints = player.getPoints();
-          numTied = 0;
-        }
-      }
-    }
-
-    return players;
+    // TODO figure this out
+//    List<GamePlayer> gamePlayers = gamePlayerRepository.selectQuarterlyTocPlayersByQuarterlySeasonId(qSeasonId);
+//
+//    for (GamePlayer gamePlayer : gamePlayers) {
+//      QuarterlySeasonPlayer player = seasonPlayerMap.get(gamePlayer.getPlayerId());
+//      if (player == null) {
+//        player = QuarterlySeasonPlayer.builder()
+//          .playerId(gamePlayer.getPlayerId())
+//          .seasonId(seasonId)
+//          .qSeasonId(qSeasonId)
+//          .name(gamePlayer.getName())
+//          .build();
+//        seasonPlayerMap.put(gamePlayer.getPlayerId(), player);
+//      }
+//
+//      if (gamePlayer.getPoints() != null && gamePlayer.getPoints() > 0) {
+//        player.setPoints(player.getPoints() + gamePlayer.getPoints());
+//      }
+//
+//      player.setEntries(player.getEntries() + 1);
+//    }
+//
+//    List<QuarterlySeasonPlayer> players = new ArrayList<>(seasonPlayerMap.values());
+//    Collections.sort(players);
+//
+//    int place = 0;
+//    int lastPoints = -1;
+//    int numTied = 0;
+//    for (QuarterlySeasonPlayer player : players) {
+//      if (player.getPoints() > 0) {
+//        // check for a tie
+//        if (player.getPoints() == lastPoints) {
+//          // tie for points so same player
+//          player.setPlace(place);
+//          ++numTied;
+//        } else {
+//          place = ++place + numTied;
+//          player.setPlace(place);
+//          lastPoints = player.getPoints();
+//          numTied = 0;
+//        }
+//      }
+//    }
+//
+//    return players;
+    return null;
   }
 
   private List<QuarterlySeasonPayout> calculatePayouts(int pot, int seasonId, int qSeasonId) {
@@ -158,5 +158,12 @@ public class QuarterlySeasonCalculator {
       .build());
 
     return payouts;
+  }
+
+  private GameModule getGameModule() {
+    if (gameModule == null) {
+      gameModule = GameModuleFactory.getGameModule();
+    }
+    return gameModule;
   }
 }

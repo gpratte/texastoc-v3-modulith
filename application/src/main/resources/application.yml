@@ -3,6 +3,9 @@ spring:
     console:
       enabled: true
 
+payouts:
+  fileName: payouts-percentages.json
+
 points:
   numPlayers: 2
   tenthPlaceIncr: 0.5
