@@ -21,6 +21,6 @@ public class Settings {
   private int id;
   @MappedCollection(idColumn = "ID")
   Version version;
-  @MappedCollection(idColumn = "ID", keyColumn = "YEAR")
+  @MappedCollection(keyColumn = "YEAR")
   private Map<Integer, TocConfig> tocConfigs;
 }

@@ -10,24 +10,22 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.time.LocalDate;
+
 // Tests are run from SpringBootBaseIntegrationTest so must Ignore here
 @Ignore
 public class GameStepdefs extends SpringBootBaseIntegrationTest {
 
-  @When("^the game is created$")
-  public void the_game_is_created() throws Exception {
-//    String token = login(USER_EMAIL, USER_PASSWORD);
-//    gameCreated = createGame(createGameRequest, token);
-  }
-
-//  private CreateGameRequest createGameRequest;
+  //  private CreateGameRequest createGameRequest;
+  private Game gameToCreate;
   private Game gameCreated;
   private Game gameRetrieved;
   private HttpClientErrorException exception;
 
+
   @Before
   public void before() {
-//    createGameRequest = null;
+    gameToCreate = null;
     gameCreated = null;
     gameRetrieved = null;
     exception = null;
@@ -35,19 +33,19 @@ public class GameStepdefs extends SpringBootBaseIntegrationTest {
 
   @Given("^a season exists$")
   public void a_season_exists() throws Exception {
-//    // Arrange
-//    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
-//    createSeason(token);
+    // Arrange
+    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
+    createSeason(token);
   }
 
   @Given("^the game starts now$")
   public void the_game_starts_now() throws Exception {
     // Arrange
-//    createGameRequest = CreateGameRequest.builder()
-//      .date(LocalDate.now())
-//      .hostId(1)
-//      .transportRequired(false)
-//      .build();
+    gameToCreate = Game.builder()
+      .date(LocalDate.now())
+      .hostId(1)
+      .transportRequired(false)
+      .build();
   }
 
   @Given("^the game supplies need to be moved$")
@@ -58,6 +56,13 @@ public class GameStepdefs extends SpringBootBaseIntegrationTest {
 //      .transportRequired(true)
 //      .build();
   }
+
+  @When("^the game is created$")
+  public void the_game_is_created() throws Exception {
+    String token = login(USER_EMAIL, USER_PASSWORD);
+    gameCreated = createGame(gameToCreate, token);
+  }
+
 
   @When("^another game is created$")
   public void anotherGameIsCreated() throws Exception {
@@ -106,7 +111,7 @@ public class GameStepdefs extends SpringBootBaseIntegrationTest {
     assertNewGame(gameCreated);
   }
 
-  @Then("^the game is not double buy in nor transport required$")
+  @Then("^the game is not transport required$")
   public void the_game_is_not_double_buy_in_nor_transport_required() throws Exception {
     Assert.assertFalse("transport required should be false", gameCreated.isTransportRequired());
   }

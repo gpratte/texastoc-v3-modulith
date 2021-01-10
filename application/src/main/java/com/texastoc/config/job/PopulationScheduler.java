@@ -31,7 +31,7 @@ import java.util.Random;
 /**
  * When running with an embedded H2 database populate the current season with games.
  */
-@Profile("!mysql")
+@Profile({"!mysql & !integration-testing"})
 @Slf4j
 @Component
 public class PopulationScheduler {

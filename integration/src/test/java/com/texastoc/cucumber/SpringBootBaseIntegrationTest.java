@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.texastoc.TestConstants;
+import com.texastoc.module.game.model.Game;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
+import com.texastoc.module.season.model.Season;
 import com.texastoc.module.settings.model.SystemSettings;
 import io.cucumber.spring.CucumberContextConfiguration;
 import lombok.Getter;
@@ -58,36 +60,36 @@ public abstract class SpringBootBaseIntegrationTest implements TestConstants {
     return start;
   }
 
-//  protected Season createSeason(String token) throws Exception {
-//    return createSeason(getSeasonStart(), token);
-//  }
+  protected Season createSeason(String token) throws Exception {
+    return createSeason(getSeasonStart(), token);
+  }
 
-//  protected Season createSeason(LocalDate start, String token) throws Exception {
-//    HttpHeaders headers = new HttpHeaders();
-//    headers.setContentType(MediaType.APPLICATION_JSON);
-//    headers.set("Authorization", "Bearer " + token);
-//
-//    ObjectMapper mapper = new ObjectMapper();
-//    mapper.registerModule(new JavaTimeModule());
-//    String seasonAsJson = mapper.writeValueAsString(start);
-//    HttpEntity<String> entity = new HttpEntity<>(seasonAsJson, headers);
-//
-//    return restTemplate.postForObject(endpoint() + "/seasons", entity, Season.class);
-//  }
+  protected Season createSeason(LocalDate start, String token) throws Exception {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.set("Authorization", "Bearer " + token);
 
-//  protected Game createGame(CreateGameRequest createGameRequest, String token) throws JsonProcessingException {
-//    HttpHeaders headers = new HttpHeaders();
-//    headers.setContentType(MediaType.APPLICATION_JSON);
-//    headers.set("Authorization", "Bearer " + token);
-//
-//    ObjectMapper mapper = new ObjectMapper();
-//    mapper.registerModule(new JavaTimeModule());
-//
-//    String createGameRequestAsJson = mapper.writeValueAsString(createGameRequest);
-//    HttpEntity<String> entity = new HttpEntity<>(createGameRequestAsJson, headers);
-//
-//    return restTemplate.postForObject(endpoint() + "/games", entity, Game.class);
-//  }
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
+    String seasonAsJson = mapper.writeValueAsString(start);
+    HttpEntity<String> entity = new HttpEntity<>(seasonAsJson, headers);
+
+    return restTemplate.postForObject(endpoint() + "/seasons", entity, Season.class);
+  }
+
+  protected Game createGame(Game gameToCreate, String token) throws JsonProcessingException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.set("Authorization", "Bearer " + token);
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
+
+    String gameToCreateAsJson = mapper.writeValueAsString(gameToCreate);
+    HttpEntity<String> entity = new HttpEntity<>(gameToCreateAsJson, headers);
+
+    return restTemplate.postForObject(endpoint() + "/games", entity, Game.class);
+  }
 
 //  protected void updateGame(int gameId, UpdateGameRequest updateGameRequest, String token) throws JsonProcessingException {
 //    HttpHeaders headers = new HttpHeaders();
