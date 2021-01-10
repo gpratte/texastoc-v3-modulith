@@ -3,6 +3,7 @@ package com.texastoc.module.player.service;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.repository.PlayerRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
       throw new UsernameNotFoundException(email);
     }
     Player player = players.get(0);
-    return new org.springframework.security.core.userdetails.User(player.getEmail(), player.getPassword(), getAuthority(player));
+    return new User(player.getEmail(), player.getPassword(), getAuthority(player));
   }
 
   private Set<SimpleGrantedAuthority> getAuthority(Player player) {

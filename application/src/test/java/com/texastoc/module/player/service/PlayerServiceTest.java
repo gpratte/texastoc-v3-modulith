@@ -32,6 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -363,12 +364,11 @@ public class PlayerServiceTest {
 
     // Act
     playerService.forgotPassword(email);
+    playerService.forgotPassword("another@whatever.com");
 
-    // Assert
     ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
-    verify(notificationModule).sendEmail(any(), anyString(), argument.capture());
-    String code = argument.getValue();
-    System.out.println(code);
+    verify(notificationModule, times(2)).sendEmail(any(), anyString(), argument.capture());
+    String code = argument.getAllValues().get(0);
 
     Player player = Player.builder()
       .id(1)
@@ -436,6 +436,37 @@ public class PlayerServiceTest {
     Assert.assertNotEquals("existingEncodedPassword", param.getPassword());
     // roles should have change
     assertThat(param.getRoles()).containsExactlyInAnyOrder(existingRole, newRole);
+  }
+
+  @Test
+  public void testAddRoleThatExists() {
+    // Arrange
+    Role existingRole = Role.builder()
+      .id(1)
+      .type(Role.Type.USER)
+      .build();
+    HashSet<Role> roles = new HashSet<>();
+    roles.add(existingRole);
+    Player existingPlayer = Player.builder()
+      .id(1)
+      .roles(roles)
+      .build();
+    when(playerRepository.findById(ArgumentMatchers.eq(1))).thenReturn(java.util.Optional.ofNullable(existingPlayer));
+
+    // mock out to pass the authorization check
+    when(authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)).thenReturn(true);
+
+    Role newRole = Role.builder()
+      .id(1)
+      .type(Role.Type.USER)
+      .build();
+
+    // Act
+    playerService.addRole(1, newRole);
+
+    // Assert
+    Mockito.verify(playerRepository, Mockito.times(1)).findById(1);
+    Mockito.verify(playerRepository, Mockito.times(0)).save(any(Player.class));
   }
 
   @Test

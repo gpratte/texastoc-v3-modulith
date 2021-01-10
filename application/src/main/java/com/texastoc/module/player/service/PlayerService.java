@@ -124,7 +124,7 @@ public class PlayerService implements PlayerModule {
     String generatedString = RandomStringUtils.random(5, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
     forgotPasswordCodes.put(email, generatedString);
     log.info("reset code: {}", generatedString);
-    notificationModule.sendEmail(Arrays.asList(email), "Reset Code", generatedString);
+    getNotificaionModule().sendEmail(Arrays.asList(email), "Reset Code", generatedString);
   }
 
   @Override
