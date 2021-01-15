@@ -3,6 +3,7 @@ package com.texastoc.cucumber;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.texastoc.DBUtils;
 import com.texastoc.TestConstants;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.player.model.Player;
@@ -38,6 +39,11 @@ public abstract class SpringBootBaseIntegrationTest implements TestConstants {
     restTemplate = new RestTemplate();
   }
 
+  protected void after() {
+    // Reset the database tables
+    DBUtils.cleanDb();
+  }
+
   protected String endpoint() {
     if (V2_ENDPOINT == null) {
       V2_ENDPOINT = SERVER_URL + ":" + port + "/api/v2";
@@ -71,7 +77,10 @@ public abstract class SpringBootBaseIntegrationTest implements TestConstants {
 
     ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new JavaTimeModule());
-    String seasonAsJson = mapper.writeValueAsString(start);
+
+    SeasonStart seasonStart = new SeasonStart();
+    seasonStart.setStartYear(start.getYear());
+    String seasonAsJson = mapper.writeValueAsString(seasonStart);
     HttpEntity<String> entity = new HttpEntity<>(seasonAsJson, headers);
 
     return restTemplate.postForObject(endpoint() + "/seasons", entity, Season.class);
@@ -329,18 +338,18 @@ public abstract class SpringBootBaseIntegrationTest implements TestConstants {
 //    return response.getBody();
 //  }
 
-//  protected Season getCurrentSeason(String token) throws JsonProcessingException {
-//    HttpHeaders headers = new HttpHeaders();
-//    headers.set("Authorization", "Bearer " + token);
-//    HttpEntity<String> entity = new HttpEntity<>("", headers);
-//
-//    ResponseEntity<Season> response = restTemplate.exchange(
-//      endpoint() + "/seasons/current",
-//      HttpMethod.GET,
-//      entity,
-//      Season.class);
-//    return response.getBody();
-//  }
+  protected Season getCurrentSeason(String token) throws JsonProcessingException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + token);
+    HttpEntity<String> entity = new HttpEntity<>("", headers);
+
+    ResponseEntity<Season> response = restTemplate.exchange(
+      endpoint() + "/seasons/current",
+      HttpMethod.GET,
+      entity,
+      Season.class);
+    return response.getBody();
+  }
 
   protected String login(String email, String password) throws JsonProcessingException {
     HttpHeaders headers = new HttpHeaders();
@@ -371,6 +380,12 @@ public abstract class SpringBootBaseIntegrationTest implements TestConstants {
   @Setter
   private static class Token {
     String token;
+  }
+
+  @Getter
+  @Setter
+  private static class SeasonStart {
+    private int startYear;
   }
 
 }

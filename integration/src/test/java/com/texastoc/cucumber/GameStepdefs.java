@@ -1,12 +1,13 @@
 package com.texastoc.cucumber;
 
 import com.texastoc.module.game.model.Game;
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -25,10 +26,17 @@ public class GameStepdefs extends SpringBootBaseIntegrationTest {
 
   @Before
   public void before() {
+    // Before each scenario
     gameToCreate = null;
     gameCreated = null;
     gameRetrieved = null;
     exception = null;
+  }
+
+  @After
+  public void after() {
+    // After each scenario
+    super.after();
   }
 
   @Given("^a season exists$")
@@ -145,8 +153,8 @@ public class GameStepdefs extends SpringBootBaseIntegrationTest {
     Assert.assertTrue("game quarterly season id should be greater than 0", game.getQSeasonId() > 0);
     //Assert.assertEquals("game quarter should be 1", 1, game.getQuarter().getValue());
 
-    Assert.assertEquals("game host id should be " + BRIAN_BAKER_PLAYER_ID, BRIAN_BAKER_PLAYER_ID, (int) game.getHostId());
-    Assert.assertEquals("game host name should be " + BRIAN_BAKER_NAME, BRIAN_BAKER_NAME, game.getHostName());
+    Assert.assertEquals("game host id should be " + GIL_PRATTE_PLAYER_ID, GIL_PRATTE_PLAYER_ID, (int) game.getHostId());
+    Assert.assertEquals("game host name should be " + GIL_PRATTE_NAME, GIL_PRATTE_NAME, game.getHostName());
 
     // Game setup variables
     Assert.assertEquals("kitty cost should come from season", KITTY_PER_GAME, (int) game.getKittyCost());

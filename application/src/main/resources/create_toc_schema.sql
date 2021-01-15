@@ -1,3 +1,26 @@
+DROP TABLE IF EXISTS season;
+DROP TABLE IF EXISTS quarterlyseason;
+DROP TABLE IF EXISTS seasonplayer;
+DROP TABLE IF EXISTS quarterlyseasonplayer;
+DROP TABLE IF EXISTS role;
+DROP TABLE IF EXISTS player;
+DROP TABLE IF EXISTS seats_per_table;
+DROP TABLE IF EXISTS table_request;
+DROP TABLE IF EXISTS seat;
+DROP TABLE IF EXISTS game_table;
+DROP TABLE IF EXISTS game_player;
+DROP TABLE IF EXISTS game_payout;
+DROP TABLE IF EXISTS game;
+DROP TABLE IF EXISTS seating;
+DROP TABLE IF EXISTS quarterlyseasonpayout;
+DROP TABLE IF EXISTS seasonpayout;
+DROP TABLE IF EXISTS seasonpayoutsettings;
+DROP TABLE IF EXISTS toc_config;
+DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS version;
+DROP TABLE IF EXISTS historicalseasonplayer;
+DROP TABLE IF EXISTS historicalseason;
+
 CREATE TABLE season
 (
     id                                int NOT NULL AUTO_INCREMENT,
@@ -82,14 +105,6 @@ CREATE TABLE player
     PRIMARY KEY (id)
 );
 ALTER TABLE player ADD UNIQUE (email);
-# password is password
-INSERT INTO player
-VALUES (1, 'Gil', 'Pratte', '5121231235', 'gilpratte@texastoc.com',
-        '$2a$10$qXQo4z4oXKPEKyYO7bAQmOQ9PhIcHK4LOo/L1U9j/xkLEmseLWECK'),
-       (2, 'Guest', 'User', '5121231235', 'guest@texastoc.com',
-        '$2a$10$qXQo4z4oXKPEKyYO7bAQmOQ9PhIcHK4LOo/L1U9j/xkLEmseLWECK'),
-       (3, 'Guest', 'Admin', '5121231235', 'admin@texastoc.com',
-        '$2a$10$qXQo4z4oXKPEKyYO7bAQmOQ9PhIcHK4LOo/L1U9j/xkLEmseLWECK');
 
 CREATE TABLE role
 (
@@ -100,13 +115,6 @@ CREATE TABLE role
 );
 alter table role
     add constraint fk_role_player foreign key (player) references player (id);
-
-INSERT INTO role
-VALUES (1, 'ADMIN', 1),
-       (2, 'USER', 1),
-       (3, 'USER', 2),
-       (4, 'ADMIN', 3),
-       (5, 'USER', 3);
 
 CREATE TABLE seating
 (
@@ -295,23 +303,6 @@ CREATE TABLE seasonpayoutsettings
     settings varchar(8192) NOT NULL,
     PRIMARY KEY (id)
 );
-INSERT INTO seasonpayoutsettings
-VALUES (1, 1,
-        '[{"lowRange" : 5000,"highRange" : 7000,
-           "guaranteed": [{"place" : 1,"amount" : 1400,"percent" : 20}],
-           "finalTable": [{"place" : 2,"amount" : 1350,"percent" : 20},
-                          {"place" : 3,"amount" : 1150,"percent" : 16},
-                          {"place" : 4,"amount" : 1100,"percent" : 14},
-                          {"place" : 5,"amount" : 0,"percent" : 30}]}]');
-INSERT INTO seasonpayoutsettings
-VALUES (2, 2,
-        '[{"lowRange" : 5000,"highRange" : 7000,
-           "guaranteed": [{"place" : 1,"amount" : 1400,"percent" : 20}],
-           "finalTable": [{"place" : 2,"amount" : 1350,"percent" : 20},
-                          {"place" : 3,"amount" : 1150,"percent" : 16},
-                          {"place" : 4,"amount" : 1100,"percent" : 14},
-                          {"place" : 5,"amount" : 0,"percent" : 30}]}]');
-
 
 CREATE TABLE version
 (
@@ -319,7 +310,6 @@ CREATE TABLE version
     version varchar(8) NOT NULL,
     PRIMARY KEY (id)
 );
-INSERT INTO version VALUES (1, '2.21');
 
 CREATE TABLE settings
 (
@@ -329,7 +319,6 @@ CREATE TABLE settings
 );
 alter table settings
     add constraint fk_settings_version foreign key (version) references version (id);
-INSERT INTO settings VALUES (1, 1);
 
 CREATE TABLE toc_config
 (
@@ -347,8 +336,6 @@ CREATE TABLE toc_config
 );
 alter table toc_config
     add constraint fk_toc_config_settings foreign key (settings) references settings (id);
-INSERT INTO toc_config VALUES (1, 10, 20, 20, 3, 40, 40, 20, 2020, 1);
-INSERT INTO toc_config VALUES (2, 0, 20, 20, 3, 40, 40, 20, 2021, 1);
 
 CREATE TABLE historicalseasonplayer
 (
