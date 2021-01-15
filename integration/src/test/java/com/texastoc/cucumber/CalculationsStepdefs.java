@@ -11,7 +11,6 @@ import com.texastoc.module.season.model.SeasonPlayer;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -81,11 +80,11 @@ public class CalculationsStepdefs extends SpringBootBaseIntegrationTest {
 //    }
   }
 
-  @When("^the game is finalized$")
-  public void the_game_is_finalized() throws Exception {
+//  @When("^the game is finalized$")
+//  public void the_game_is_finalized() throws Exception {
 //    String token = login(USER_EMAIL, USER_PASSWORD);
 //    finalizeGame(gameId, token);
-  }
+//  }
 
   @And("^the calculated season is retrieved$")
   public void the_calculated_season_is_retrieved() throws Exception {

@@ -26,7 +26,7 @@ import java.util.List;
 @RestController
 public class GameRestController {
 
-  public static final String CONTENT_TYPE_CURRENT_GAME = "application/vnd.texastoc.current-game+json";
+  public static final String CONTENT_TYPE_CURRENT_GAME = "application/vnd.texastoc.current+json";
   public static final String CONTENT_TYPE_CLEAR_CACHE = "application/vnd.texastoc.clear-cache+json";
   public static final String CONTENT_TYPE_FINALIZE = "application/vnd.texastoc.finalize+json";
   public static final String CONTENT_TYPE_UNFINALIZE = "application/vnd.texastoc.unfinalize+json";

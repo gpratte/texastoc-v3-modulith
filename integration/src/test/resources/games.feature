@@ -19,14 +19,14 @@ Feature: CRUD Games
     Given the game starts now
     When the game is created and retrieved
     Then the retrieved game is normal
-    Then the retrieved game has no players
+    Then the retrieved game has no players or payouts
 
   Scenario: create and retrieve the current game
     Given a season exists
     Given the game starts now
     When the game is created
     When the current game is retrieved
-    Then the current game is found
+    Then the current game has no players or payouts
 
   Scenario: create and update a simple game
     Given a season exists
@@ -34,7 +34,14 @@ Feature: CRUD Games
     When the game is created and retrieved
     And the retrieved game is updated and retrieved
     Then the game is normal
-#    Then the game is double buy-in, transport and delta changed
+
+  Scenario: create and finalize a simple game
+    Given a season exists
+    Given the game starts now
+    When the game is created
+    When the game is finalized
+    And the current game is retrieved
+    Then the retrieved game is finalized
 
 #  TODO flesh this out - need to handle a status besides 200 from the server
 #  Scenario: try to create a game when there is a game in progress
