@@ -4,12 +4,12 @@ Refactor version 2 to version 3.
 Version 3 will employ a modular monolith architecture.
 
 Break the code into modules by
-determining the bounded context of the data.
-use Spring Data JDBC for accessing the aggregate
-use Java packaging to encapsulate a module
-use ArchUnit to enforce package separation
-access modules via a single module interface (sideway calls)
-use Spring Integration for messaging
+* determining the bounded context of the data.
+* use Spring Data JDBC for accessing the aggregate
+* use Java packaging to encapsulate a module
+* use ArchUnit to enforce package separation
+* access modules via a single module interface (sideway calls)
+* use Spring Integration for messaging
 
 
 # Profiles, Building and Running
@@ -166,9 +166,7 @@ To see the code for a branch compare the branch to the previous branch.
 A ton of changes to create the game module.
 * Updated ArchUnit for isolating the GameModule from the rest of the modules
 * a pair of fields (boolean and Integer) for bought in, rebought, annual toc participant and quarterly toc participant
-* Added seating during the popluation of a season 
+* Added seating during the popluation of a season
 * Broke out code into GameHelper and GameSummary for better single purpose classes
 * 95% plus unit test coverage
 * New Game and GamePlayer fields (and corresponding database changes)
-
-
