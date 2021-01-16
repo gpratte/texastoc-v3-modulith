@@ -178,6 +178,15 @@ public abstract class BaseIntegrationTest implements TestConstants {
     restTemplate.put(endpoint() + "/games/" + gameId, entity);
   }
 
+  protected void unfinalizeGame(int gameId, String token) throws JsonProcessingException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + token);
+    headers.set("Content-Type", "application/vnd.texastoc.unfinalize+json");
+
+    HttpEntity<String> entity = new HttpEntity<>(headers);
+    restTemplate.put(endpoint() + "/games/" + gameId, entity);
+  }
+
 //  protected Seating seatPlayers(int gameId, List<Integer> numSeatsPerTable, List<TableRequest> tableRequests, String token) throws Exception {
 //
 //    HttpHeaders headers = new HttpHeaders();

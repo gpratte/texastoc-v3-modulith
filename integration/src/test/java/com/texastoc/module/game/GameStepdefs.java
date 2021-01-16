@@ -8,12 +8,15 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -24,7 +27,6 @@ public class GameStepdefs extends BaseIntegrationTest {
   private Game gameCreated;
   private Game gameRetrieved;
   private HttpClientErrorException exception;
-
 
   @Before
   public void before() {
@@ -76,18 +78,28 @@ public class GameStepdefs extends BaseIntegrationTest {
 
   @When("^another game is created$")
   public void anotherGameIsCreated() throws Exception {
-//    String token = login(USER_EMAIL, USER_PASSWORD);
-//    createGame(CreateGameRequest.builder()
-//      .date(LocalDate.now())
-//      .hostId(1)
-//      .transportRequired(true)
-//      .build(), token);
+    String token = login(USER_EMAIL, USER_PASSWORD);
+    try {
+      createGame(Game.builder()
+        .date(LocalDate.now().plusDays(1))
+        .hostId(1)
+        .transportRequired(true)
+        .build(), token);
+    } catch (HttpClientErrorException e) {
+      exception = e;
+    }
   }
 
   @When("^the game is finalized$")
   public void the_game_is_finalized() throws Exception {
     String token = login(USER_EMAIL, USER_PASSWORD);
     finalizeGame(gameCreated.getId(), token);
+  }
+
+  @When("^the game is unfinalized$")
+  public void the_game_is_unfinalized() throws Exception {
+    String token = login(USER_EMAIL, USER_PASSWORD);
+    unfinalizeGame(gameCreated.getId(), token);
   }
 
   @And("^the retrieved game is updated and retrieved$")
@@ -155,9 +167,20 @@ public class GameStepdefs extends BaseIntegrationTest {
     assertTrue("game should be finalized", gameRetrieved.isFinalized());
   }
 
+  @Then("^the retrieved game is unfinalized$")
+  public void the_retrieved_game_is_unfinalized() throws Exception {
+    assertFalse("game should be unfinalized", gameRetrieved.isFinalized());
+  }
+
   @Then("^the current game has no players or payouts$")
   public void the_current_game_has_no_players() throws Exception {
     gameHasNoPlayersOrPayouts(gameRetrieved);
+  }
+
+  @Then("^the new game is not allowed$")
+  public void notAllowed() throws Exception {
+    assertNotNull(exception);
+    assertThat(exception.getStatusCode().value()).isEqualTo(HttpStatus.SC_CONFLICT);
   }
 
   public void gameHasNoPlayersOrPayouts(Game game) throws Exception {

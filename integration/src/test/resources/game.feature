@@ -43,10 +43,22 @@ Feature: CRUD Games
     And the current game is retrieved
     Then the retrieved game is finalized
 
-#  TODO flesh this out - need to handle a status besides 200 from the server
-#  Scenario: try to create a game when there is a game in progress
-#    Given a season exists
-#    Given the game starts now
-#    When the game is created
-#    When another game is created
-#    Then the new game is not allowed
+  Scenario: create, finalize and unfinalize a simple game
+    Given a season exists
+    Given the game starts now
+    When the game is created
+    And the current game is retrieved
+    Then the retrieved game is unfinalized
+    When the game is finalized
+    And the current game is retrieved
+    Then the retrieved game is finalized
+    When the game is unfinalized
+    And the current game is retrieved
+    Then the retrieved game is unfinalized
+
+  Scenario: try to create a game when there is a game in progress
+    Given a season exists
+    Given the game starts now
+    When the game is created
+    When another game is created
+    Then the new game is not allowed
