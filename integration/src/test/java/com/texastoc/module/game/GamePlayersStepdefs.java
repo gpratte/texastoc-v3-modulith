@@ -1,5 +1,6 @@
-package com.texastoc.cucumber;
+package com.texastoc.module.game;
 
+import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.game.model.FirstTimeGamePlayer;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
@@ -16,7 +17,7 @@ import java.util.Random;
 
 // Tests are run from SpringBootBaseIntegrationTest so must Ignore here
 @Ignore
-public class GamePlayersStepdefs extends SpringBootBaseIntegrationTest {
+public class GamePlayersStepdefs extends BaseIntegrationTest {
 
   private Integer gameId;
   private Integer numPlayers;

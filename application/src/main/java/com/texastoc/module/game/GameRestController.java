@@ -26,6 +26,16 @@ import java.util.List;
 @RestController
 public class GameRestController {
 
+  public static final String CONTENT_TYPE_CURRENT_GAME = "application/vnd.texastoc.current+json";
+  public static final String CONTENT_TYPE_CLEAR_CACHE = "application/vnd.texastoc.clear-cache+json";
+  public static final String CONTENT_TYPE_FINALIZE = "application/vnd.texastoc.finalize+json";
+  public static final String CONTENT_TYPE_UNFINALIZE = "application/vnd.texastoc.unfinalize+json";
+  public static final String CONTENT_TYPE_NEW_GAME_PLAYER = "application/vnd.texastoc.first-time+json";
+  public static final String CONTENT_TYPE_KNOCKOUT = "application/vnd.texastoc.knockout+json";
+  public static final String CONTENT_TYPE_REBUY = "application/vnd.texastoc.rebuy+json";
+  public static final String CONTENT_TYPE_ASSIGN_SEATS = "application/vnd.texastoc.assign-seats+json";
+  public static final String CONTENT_TYPE_NOTIFY_SEATING = "application/vnd.texastoc.notify-seating+json";
+
   private final GameModule gameModule;
   private final GameService gameService;
 
@@ -50,13 +60,13 @@ public class GameRestController {
     return gameModule.get(id);
   }
 
-  @GetMapping(value = "/api/v2/games", consumes = "application/vnd.texastoc.current+json")
+  @GetMapping(value = "/api/v2/games", consumes = CONTENT_TYPE_CURRENT_GAME)
   public Game getCurrentGame() {
     return gameModule.getCurrent();
   }
 
   // TODO this needs to go away
-  @GetMapping(value = "/api/v2/games", consumes = "application/vnd.texastoc.clear-cache+json")
+  @GetMapping(value = "/api/v2/games", consumes = CONTENT_TYPE_CLEAR_CACHE)
   public String getCurrentNoCacheGame() {
     gameService.clearCacheGame();
     return "done";
@@ -67,12 +77,12 @@ public class GameRestController {
     return gameModule.getBySeasonId(seasonId);
   }
 
-  @PutMapping(value = "/api/v2/games/{id}", consumes = "application/vnd.texastoc.finalize+json")
+  @PutMapping(value = "/api/v2/games/{id}", consumes = CONTENT_TYPE_FINALIZE)
   public void finalizeGame(@PathVariable("id") int id) {
     gameModule.finalize(id);
   }
 
-  @PutMapping(value = "/api/v2/games/{id}", consumes = "application/vnd.texastoc.unfinalize+json")
+  @PutMapping(value = "/api/v2/games/{id}", consumes = CONTENT_TYPE_UNFINALIZE)
   public void unfinalizeGame(@PathVariable("id") int id) {
     gameModule.unfinalize(id);
   }
@@ -83,7 +93,7 @@ public class GameRestController {
     return gameModule.createGamePlayer(gamePlayer);
   }
 
-  @PostMapping(value = "/api/v2/games/{id}/players", consumes = "application/vnd.texastoc.new-player+json")
+  @PostMapping(value = "/api/v2/games/{id}/players", consumes = CONTENT_TYPE_NEW_GAME_PLAYER)
   public GamePlayer createFirstTimeGamePlayer(@PathVariable("id") int id, @RequestBody GamePlayer gamePlayer) {
     gamePlayer.setGameId(id);
     return gameModule.createFirstTimeGamePlayer(gamePlayer);
@@ -96,12 +106,12 @@ public class GameRestController {
     gameModule.updateGamePlayer(gamePlayer);
   }
 
-  @PutMapping(value = "/api/v2/games/{gameId}/players/{gamePlayerId}", consumes = "application/vnd.texastoc.knockout+json")
+  @PutMapping(value = "/api/v2/games/{gameId}/players/{gamePlayerId}", consumes = CONTENT_TYPE_KNOCKOUT)
   public void toggleKnockedOut(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId) {
     gameModule.toggleGamePlayerKnockedOut(gameId, gamePlayerId);
   }
 
-  @PutMapping(value = "/api/v2/games/{gameId}/players/{gamePlayerId}", consumes = "application/vnd.texastoc.rebuy+json")
+  @PutMapping(value = "/api/v2/games/{gameId}/players/{gamePlayerId}", consumes = CONTENT_TYPE_REBUY)
   public void toggleRebuy(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId) {
     gameModule.toggleGamePlayerRebuy(gameId, gamePlayerId);
   }
@@ -111,13 +121,13 @@ public class GameRestController {
     gameModule.deleteGamePlayer(gameId, gamePlayerId);
   }
 
-  @PostMapping(value = "/api/v2/games/{gameId}/seats", consumes = "application/vnd.texastoc.assign-seats+json")
+  @PostMapping(value = "/api/v2/games/{gameId}/seats", consumes = CONTENT_TYPE_ASSIGN_SEATS)
   public Seating seating(@PathVariable("gameId") int gameId, @RequestBody Seating seating) {
     seating.setGameId(gameId);
     return gameModule.seatGamePlayers(seating);
   }
 
-  @PostMapping(value = "/api/v2/games/{gameId}/seats", consumes = "application/vnd.texastoc.notify-seats+json")
+  @PostMapping(value = "/api/v2/games/{gameId}/seats", consumes = CONTENT_TYPE_NOTIFY_SEATING)
   public void notifySeating(@PathVariable("gameId") int gameId) {
     gameModule.notifySeating(gameId);
   }

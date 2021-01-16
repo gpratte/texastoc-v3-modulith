@@ -8,19 +8,17 @@ import java.util.List;
 
 public interface TestConstants {
 
-  int KITTY_PER_GAME = 9;
-  int TOC_PER_GAME = 8;
-  int QUARTERLY_TOC_PER_GAME = 7;
+  int KITTY_PER_GAME = 10;
+  int TOC_PER_GAME = 20;
+  int QUARTERLY_TOC_PER_GAME = 20;
   int QUARTERLY_NUM_PAYOUTS = 3;
 
-  int GAME_BUY_IN = 6;
-  int GAME_REBUY = 5;
-  int GAME_REBUY_TOC_DEBIT = 4;
+  int GAME_BUY_IN = 40;
+  int GAME_REBUY = 40;
+  int GAME_REBUY_TOC_DEBIT = 20;
 
-  int BRIAN_BAKER_PLAYER_ID = 1;
-  String BRIAN_BAKER_NAME = "Brian Baker";
-  int ANDY_THOMAS_PLAYER_ID = 2;
-  String ANDY_THOMAS_NAME = "Andy Thomas";
+  int GIL_PRATTE_PLAYER_ID = 1;
+  String GIL_PRATTE_NAME = "Gil Pratte";
 
   int CHOP_NUM_PLAYERS = 2;
   double CHOP_TENTH_PLACE_INCR = 0.5;

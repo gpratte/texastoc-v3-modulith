@@ -1,5 +1,6 @@
-package com.texastoc.cucumber;
+package com.texastoc.module.season;
 
+import com.texastoc.BaseIntegrationTest;
 import com.texastoc.TestUtils;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.season.model.Season;
@@ -18,7 +19,7 @@ import java.util.List;
 
 // Tests are run from SpringBootBaseIntegrationTest so must Ignore here
 @Ignore
-public class SeasonStepdefs extends SpringBootBaseIntegrationTest {
+public class SeasonStepdefs extends BaseIntegrationTest {
 
   private LocalDate start;
   private Season seasonCreated;

@@ -3,6 +3,7 @@ package com.texastoc.module.player.service;
 import com.google.common.collect.ImmutableSet;
 import com.texastoc.common.AuthorizationHelper;
 import com.texastoc.exception.NotFoundException;
+import com.texastoc.exception.PermissionDeniedException;
 import com.texastoc.module.notification.NotificationModule;
 import com.texastoc.module.notification.NotificationModuleFactory;
 import com.texastoc.module.player.PlayerModule;
@@ -12,7 +13,6 @@ import com.texastoc.module.player.model.Role;
 import com.texastoc.module.player.repository.PlayerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -200,7 +200,7 @@ public class PlayerService implements PlayerModule {
   // verify the user is an admin
   private void verifyLoggedInUserIsAdmin() {
     if (!authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)) {
-      throw new AccessDeniedException("A player that is not an admin cannot update another player");
+      throw new PermissionDeniedException("A player that is not an admin cannot update another player");
     }
   }
 
@@ -214,7 +214,7 @@ public class PlayerService implements PlayerModule {
       }
       Player loggedInPlayer = players.get(0);
       if (loggedInPlayer.getId() != player.getId()) {
-        throw new AccessDeniedException("A player that is not an admin cannot update another player");
+        throw new PermissionDeniedException("A player that is not an admin cannot update another player");
       }
     }
   }

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.texastoc.common.AuthorizationHelper;
 import com.texastoc.exception.NotFoundException;
+import com.texastoc.exception.PermissionDeniedException;
 import com.texastoc.module.notification.NotificationModule;
 import com.texastoc.module.player.exception.CannotRemoveRoleException;
 import com.texastoc.module.player.model.Player;
@@ -15,7 +16,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -191,7 +191,7 @@ public class PlayerServiceTest {
     // Act
     assertThatThrownBy(() -> {
       playerService.update(playersNewValues);
-    }).isInstanceOf(AccessDeniedException.class)
+    }).isInstanceOf(PermissionDeniedException.class)
       .hasMessageContaining("A player that is not an admin cannot update another player");
   }
 
@@ -303,7 +303,7 @@ public class PlayerServiceTest {
     // Act
     assertThatThrownBy(() -> {
       playerService.delete(1);
-    }).isInstanceOf(AccessDeniedException.class)
+    }).isInstanceOf(PermissionDeniedException.class)
       .hasMessageContaining("A player that is not an admin cannot update another player");
   }
 

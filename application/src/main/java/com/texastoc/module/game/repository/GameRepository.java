@@ -19,6 +19,6 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
   @Query("select * from game where season_id = :seasonId and finalized = false")
   List<Game> findUnfinalizedBySeasonId(@Param("seasonId") int seasonId);
 
-  @Query("select * from game where season_id = :seasonId order by gameDate desc limit 1")
+  @Query("select * from game where season_id = :seasonId order by game_date desc limit 1")
   List<Game> findMostRecentBySeasonId(@Param("seasonId") int seasonId);
 }

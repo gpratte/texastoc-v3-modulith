@@ -1,6 +1,7 @@
-package com.texastoc.cucumber;
+package com.texastoc.module.player;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
 import io.cucumber.java.en.Given;
@@ -21,7 +22,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class PlayerStepdefs extends SpringBootBaseIntegrationTest {
+public class PlayerStepdefs extends BaseIntegrationTest {
 
   Player playerToCreate;
   Player anotherPlayerToCreate;

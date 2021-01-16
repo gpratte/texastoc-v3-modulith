@@ -25,7 +25,7 @@ public class H2DatabaseConfig {
   public DataSource dataSource() {
     DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
     dataSourceBuilder.driverClassName("org.h2.Driver");
-    dataSourceBuilder.url("jdbc:h2:mem:testdb");
+    dataSourceBuilder.url("jdbc:h2:file:~/testdb;AUTO_SERVER=TRUE");
     dataSourceBuilder.username("sa");
     dataSourceBuilder.password("");
     return dataSourceBuilder.build();
@@ -36,6 +36,29 @@ public class H2DatabaseConfig {
     return args -> {
       InputStream resource = new ClassPathResource(
         "create_toc_schema.sql").getInputStream();
+      try (BufferedReader reader = new BufferedReader(
+        new InputStreamReader(resource))) {
+        String line;
+        StringBuilder sb = new StringBuilder();
+        while ((line = reader.readLine()) != null) {
+          if (StringUtils.isBlank(line)) {
+            continue;
+          }
+          if (line.startsWith("#")) {
+            continue;
+          }
+
+          sb.append(" " + line);
+
+          if (line.endsWith(";")) {
+            jdbcTemplate.execute(sb.toString());
+            sb = new StringBuilder();
+          }
+        }
+      }
+
+      resource = new ClassPathResource(
+        "seed_toc.sql").getInputStream();
       try (BufferedReader reader = new BufferedReader(
         new InputStreamReader(resource))) {
         String line;
