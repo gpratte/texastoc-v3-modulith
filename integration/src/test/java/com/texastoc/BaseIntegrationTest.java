@@ -1,16 +1,13 @@
-package com.texastoc.cucumber;
+package com.texastoc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.texastoc.DBUtils;
-import com.texastoc.TestConstants;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
 import com.texastoc.module.season.model.Season;
 import com.texastoc.module.settings.model.SystemSettings;
-import io.cucumber.spring.CucumberContextConfiguration;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.http.client.HttpClient;
@@ -28,8 +25,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
 
-@CucumberContextConfiguration
-public abstract class SpringBootBaseIntegrationTest implements TestConstants {
+public abstract class BaseIntegrationTest implements TestConstants {
 
   private final String SERVER_URL = "http://localhost";
   private String V2_ENDPOINT;
@@ -38,7 +34,7 @@ public abstract class SpringBootBaseIntegrationTest implements TestConstants {
 
   protected RestTemplate restTemplate;
 
-  public SpringBootBaseIntegrationTest() {
+  public BaseIntegrationTest() {
     HttpClient client = HttpClients.createDefault();
     restTemplate = new RestTemplate();
     restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(client));

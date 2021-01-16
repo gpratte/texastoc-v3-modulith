@@ -1,5 +1,6 @@
-package com.texastoc.cucumber;
+package com.texastoc.module.game;
 
+import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.game.model.Game;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
@@ -16,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class GameStepdefs extends SpringBootBaseIntegrationTest {
+public class GameStepdefs extends BaseIntegrationTest {
 
   //  private CreateGameRequest createGameRequest;
   private Game gameToCreate;

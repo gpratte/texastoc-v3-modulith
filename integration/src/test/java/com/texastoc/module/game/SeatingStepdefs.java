@@ -1,5 +1,6 @@
-package com.texastoc.cucumber;
+package com.texastoc.module.game;
 
+import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.game.model.GameTable;
 import com.texastoc.module.game.model.Seat;
 import com.texastoc.module.game.model.Seating;
@@ -16,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 
 // Tests are run from SpringBootBaseIntegrationTest so must Ignore here
 @Ignore
-public class SeatingStepdefs extends SpringBootBaseIntegrationTest {
+public class SeatingStepdefs extends BaseIntegrationTest {
 
   Integer gameId;
   Seating seating;

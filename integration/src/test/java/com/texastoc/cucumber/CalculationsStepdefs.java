@@ -1,5 +1,6 @@
 package com.texastoc.cucumber;
 
+import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePayout;
 import com.texastoc.module.game.model.GamePlayer;
@@ -11,6 +12,7 @@ import com.texastoc.module.season.model.SeasonPlayer;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -21,7 +23,7 @@ import java.util.List;
 
 // Tests are run from SpringBootBaseIntegrationTest so must Ignore here
 @Ignore
-public class CalculationsStepdefs extends SpringBootBaseIntegrationTest {
+public class CalculationsStepdefs extends BaseIntegrationTest {
 
   private static final int NUM_PLAYERS = 10;
 
@@ -80,11 +82,11 @@ public class CalculationsStepdefs extends SpringBootBaseIntegrationTest {
 //    }
   }
 
-//  @When("^the game is finalized$")
-//  public void the_game_is_finalized() throws Exception {
-//    String token = login(USER_EMAIL, USER_PASSWORD);
-//    finalizeGame(gameId, token);
-//  }
+  @When("^the game is finalized$")
+  public void the_game_is_finalized() throws Exception {
+    String token = login(USER_EMAIL, USER_PASSWORD);
+    finalizeGame(gameId, token);
+  }
 
   @And("^the calculated season is retrieved$")
   public void the_calculated_season_is_retrieved() throws Exception {

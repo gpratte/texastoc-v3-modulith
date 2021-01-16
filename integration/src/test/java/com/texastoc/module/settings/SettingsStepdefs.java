@@ -1,5 +1,6 @@
-package com.texastoc.cucumber;
+package com.texastoc.module.settings;
 
+import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.settings.model.Payout;
 import com.texastoc.module.settings.model.SystemSettings;
 import com.texastoc.module.settings.model.TocConfig;
@@ -12,7 +13,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class SettingsStepdefs extends SpringBootBaseIntegrationTest {
+public class SettingsStepdefs extends BaseIntegrationTest {
 
   SystemSettings settings;
 
