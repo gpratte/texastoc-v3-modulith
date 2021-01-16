@@ -40,6 +40,11 @@ public class RestControllerAdvise extends ResponseEntityExceptionHandler {
     response.sendError(HttpStatus.UNAUTHORIZED.value());
   }
 
+  @ExceptionHandler(value = {PermissionDeniedException.class})
+  protected void handleAccessDenied(PermissionDeniedException ex, HttpServletResponse response) throws IOException {
+    response.sendError(HttpStatus.FORBIDDEN.value());
+  }
+
   @ExceptionHandler(value = {IncorrectResultSizeDataAccessException.class})
   protected void handleIncorrectSize(IncorrectResultSizeDataAccessException ex, HttpServletResponse response) throws IOException {
     response.sendError(HttpStatus.NOT_FOUND.value());
