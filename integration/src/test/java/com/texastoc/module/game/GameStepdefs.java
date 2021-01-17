@@ -1,6 +1,8 @@
 package com.texastoc.module.game;
 
 import com.texastoc.module.game.model.Game;
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -19,13 +21,13 @@ import static org.junit.Assert.assertTrue;
 
 public class GameStepdefs extends BaseGameStepdefs {
 
-  @When("^before game scenario$")
+  @Before
   public void before() {
     // Before each scenario
     super.before();
   }
 
-  @Then("^after game scenario$")
+  @After
   public void after() {
     // After each scenario
     super.after();

@@ -41,6 +41,10 @@ public abstract class BaseIntegrationTest implements TestConstants {
     restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(client));
   }
 
+  protected void before() {
+    DBUtils.cleanDb();
+  }
+
   protected void after() {
     // Reset the database tables
     DBUtils.cleanDb();
@@ -158,17 +162,17 @@ public abstract class BaseIntegrationTest implements TestConstants {
 //    restTemplate.put(endpoint() + "/games/" + ugpr.getGameId() + "/players/" + gamePlayerId, entity);
 //  }
 
-//  protected void deletePlayerFromGame(int gameId, int gamePlayerId, String token) throws JsonProcessingException {
-//    HttpHeaders headers = new HttpHeaders();
-//    headers.set("Authorization", "Bearer " + token);
-//    HttpEntity<String> entity = new HttpEntity<>("", headers);
-//
-//    ResponseEntity<Void> response = restTemplate.exchange(
-//      endpoint() + "/games/" + gameId + "/players/" + gamePlayerId,
-//      HttpMethod.DELETE,
-//      entity,
-//      Void.class);
-//  }
+  protected void deletePlayerFromGame(int gameId, int gamePlayerId, String token) throws JsonProcessingException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + token);
+    HttpEntity<String> entity = new HttpEntity<>("", headers);
+
+    ResponseEntity<Void> response = restTemplate.exchange(
+      endpoint() + "/games/" + gameId + "/players/" + gamePlayerId,
+      HttpMethod.DELETE,
+      entity,
+      Void.class);
+  }
 
   protected void finalizeGame(int gameId, String token) throws JsonProcessingException {
     HttpHeaders headers = new HttpHeaders();

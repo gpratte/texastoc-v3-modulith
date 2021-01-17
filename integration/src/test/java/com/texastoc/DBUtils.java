@@ -32,7 +32,7 @@ public class DBUtils {
   }
 
   // Delete all the rows of all the tables
-  public static void cleanDb() {
+  public static synchronized void cleanDb() {
     try(Connection conn = DriverManager.getConnection(DB_CONNECT, DB_USER, DB_PASSWORD)) {
       Statement st = conn.createStatement();
       for (String tableName : TABLES_TO_CLEAN_IN_ORDER) {
