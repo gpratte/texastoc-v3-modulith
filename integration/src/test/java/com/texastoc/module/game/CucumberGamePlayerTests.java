@@ -5,6 +5,8 @@ import io.cucumber.junit.CucumberOptions;
 import org.junit.runner.RunWith;
 
 @RunWith(Cucumber.class)
-@CucumberOptions(plugin = "pretty", features = "src/test/resources/game.feature")
-public class  GameCucumberTests {
+@CucumberOptions(
+  plugin = "pretty",
+  features = "src/test/resources/game/game_player.feature")
+public class CucumberGamePlayerTests {
 }

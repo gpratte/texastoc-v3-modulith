@@ -130,7 +130,7 @@ public class GameService {
       return;
     }
 
-    gameHelper.recalculate(game);
+    gameHelper.recalculate(game.getId());
     game = get(id);
     game.setFinalized(true);
     game.setSeating(null);

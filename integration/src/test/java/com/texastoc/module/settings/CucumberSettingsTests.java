@@ -5,6 +5,6 @@ import io.cucumber.junit.CucumberOptions;
 import org.junit.runner.RunWith;
 
 @RunWith(Cucumber.class)
-@CucumberOptions(plugin = "pretty", features = "src/test/resources/settings.feature")
-public class SettingsCucumberTests {
+@CucumberOptions(plugin = "pretty", features = "src/test/resources/settings/settings.feature")
+public class CucumberSettingsTests {
 }

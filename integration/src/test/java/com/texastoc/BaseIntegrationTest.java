@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.texastoc.module.game.model.Game;
+import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
 import com.texastoc.module.season.model.Season;
@@ -118,18 +119,18 @@ public abstract class BaseIntegrationTest implements TestConstants {
       Void.class);
   }
 
-//  protected GamePlayer addPlayerToGame(CreateGamePlayerRequest cgpr, String token) throws JsonProcessingException {
-//    HttpHeaders headers = new HttpHeaders();
-//    headers.setContentType(MediaType.APPLICATION_JSON);
-//    headers.set("Authorization", "Bearer " + token);
-//
-//    ObjectMapper mapper = new ObjectMapper();
-//    mapper.registerModule(new JavaTimeModule());
-//    String createGamePlayerRequestAsJson = mapper.writeValueAsString(cgpr);
-//    HttpEntity<String> entity = new HttpEntity<>(createGamePlayerRequestAsJson, headers);
-//
-//    return restTemplate.postForObject(endpoint() + "/games/" + cgpr.getGameId() + "/players", entity, GamePlayer.class);
-//  }
+  protected GamePlayer addPlayerToGame(GamePlayer gamePlayer, String token) throws JsonProcessingException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.set("Authorization", "Bearer " + token);
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
+    String createGamePlayerRequestAsJson = mapper.writeValueAsString(gamePlayer);
+    HttpEntity<String> entity = new HttpEntity<>(createGamePlayerRequestAsJson, headers);
+
+    return restTemplate.postForObject(endpoint() + "/games/" + gamePlayer.getGameId() + "/players", entity, GamePlayer.class);
+  }
 
 //  protected GamePlayer addFirstTimePlayerToGame(FirstTimeGamePlayer firstTimeGamePlayer, String token) throws JsonProcessingException {
 //    HttpHeaders headers = new HttpHeaders();

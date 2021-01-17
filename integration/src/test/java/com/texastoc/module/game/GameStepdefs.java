@@ -1,8 +1,6 @@
 package com.texastoc.module.game;
 
 import com.texastoc.module.game.model.Game;
-import io.cucumber.java.After;
-import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -21,37 +19,30 @@ import static org.junit.Assert.assertTrue;
 
 public class GameStepdefs extends BaseGameStepdefs {
 
-  @Before
+  @When("^before game scenario$")
   public void before() {
     // Before each scenario
     super.before();
   }
 
-  @After
+  @Then("^after game scenario$")
   public void after() {
     // After each scenario
     super.after();
   }
 
   @Given("^a season exists$")
-  public void a_season_exists() throws Exception {
-    // Arrange
-    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
-    createSeason(token);
+  public void aSeasonExists() throws Exception {
+    super.aSeasonExists();
   }
 
   @Given("^the game starts now$")
-  public void the_game_starts_now() throws Exception {
-    // Arrange
-    gameToCreate = Game.builder()
-      .date(LocalDate.now())
-      .hostId(1)
-      .transportRequired(false)
-      .build();
+  public void theGameStartsNow() throws Exception {
+    super.theGameStartsNow();
   }
 
   @Given("^the game supplies need to be moved$")
-  public void the_game_supplies_need_to_be_moved() throws Exception {
+  public void the_game_supplies_need_to_be_moved() {
     gameToCreate = Game.builder()
       .date(LocalDate.now())
       .hostId(1)
@@ -60,9 +51,8 @@ public class GameStepdefs extends BaseGameStepdefs {
   }
 
   @When("^the game is created$")
-  public void the_game_is_created() throws Exception {
-    String token = login(USER_EMAIL, USER_PASSWORD);
-    gameCreated = createGame(gameToCreate, token);
+  public void theGameIsCreated() throws Exception {
+    super.theGameIsCreated();
   }
 
 
@@ -115,8 +105,7 @@ public class GameStepdefs extends BaseGameStepdefs {
 
   @When("^the current game is retrieved$")
   public void getCurrentGame() throws Exception {
-    String token = login(USER_EMAIL, USER_PASSWORD);
-    gameRetrieved = getCurrentGame(token);
+    super.getCurrentGame();
   }
 
   @Then("^the current game is found$")

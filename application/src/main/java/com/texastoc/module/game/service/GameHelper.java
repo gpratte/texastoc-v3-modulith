@@ -80,7 +80,8 @@ public class GameHelper {
   }
 
   // TODO separate thread
-  public void recalculate(Game game) {
+  public void recalculate(int gameId) {
+    Game game = get(gameId);
     Game calculatedGame = gameCalculator.calculate(game);
     payoutCalculator.calculate(calculatedGame);
     pointsCalculator.calculate(calculatedGame);
