@@ -19,6 +19,8 @@ public interface TestConstants {
 
   int GIL_PRATTE_PLAYER_ID = 1;
   String GIL_PRATTE_NAME = "Gil Pratte";
+  int GUEST_USER_PLAYER_ID = 2;
+  String GUEST_USER_NAME = "Guest User";
 
   int CHOP_NUM_PLAYERS = 2;
   double CHOP_TENTH_PLACE_INCR = 0.5;

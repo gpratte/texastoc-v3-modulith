@@ -40,6 +40,7 @@ public class GamePlayerService {
     gameHelper.checkFinalized(game);
 
     GamePlayer gamePlayerCreated = createGamePlayerWorker(gamePlayer, game);
+    gameHelper.recalculate(game.getId());
     gameHelper.sendUpdatedGame();
     return gamePlayerCreated;
   }
@@ -65,6 +66,7 @@ public class GamePlayerService {
     gamePlayer.setPlayerId(playerId);
 
     GamePlayer gamePlayerCreated = createGamePlayerWorker(gamePlayer, game);
+    gameHelper.recalculate(game.getId());
     gameHelper.sendUpdatedGame();
     return gamePlayerCreated;
   }
@@ -94,7 +96,7 @@ public class GamePlayerService {
     }
 
     gameRepository.save(game);
-    gameHelper.recalculate(game);
+    gameHelper.recalculate(game.getId());
     gameHelper.sendUpdatedGame();
   }
 
@@ -113,7 +115,6 @@ public class GamePlayerService {
     GamePlayer gamePlayer = optionalGamePlayer.get();
     gamePlayer.setKnockedOut(!gamePlayer.isKnockedOut());
     gameRepository.save(game);
-    gameHelper.recalculate(game);
     gameHelper.sendUpdatedGame();
   }
 
@@ -132,7 +133,7 @@ public class GamePlayerService {
     GamePlayer gamePlayer = optionalGamePlayer.get();
     gamePlayer.setRebought(!gamePlayer.isRebought());
     gameRepository.save(game);
-    gameHelper.recalculate(game);
+    gameHelper.recalculate(game.getId());
     gameHelper.sendUpdatedGame();
   }
 
@@ -148,7 +149,7 @@ public class GamePlayerService {
         .filter(gp -> gp.getId() != gamePlayerId)
         .collect(Collectors.toList()));
       gameRepository.save(game);
-      gameHelper.recalculate(game);
+      gameHelper.recalculate(game.getId());
       gameHelper.sendUpdatedGame();
     }
   }
@@ -168,7 +169,6 @@ public class GamePlayerService {
     game.getPlayers().add(gamePlayer);
     // TODO verify the game player id gets set by spring data jdbc
     gameRepository.save(game);
-    gameHelper.recalculate(game);
     return gamePlayer;
   }
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.texastoc.module.game.model.Game;
+import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
 import com.texastoc.module.season.model.Season;
@@ -38,6 +39,10 @@ public abstract class BaseIntegrationTest implements TestConstants {
     HttpClient client = HttpClients.createDefault();
     restTemplate = new RestTemplate();
     restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(client));
+  }
+
+  protected void before() {
+    DBUtils.cleanDb();
   }
 
   protected void after() {
@@ -118,18 +123,18 @@ public abstract class BaseIntegrationTest implements TestConstants {
       Void.class);
   }
 
-//  protected GamePlayer addPlayerToGame(CreateGamePlayerRequest cgpr, String token) throws JsonProcessingException {
-//    HttpHeaders headers = new HttpHeaders();
-//    headers.setContentType(MediaType.APPLICATION_JSON);
-//    headers.set("Authorization", "Bearer " + token);
-//
-//    ObjectMapper mapper = new ObjectMapper();
-//    mapper.registerModule(new JavaTimeModule());
-//    String createGamePlayerRequestAsJson = mapper.writeValueAsString(cgpr);
-//    HttpEntity<String> entity = new HttpEntity<>(createGamePlayerRequestAsJson, headers);
-//
-//    return restTemplate.postForObject(endpoint() + "/games/" + cgpr.getGameId() + "/players", entity, GamePlayer.class);
-//  }
+  protected GamePlayer addPlayerToGame(GamePlayer gamePlayer, String token) throws JsonProcessingException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.set("Authorization", "Bearer " + token);
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
+    String createGamePlayerRequestAsJson = mapper.writeValueAsString(gamePlayer);
+    HttpEntity<String> entity = new HttpEntity<>(createGamePlayerRequestAsJson, headers);
+
+    return restTemplate.postForObject(endpoint() + "/games/" + gamePlayer.getGameId() + "/players", entity, GamePlayer.class);
+  }
 
 //  protected GamePlayer addFirstTimePlayerToGame(FirstTimeGamePlayer firstTimeGamePlayer, String token) throws JsonProcessingException {
 //    HttpHeaders headers = new HttpHeaders();
@@ -157,17 +162,17 @@ public abstract class BaseIntegrationTest implements TestConstants {
 //    restTemplate.put(endpoint() + "/games/" + ugpr.getGameId() + "/players/" + gamePlayerId, entity);
 //  }
 
-//  protected void deletePlayerFromGame(int gameId, int gamePlayerId, String token) throws JsonProcessingException {
-//    HttpHeaders headers = new HttpHeaders();
-//    headers.set("Authorization", "Bearer " + token);
-//    HttpEntity<String> entity = new HttpEntity<>("", headers);
-//
-//    ResponseEntity<Void> response = restTemplate.exchange(
-//      endpoint() + "/games/" + gameId + "/players/" + gamePlayerId,
-//      HttpMethod.DELETE,
-//      entity,
-//      Void.class);
-//  }
+  protected void deletePlayerFromGame(int gameId, int gamePlayerId, String token) throws JsonProcessingException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + token);
+    HttpEntity<String> entity = new HttpEntity<>("", headers);
+
+    ResponseEntity<Void> response = restTemplate.exchange(
+      endpoint() + "/games/" + gameId + "/players/" + gamePlayerId,
+      HttpMethod.DELETE,
+      entity,
+      Void.class);
+  }
 
   protected void finalizeGame(int gameId, String token) throws JsonProcessingException {
     HttpHeaders headers = new HttpHeaders();

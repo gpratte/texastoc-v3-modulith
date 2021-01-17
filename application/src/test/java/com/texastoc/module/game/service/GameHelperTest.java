@@ -165,7 +165,7 @@ public class GameHelperTest {
     when(gameCalculator.calculate(game)).thenReturn(calculatgedGame);
 
     // Act
-    gameHelper.recalculate(game);
+    gameHelper.recalculate(game.getId());
 
     // Assert
     verify(gameCalculator, Mockito.times(1)).calculate(game);
