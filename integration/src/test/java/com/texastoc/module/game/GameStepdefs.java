@@ -1,6 +1,5 @@
 package com.texastoc.module.game;
 
-import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.game.model.Game;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
@@ -20,21 +19,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class GameStepdefs extends BaseIntegrationTest {
-
-  //  private CreateGameRequest createGameRequest;
-  private Game gameToCreate;
-  private Game gameCreated;
-  private Game gameRetrieved;
-  private HttpClientErrorException exception;
+public class GameStepdefs extends BaseGameStepdefs {
 
   @Before
   public void before() {
     // Before each scenario
-    gameToCreate = null;
-    gameCreated = null;
-    gameRetrieved = null;
-    exception = null;
+    super.before();
   }
 
   @After

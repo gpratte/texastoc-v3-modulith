@@ -1,27 +1,20 @@
 package com.texastoc.module.game;
 
-import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.game.model.FirstTimeGamePlayer;
-import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-// Tests are run from SpringBootBaseIntegrationTest so must Ignore here
-@Ignore
-public class GamePlayersStepdefs extends BaseIntegrationTest {
+public class GamePlayerStepdefs extends BaseGameStepdefs {
 
-  private Integer gameId;
   private Integer numPlayers;
-  private Game gameRetrieved;
   private List<GamePlayer> gamePlayers = new LinkedList<>();
 //  private List<UpdateGamePlayerRequest> gamePlayersUpdated = new LinkedList<>();
   private List<FirstTimeGamePlayer> firstTimeGamePlayers = new LinkedList<>();
@@ -30,7 +23,6 @@ public class GamePlayersStepdefs extends BaseIntegrationTest {
 
   @Before
   public void before() {
-    gameId = null;
     numPlayers = null;
     gameRetrieved = null;
     gamePlayers.clear();
