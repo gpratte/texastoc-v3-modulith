@@ -2,6 +2,7 @@ package com.texastoc.module.game;
 
 import com.texastoc.module.game.exception.GameInProgressException;
 import com.texastoc.module.game.exception.GameIsFinalizedException;
+import com.texastoc.module.game.exception.SeatingException;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.model.Seating;
@@ -142,4 +143,8 @@ public class GameRestController {
     response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
   }
 
+  @ExceptionHandler(value = {SeatingException.class})
+  protected void handleSeatingException(SeatingException ex, HttpServletResponse response) throws IOException {
+    response.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+  }
 }
