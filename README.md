@@ -162,8 +162,7 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 21-game-player-integration-tests
-* The game player cucumber JUnit test class, GamePlayerCucumberTests, configures the game-player.feature in its @CucumberOptions
-* Tests the main game player APIs.
-* Does not test the game calcuations. That will be done in different set of integration tests.
+## Current Branch: 22-game-seating-integration-tests
+* The game seating cucumber JUnit test class, GameSeatingCucumberTests, configures the game-seating.feature in its @CucumberOptions
+* Tests the main game seating API.
 * Currently unable to run from the mvn command line but can run all in IntelliJ
