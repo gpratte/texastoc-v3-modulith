@@ -1,13 +1,16 @@
 package com.texastoc;
 
+import com.texastoc.module.game.model.Game;
 import com.texastoc.module.season.model.QuarterlySeason;
 import com.texastoc.module.season.model.Season;
+import com.texastoc.module.settings.model.TocConfig;
 import org.junit.Assert;
 
 import java.time.LocalDate;
 
 public class TestUtils implements TestConstants {
 
+  // TODO REMOVE THIS
   public static void assertCreatedSeason(LocalDate start, Season actual) {
     Assert.assertTrue(actual.getId() > 0);
 
@@ -51,8 +54,17 @@ public class TestUtils implements TestConstants {
 
       Assert.assertTrue(qSeason.getPlayers() == null || qSeason.getPlayers().size() == 0);
       Assert.assertTrue(qSeason.getPayouts() == null || qSeason.getPayouts().size() == 0);
-
     }
+  }
+
+  public static void populateGameCosts(Game game) {
+    TocConfig tocConfig = TestConstants.getTocConfig();
+    game.setAnnualTocCost(tocConfig.getAnnualTocCost());
+    game.setQuarterlyTocCost(tocConfig.getQuarterlyTocCost());
+    game.setKittyCost(tocConfig.getKittyDebit());
+    game.setBuyInCost(tocConfig.getRegularBuyInCost());
+    game.setRebuyAddOnCost(tocConfig.getRegularRebuyCost());
+    game.setRebuyAddOnTocDebitCost(tocConfig.getRegularRebuyTocDebit());
   }
 
 }

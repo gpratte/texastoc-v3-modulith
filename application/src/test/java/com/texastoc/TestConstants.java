@@ -35,7 +35,6 @@ public interface TestConstants {
   }
 
   static List<Payout> getPayouts(int num) {
-
     if (num == 2) {
       List<Payout> payouts = new ArrayList<>(2);
       payouts.add(Payout.builder()
@@ -283,6 +282,4 @@ public interface TestConstants {
 
     throw new RuntimeException("no payouts found for " + num);
   }
-
-
 }
