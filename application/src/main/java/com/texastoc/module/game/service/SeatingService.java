@@ -1,6 +1,7 @@
 package com.texastoc.module.game.service;
 
 import com.texastoc.exception.NotFoundException;
+import com.texastoc.module.game.exception.SeatingException;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.model.GameTable;
@@ -123,6 +124,14 @@ public class SeatingService {
 
     // Go through the requests
     for (TableRequest tableRequest : seating.getTableRequests()) {
+      // Make sure the table request exists
+      final int tableRequestedNum = tableRequest.getTableNum();
+      Optional<GameTable> optional = gameTables.stream()
+        .filter(gameTable -> gameTable.getTableNum() == tableRequestedNum)
+        .findFirst();
+      if (!optional.isPresent()) {
+        throw new SeatingException("Requested invalid table number " + tableRequestedNum);
+      }
 
       // Find the seat of the player that wants to swap
       Seat playerThatWantsToSwapSeat = null;

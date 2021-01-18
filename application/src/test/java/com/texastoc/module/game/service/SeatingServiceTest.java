@@ -1,6 +1,7 @@
 package com.texastoc.module.game.service;
 
 import com.texastoc.TestConstants;
+import com.texastoc.module.game.exception.SeatingException;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.model.GameTable;
@@ -11,20 +12,17 @@ import com.texastoc.module.game.model.TableRequest;
 import com.texastoc.module.game.repository.GameRepository;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
 public class SeatingServiceTest implements TestConstants {
 
   private SeatingService seatingService;
@@ -51,7 +49,6 @@ public class SeatingServiceTest implements TestConstants {
         .build());
     }
 
-    LocalDate now = LocalDate.now();
     Game game = Game.builder()
       .id(111)
       .players(gamePlayers)
@@ -119,7 +116,6 @@ public class SeatingServiceTest implements TestConstants {
       .boughtIn(false)
       .build());
 
-    LocalDate now = LocalDate.now();
     Game game = Game.builder()
       .id(111)
       .players(gamePlayers)
@@ -227,7 +223,6 @@ public class SeatingServiceTest implements TestConstants {
       .boughtIn(false)
       .build());
 
-    LocalDate now = LocalDate.now();
     Game game = Game.builder()
       .id(111)
       .players(gamePlayers)
@@ -259,4 +254,47 @@ public class SeatingServiceTest implements TestConstants {
     assertEquals(3, gameTable3.getSeats().size());
   }
 
+  @Test
+  public void seatInvalidTableRequest() {
+    // Arrange
+    List<SeatsPerTable> seatsPerTables = new LinkedList<>();
+    SeatsPerTable seatsPerTable = new SeatsPerTable();
+    // Table 1 with 8 seats
+    seatsPerTable.setTableNum(1);
+    seatsPerTable.setNumSeats(8);
+    seatsPerTables.add(seatsPerTable);
+
+    List<TableRequest> tableRequests = new LinkedList<>();
+    TableRequest tableRequest = new TableRequest();
+    tableRequest.setGamePlayerId(1);
+    tableRequest.setGamePlayerName("Twenty Three");
+    tableRequest.setTableNum(7);
+    tableRequests.add(tableRequest);
+
+    Seating seating = new Seating();
+    seating.setGameId(111);
+    seating.setSeatsPerTables(seatsPerTables);
+    seating.setTableRequests(tableRequests);
+
+    // 2 players with buy-ins
+    List<GamePlayer> gamePlayers = new LinkedList<>();
+    for (int i = 0; i < 2; i++) {
+      gamePlayers.add(GamePlayer.builder()
+        .id(i+1)
+        .boughtIn(true)
+        .build());
+    }
+
+    Game game = Game.builder()
+      .id(111)
+      .players(gamePlayers)
+      .build();
+    when(gameRepository.findById(111)).thenReturn(Optional.of(game));
+
+    // Act and Assert
+    assertThatThrownBy(() -> {
+      Seating seated = seatingService.seatGamePlayers(seating);
+    }).isInstanceOf(SeatingException.class)
+      .hasMessageContaining("Requested invalid table number 7");
+  }
 }

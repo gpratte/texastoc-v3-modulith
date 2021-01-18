@@ -4,9 +4,9 @@ import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.settings.model.Payout;
 import com.texastoc.module.settings.model.SystemSettings;
 import com.texastoc.module.settings.model.TocConfig;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.junit.Before;
 
 import java.util.List;
 
@@ -19,6 +19,7 @@ public class SettingsStepdefs extends BaseIntegrationTest {
 
   @Before
   public void before() {
+    super.before();
     settings = null;
   }
 

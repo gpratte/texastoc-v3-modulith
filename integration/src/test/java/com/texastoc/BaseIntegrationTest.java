@@ -45,11 +45,6 @@ public abstract class BaseIntegrationTest implements TestConstants {
     DBUtils.cleanDb();
   }
 
-  protected void after() {
-    // Reset the database tables
-    DBUtils.cleanDb();
-  }
-
   protected String endpoint() {
     if (V2_ENDPOINT == null) {
       V2_ENDPOINT = SERVER_URL + ":" + port + "/api/v2";
