@@ -1,7 +1,6 @@
 package com.texastoc.module.game;
 
 import com.texastoc.module.game.model.GamePlayer;
-import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
@@ -25,12 +24,6 @@ public class GamePlayerStepdefs extends BaseGameStepdefs {
     // Before each scenario
     super.before();
     gameId = null;
-  }
-
-  @After
-  public void after() {
-    // After each scenario
-    super.after();
   }
 
   @When("^a game is created$")

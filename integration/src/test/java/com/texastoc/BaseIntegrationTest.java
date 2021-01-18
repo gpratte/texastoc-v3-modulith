@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
+import com.texastoc.module.game.model.Seating;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
 import com.texastoc.module.season.model.Season;
@@ -42,11 +43,6 @@ public abstract class BaseIntegrationTest implements TestConstants {
   }
 
   protected void before() {
-    DBUtils.cleanDb();
-  }
-
-  protected void after() {
-    // Reset the database tables
     DBUtils.cleanDb();
   }
 
@@ -136,18 +132,18 @@ public abstract class BaseIntegrationTest implements TestConstants {
     return restTemplate.postForObject(endpoint() + "/games/" + gamePlayer.getGameId() + "/players", entity, GamePlayer.class);
   }
 
-//  protected GamePlayer addFirstTimePlayerToGame(FirstTimeGamePlayer firstTimeGamePlayer, String token) throws JsonProcessingException {
-//    HttpHeaders headers = new HttpHeaders();
-//    headers.set("Content-Type", "application/vnd.texastoc.new-player+json");
-//    headers.set("Authorization", "Bearer " + token);
-//
-//    ObjectMapper mapper = new ObjectMapper();
-//    mapper.registerModule(new JavaTimeModule());
-//    String firstTimeGamePlayerRequestAsJson = mapper.writeValueAsString(firstTimeGamePlayer);
-//    HttpEntity<String> entity = new HttpEntity<>(firstTimeGamePlayerRequestAsJson, headers);
-//
-//    return restTemplate.postForObject(endpoint() + "/games/" + firstTimeGamePlayer.getGameId() + "/players", entity, GamePlayer.class);
-//  }
+  protected GamePlayer addFirstTimePlayerToGame(GamePlayer gamePlayer, String token) throws JsonProcessingException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Content-Type", "application/vnd.texastoc.first-time+json");
+    headers.set("Authorization", "Bearer " + token);
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
+    String firstTimeGamePlayerRequestAsJson = mapper.writeValueAsString(gamePlayer);
+    HttpEntity<String> entity = new HttpEntity<>(firstTimeGamePlayerRequestAsJson, headers);
+
+    return restTemplate.postForObject(endpoint() + "/games/" + gamePlayer.getGameId() + "/players", entity, GamePlayer.class);
+  }
 
 //  protected void updatePlayerInGame(int gamePlayerId, UpdateGamePlayerRequest ugpr, String token) throws JsonProcessingException {
 //    HttpHeaders headers = new HttpHeaders();
@@ -192,25 +188,19 @@ public abstract class BaseIntegrationTest implements TestConstants {
     restTemplate.put(endpoint() + "/games/" + gameId, entity);
   }
 
-//  protected Seating seatPlayers(int gameId, List<Integer> numSeatsPerTable, List<TableRequest> tableRequests, String token) throws Exception {
-//
-//    HttpHeaders headers = new HttpHeaders();
-//    headers.set("Content-Type", "application/vnd.texastoc.assign-seats+json");
-//    headers.set("Authorization", "Bearer " + token);
-//
-//    SeatingRequest seatingRequest = SeatingRequest.builder()
-//      .gameId(gameId)
-//      .numSeatsPerTable(numSeatsPerTable)
-//      .tableRequests(tableRequests)
-//      .build();
-//
-//    ObjectMapper mapper = new ObjectMapper();
-//    mapper.registerModule(new JavaTimeModule());
-//    String seatingRequestAsJson = mapper.writeValueAsString(seatingRequest);
-//    HttpEntity<String> entity = new HttpEntity<>(seatingRequestAsJson, headers);
-//
-//    return restTemplate.postForObject(endpoint() + "/games/" + gameId + "/seats", entity, Seating.class);
-//  }
+  protected Seating seatPlayers(int gameId, Seating seating, String token) throws Exception {
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Content-Type", "application/vnd.texastoc.assign-seats+json");
+    headers.set("Authorization", "Bearer " + token);
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
+    String seatingRequestAsJson = mapper.writeValueAsString(seating);
+    HttpEntity<String> entity = new HttpEntity<>(seatingRequestAsJson, headers);
+
+    return restTemplate.postForObject(endpoint() + "/games/" + gameId + "/seats", entity, Seating.class);
+  }
 
   protected Player createPlayer(Player player, String token) throws JsonProcessingException {
     HttpHeaders headers = new HttpHeaders();

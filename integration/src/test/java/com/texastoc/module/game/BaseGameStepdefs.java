@@ -22,11 +22,6 @@ public class BaseGameStepdefs extends BaseIntegrationTest {
     exception = null;
   }
 
-  protected void after() {
-    // After each scenario
-    super.after();
-  }
-
   protected void aSeasonExists() throws Exception {
     String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
     createSeason(token);

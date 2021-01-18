@@ -159,18 +159,21 @@ public class GameHelperTest {
   @Test
   public void testRecalculate() {
     // Arrange
-    Game game = new Game();
-    Game calculatgedGame = new Game();
+    Game game = Game.builder()
+      .id(111)
+      .build();
+    when(gameRepository.findById(111)).thenReturn(Optional.of(game));
 
-    when(gameCalculator.calculate(game)).thenReturn(calculatgedGame);
+    Game calculatedGame = new Game();
+    when(gameCalculator.calculate(game)).thenReturn(calculatedGame);
 
     // Act
     gameHelper.recalculate(game.getId());
 
     // Assert
     verify(gameCalculator, Mockito.times(1)).calculate(game);
-    verify(payoutCalculator, Mockito.times(1)).calculate(calculatgedGame);
-    verify(pointsCalculator, Mockito.times(1)).calculate(calculatgedGame);
+    verify(payoutCalculator, Mockito.times(1)).calculate(calculatedGame);
+    verify(pointsCalculator, Mockito.times(1)).calculate(calculatedGame);
   }
 
   @Test

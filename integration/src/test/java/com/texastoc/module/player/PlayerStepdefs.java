@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.junit.Before;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -35,6 +35,7 @@ public class PlayerStepdefs extends BaseIntegrationTest {
 
   @Before
   public void before() {
+    super.before();
     playerToCreate = null;
     anotherPlayerToCreate = null;
     playerCreated = null;

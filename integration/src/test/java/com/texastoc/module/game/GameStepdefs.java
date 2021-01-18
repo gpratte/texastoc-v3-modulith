@@ -1,7 +1,6 @@
 package com.texastoc.module.game;
 
 import com.texastoc.module.game.model.Game;
-import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -25,12 +24,6 @@ public class GameStepdefs extends BaseGameStepdefs {
   public void before() {
     // Before each scenario
     super.before();
-  }
-
-  @After
-  public void after() {
-    // After each scenario
-    super.after();
   }
 
   @Given("^a season exists$")
