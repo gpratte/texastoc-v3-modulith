@@ -4,16 +4,20 @@ import com.texastoc.TestConstants;
 import com.texastoc.module.game.calculator.PayoutCalculator;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePayout;
+import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.repository.GameRepository;
+import com.texastoc.module.settings.SettingsModule;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import static com.texastoc.TestConstants.getSettings;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -33,6 +37,9 @@ public class PayoutCalculatorTest implements TestConstants {
   public void before() {
     gameRepository = mock(GameRepository.class);
     payoutCalculator = new PayoutCalculator(gameRepository);
+    SettingsModule settingsModule = mock(SettingsModule.class);
+    when(settingsModule.get()).thenReturn(getSettings());
+    ReflectionTestUtils.setField(payoutCalculator, "settingsModule", settingsModule);
   }
 
   @Test
@@ -86,7 +93,6 @@ public class PayoutCalculatorTest implements TestConstants {
     assertEquals("payout should be place 1", 1, gamePayout.getPlace());
     assertEquals("payout amount should be " + GAME_BUY_IN, GAME_BUY_IN, gamePayout.getAmount());
     assertNull("payout chop amount should be null", gamePayout.getChopAmount());
-    assertNull("payout chop percentage should be null", gamePayout.getChopPercent());
   }
 
   @Test
@@ -111,11 +117,10 @@ public class PayoutCalculatorTest implements TestConstants {
     assertEquals("payout should be place 1", 1, gamePayout.getPlace());
     assertEquals("payout amount should be " + (GAME_BUY_IN * 7), GAME_BUY_IN * 7, gamePayout.getAmount());
     assertNull("payout chop amount should be null", gamePayout.getChopAmount());
-    assertNull("payout chop percentage should be null", gamePayout.getChopPercent());
   }
 
   @Test
-  public void test8To12Players2Payouts() {
+  public void test8To12Players2PayoutsWithChop() {
     // Create between 8 and 12 players
     int numPlayers = 0;
     while (numPlayers == 0) {
@@ -123,14 +128,17 @@ public class PayoutCalculatorTest implements TestConstants {
     }
     numPlayers += 7;
 
+    List<GamePlayer> gamePlayers = new ArrayList<>(numPlayers);
+
     int prizePot = GAME_BUY_IN * numPlayers;
     Game gameToCalculate = Game.builder()
       .id(1)
       .numPlayers(numPlayers)
+      .players(gamePlayers)
       .prizePotCalculated(prizePot)
       .build();
 
-    when(gameRepository.findById(1)).thenReturn(Optional.of(new Game()));
+    when(gameRepository.findById(1)).thenReturn(Optional.of(gameToCalculate));
 
     List<GamePayout> gamePayouts = payoutCalculator.calculate(gameToCalculate);
 
@@ -159,7 +167,6 @@ public class PayoutCalculatorTest implements TestConstants {
       assertEquals("payout should be place " + place, place, gamePayout.getPlace());
       assertEquals(amount, gamePayout.getAmount(), leftover);
       assertNull("payout chop amount should be null", gamePayout.getChopAmount());
-      assertNull("payout chop percentage should be null", gamePayout.getChopPercent());
       totalPaidOut += gamePayout.getAmount();
     }
 
