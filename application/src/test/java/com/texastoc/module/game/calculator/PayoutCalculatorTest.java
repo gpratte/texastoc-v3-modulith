@@ -1,7 +1,6 @@
-package com.texastoc.service.calculator;
+package com.texastoc.module.game.calculator;
 
 import com.texastoc.TestConstants;
-import com.texastoc.module.game.calculator.PayoutCalculator;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePayout;
 import com.texastoc.module.game.model.GamePlayer;
