@@ -241,7 +241,6 @@ public class CalculationsStepdefs extends BaseIntegrationTest {
       Assert.assertEquals("payout should be place " + place, place, gamePayout.getPlace());
       Assert.assertEquals(amount, gamePayout.getAmount(), leftover);
       Assert.assertNull("payout chop amount should be null", gamePayout.getChopAmount());
-      Assert.assertNull("payout chop percentage should be null", gamePayout.getChopPercent());
       totalPaidOut += gamePayout.getAmount();
       ++i;
     }

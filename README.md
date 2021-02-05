@@ -162,5 +162,7 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 23-game-calculator-unit-tests
-Unit tests for the GameCalculator class.
+## Current Branch: 24-game-payout-calculator-unit-tests
+Unit tests for the PayoutCalculator class.
+
+Now uses an Independent Chip Model algorithm for chopping payouts.

@@ -24,27 +24,27 @@ DROP TABLE IF EXISTS historicalseason;
 CREATE TABLE season
 (
     id                                int NOT NULL AUTO_INCREMENT,
-    startDate                         date    DEFAULT NULL,
-    endDate                           date    DEFAULT NULL,
-    kittyPerGame                      int     DEFAULT NULL,
-    tocPerGame                        int     DEFAULT NULL,
-    quarterlyTocPerGame               int     DEFAULT NULL,
-    quarterlyTocPayouts               int     DEFAULT NULL,
-    buyInCost                         int     DEFAULT NULL,
-    rebuyAddOnCost                    int     DEFAULT NULL,
-    rebuyAddOnTocDebit                int     DEFAULT NULL,
-    buyInCollected                    int     DEFAULT NULL,
-    rebuyAddOnCollected               int     DEFAULT NULL,
-    annualTocCollected                int     DEFAULT NULL,
-    totalCollected                    int     DEFAULT NULL,
-    annualTocFromRebuyAddOnCalculated int     DEFAULT NULL,
-    rebuyAddOnLessAnnualTocCalculated int     DEFAULT NULL,
-    totalCombinedAnnualTocCalculated  int     DEFAULT NULL,
-    kittyCalculated                   int     DEFAULT NULL,
-    prizePotCalculated                int     DEFAULT NULL,
-    numGames                          int     DEFAULT NULL,
-    numGamesPlayed                    int     DEFAULT NULL,
-    finalized                         boolean DEFAULT NULL,
+    startDate                         date      DEFAULT NULL,
+    endDate                           date      DEFAULT NULL,
+    kittyPerGame                      int       DEFAULT NULL,
+    tocPerGame                        int       DEFAULT NULL,
+    quarterlyTocPerGame               int       DEFAULT NULL,
+    quarterlyTocPayouts               int       DEFAULT NULL,
+    buyInCost                         int       DEFAULT NULL,
+    rebuyAddOnCost                    int       DEFAULT NULL,
+    rebuyAddOnTocDebit                int       DEFAULT NULL,
+    buyInCollected                    int       DEFAULT NULL,
+    rebuyAddOnCollected               int       DEFAULT NULL,
+    annualTocCollected                int       DEFAULT NULL,
+    totalCollected                    int       DEFAULT NULL,
+    annualTocFromRebuyAddOnCalculated int       DEFAULT NULL,
+    rebuyAddOnLessAnnualTocCalculated int       DEFAULT NULL,
+    totalCombinedAnnualTocCalculated  int       DEFAULT NULL,
+    kittyCalculated                   int       DEFAULT NULL,
+    prizePotCalculated                int       DEFAULT NULL,
+    numGames                          int       DEFAULT NULL,
+    numGamesPlayed                    int       DEFAULT NULL,
+    finalized                         boolean   DEFAULT NULL,
     lastCalculated                    timestamp DEFAULT NULL,
     PRIMARY KEY (id)
 );
@@ -53,14 +53,14 @@ CREATE TABLE quarterlyseason
 (
     id             int NOT NULL AUTO_INCREMENT,
     seasonId       int NOT NULL,
-    startDate      date    DEFAULT NULL,
-    endDate        date    DEFAULT NULL,
-    finalized      boolean DEFAULT NULL,
+    startDate      date      DEFAULT NULL,
+    endDate        date      DEFAULT NULL,
+    finalized      boolean   DEFAULT NULL,
     quarter        int NOT NULL,
-    numGames       int     DEFAULT NULL,
-    numGamesPlayed int     DEFAULT NULL,
-    qTocCollected  int     DEFAULT NULL,
-    qTocPerGame    int     DEFAULT NULL,
+    numGames       int       DEFAULT NULL,
+    numGamesPlayed int       DEFAULT NULL,
+    qTocCollected  int       DEFAULT NULL,
+    qTocPerGame    int       DEFAULT NULL,
     numPayouts     int NOT NULL,
     lastCalculated timestamp DEFAULT NULL,
     PRIMARY KEY (id)
@@ -96,21 +96,22 @@ CREATE TABLE quarterlyseasonplayer
 
 CREATE TABLE player
 (
-    id        int NOT NULL AUTO_INCREMENT,
+    id         int NOT NULL AUTO_INCREMENT,
     first_name varchar(32)  DEFAULT NULL,
     last_name  varchar(32)  DEFAULT NULL,
-    phone     varchar(32)  DEFAULT NULL,
-    email     varchar(64)  DEFAULT NULL,
-    password  varchar(255) DEFAULT NULL,
+    phone      varchar(32)  DEFAULT NULL,
+    email      varchar(64)  DEFAULT NULL,
+    password   varchar(255) DEFAULT NULL,
     PRIMARY KEY (id)
 );
-ALTER TABLE player ADD UNIQUE (email);
+ALTER TABLE player
+    ADD UNIQUE (email);
 
 CREATE TABLE role
 (
-    id          int NOT NULL AUTO_INCREMENT,
-    type        varchar(255) DEFAULT NULL,
-    player      int,
+    id     int NOT NULL AUTO_INCREMENT,
+    type   varchar(255) DEFAULT NULL,
+    player int,
     PRIMARY KEY (id)
 );
 alter table role
@@ -118,53 +119,54 @@ alter table role
 
 CREATE TABLE seating
 (
-    id       int NOT NULL AUTO_INCREMENT,
-    game_id  int           NOT NULL,
+    id      int NOT NULL AUTO_INCREMENT,
+    game_id int NOT NULL,
     PRIMARY KEY (id)
 );
-ALTER TABLE seating ADD UNIQUE (game_id);
+ALTER TABLE seating
+    ADD UNIQUE (game_id);
 
 CREATE TABLE game
 (
-    id                                      int                NOT NULL AUTO_INCREMENT,
-    host_id                                 int            DEFAULT NULL,
-    game_date                               date               NOT NULL,
-    transport_required                      boolean        DEFAULT FALSE,
+    id                                      int  NOT NULL AUTO_INCREMENT,
+    host_id                                 int         DEFAULT NULL,
+    game_date                               date NOT NULL,
+    transport_required                      boolean     DEFAULT FALSE,
 
-    host_name                               varchar(64)    DEFAULT NULL,
-    season_id                               int                NOT NULL,
-    q_season_id                             int                NOT NULL,
-    quarter                                 varchar(16)    DEFAULT NULL,
-    season_game_num                         int            DEFAULT NULL,
-    quarterly_game_num                      int            DEFAULT NULL,
+    host_name                               varchar(64) DEFAULT NULL,
+    season_id                               int  NOT NULL,
+    q_season_id                             int  NOT NULL,
+    quarter                                 varchar(16) DEFAULT NULL,
+    season_game_num                         int         DEFAULT NULL,
+    quarterly_game_num                      int         DEFAULT NULL,
 
-    kitty_cost                              int            DEFAULT 0,
-    buy_in_cost                             int            DEFAULT 0,
-    rebuy_add_on_cost                       int            DEFAULT 0,
-    rebuy_add_on_toc_debit_cost             int            DEFAULT 0,
-    annual_toc_cost                         int            DEFAULT 0,
-    quarterly_toc_cost                      int            DEFAULT 0,
+    kitty_cost                              int         DEFAULT 0,
+    buy_in_cost                             int         DEFAULT 0,
+    rebuy_add_on_cost                       int         DEFAULT 0,
+    rebuy_add_on_toc_debit_cost             int         DEFAULT 0,
+    annual_toc_cost                         int         DEFAULT 0,
+    quarterly_toc_cost                      int         DEFAULT 0,
 
-    buy_in_collected                        int            DEFAULT 0,
-    rebuy_add_on_collected                  int            DEFAULT 0,
-    annual_toc_collected                    int            DEFAULT 0,
-    quarterly_toc_collected                 int            DEFAULT 0,
-    total_collected                         int            DEFAULT 0,
+    buy_in_collected                        int         DEFAULT 0,
+    rebuy_add_on_collected                  int         DEFAULT 0,
+    annual_toc_collected                    int         DEFAULT 0,
+    quarterly_toc_collected                 int         DEFAULT 0,
+    total_collected                         int         DEFAULT 0,
 
-    annual_toc_from_rebuy_add_on_calculated int            DEFAULT 0,
-    rebuy_add_on_less_annual_toc_calculated int            DEFAULT 0,
-    total_combined_toc_calculated           int            DEFAULT 0,
-    kitty_calculated                        int            DEFAULT 0,
-    prize_pot_calculated                    int            DEFAULT 0,
+    annual_toc_from_rebuy_add_on_calculated int         DEFAULT 0,
+    rebuy_add_on_less_annual_toc_calculated int         DEFAULT 0,
+    total_combined_toc_calculated           int         DEFAULT 0,
+    kitty_calculated                        int         DEFAULT 0,
+    prize_pot_calculated                    int         DEFAULT 0,
 
-    num_players                             int            DEFAULT 0,
-    num_paid_players                        int            DEFAULT 0,
+    num_players                             int         DEFAULT 0,
+    num_paid_players                        int         DEFAULT 0,
     started                                 timestamp NULL DEFAULT NULL,
-    last_calculated                         timestamp      DEFAULT NULL,
-    chopped                                 boolean        DEFAULT TRUE,
-    can_rebuy                               boolean        DEFAULT TRUE,
-    finalized                               boolean        DEFAULT FALSE,
-    payout_delta                            int            DEFAULT NULL,
+    last_calculated                         timestamp   DEFAULT NULL,
+    chopped                                 boolean     DEFAULT TRUE,
+    can_rebuy                               boolean     DEFAULT TRUE,
+    finalized                               boolean     DEFAULT FALSE,
+    payout_delta                            int         DEFAULT NULL,
     seating_id                              int,
     PRIMARY KEY (id)
 );
@@ -173,9 +175,9 @@ alter table game
 
 CREATE TABLE game_player
 (
-    id                        int         NOT NULL AUTO_INCREMENT,
-    player_id                 int         NOT NULL,
-    game_id                   int         NOT NULL,
+    id                        int NOT NULL AUTO_INCREMENT,
+    player_id                 int NOT NULL,
+    game_id                   int NOT NULL,
     bought_in                 boolean     DEFAULT NULL,
     rebought                  boolean     DEFAULT NULL,
     annual_toc_participant    boolean     DEFAULT NULL,
@@ -185,8 +187,8 @@ CREATE TABLE game_player
     knocked_out               boolean     DEFAULT FALSE,
     chop                      int         DEFAULT NULL,
 
-    season_id                 int         NOT NULL,
-    q_season_id               int         NOT NULL,
+    season_id                 int NOT NULL,
+    q_season_id               int NOT NULL,
     first_name                varchar(64) DEFAULT NULL,
     last_name                 varchar(64) DEFAULT NULL,
     email                     varchar(64) DEFAULT NULL,
@@ -197,8 +199,8 @@ CREATE TABLE game_player
     annual_toc_collected      boolean     DEFAULT NULL,
     quarterly_toc_collected   boolean     DEFAULT NULL,
 
-    game                      int         NOT NULL,
-    game_key                  int         NOT NULL,
+    game                      int NOT NULL,
+    game_key                  int NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY game_player_unique (game_id, player_id)
 );
@@ -207,14 +209,13 @@ alter table game_player
 
 CREATE TABLE game_payout
 (
-    id           int        NOT NULL AUTO_INCREMENT,
-    game_id      int        NOT NULL,
-    place        int        NOT NULL,
-    amount       int    DEFAULT NULL,
-    chop_amount  int    DEFAULT NULL,
-    chop_percent double DEFAULT NULL,
-    game         int        NOT NULL,
-    game_key     int        NOT NULL,
+    id          int NOT NULL AUTO_INCREMENT,
+    game_id     int NOT NULL,
+    place       int NOT NULL,
+    amount      int DEFAULT NULL,
+    chop_amount int DEFAULT NULL,
+    game        int NOT NULL,
+    game_key    int NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY game_payout_unique (game_id, place)
 );
@@ -259,13 +260,13 @@ alter table game_table
 
 CREATE TABLE seat
 (
-    id               int          NOT NULL AUTO_INCREMENT,
-    seat_num         int          NOT NULL,
-    table_num        int          NOT NULL,
+    id               int NOT NULL AUTO_INCREMENT,
+    seat_num         int NOT NULL,
+    table_num        int NOT NULL,
     game_player_id   int          DEFAULT NULL,
     game_player_name varchar(128) DEFAULT NULL,
-    game_table       int          NOT NULL,
-    game_table_key   int          NOT NULL,
+    game_table       int NOT NULL,
+    game_table_key   int NOT NULL,
     PRIMARY KEY (id)
 );
 alter table seat
@@ -306,7 +307,7 @@ CREATE TABLE seasonpayoutsettings
 
 CREATE TABLE version
 (
-    id      int NOT NULL AUTO_INCREMENT,
+    id      int        NOT NULL AUTO_INCREMENT,
     version varchar(8) NOT NULL,
     PRIMARY KEY (id)
 );
@@ -339,21 +340,21 @@ alter table toc_config
 
 CREATE TABLE historicalseasonplayer
 (
-    id int NOT NULL AUTO_INCREMENT,
-    seasonId int NOT NULL,
+    id        int NOT NULL AUTO_INCREMENT,
+    seasonId  int NOT NULL,
     firstName varchar(64),
-    lastName varchar(64),
-    name varchar(64),
-    points int,
-    entries int,
+    lastName  varchar(64),
+    name      varchar(64),
+    points    int,
+    entries   int,
     PRIMARY KEY (id)
 );
 
 CREATE TABLE historicalseason
 (
-    id int NOT NULL AUTO_INCREMENT,
-    seasonId int NOT NULL,
+    id        int NOT NULL AUTO_INCREMENT,
+    seasonId  int NOT NULL,
     startYear int DEFAULT NULL,
-    endYear int DEFAULT NULL,
+    endYear   int DEFAULT NULL,
     PRIMARY KEY (id)
 );

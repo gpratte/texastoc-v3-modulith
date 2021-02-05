@@ -1,21 +1,25 @@
 package com.texastoc.module.game.calculator;
 
+import com.texastoc.module.game.calculator.icm.ICMCalculator;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePayout;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.repository.GameRepository;
+import com.texastoc.module.settings.SettingsModule;
 import com.texastoc.module.settings.SettingsModuleFactory;
 import com.texastoc.module.settings.model.Payout;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 @Component
 public class PayoutCalculator {
 
   private final GameRepository gameRepository;
+  private SettingsModule settingsModule;
 
   public PayoutCalculator(GameRepository gameRepository) {
     this.gameRepository = gameRepository;
@@ -57,7 +61,7 @@ public class PayoutCalculator {
       return gamePayouts;
     }
 
-    List<Payout> payouts = SettingsModuleFactory.getSettingsModule().get().getPayouts().get(numToPay);
+    List<Payout> payouts = getSettingsModule().get().getPayouts().get(numToPay);
 
     int prizePot = game.getPrizePotCalculated();
     int totalPayout = 0;
@@ -72,8 +76,31 @@ public class PayoutCalculator {
       gamePayouts.add(gp);
     }
 
-
     // Adjust if payouts are more or less than prize pot
+    adjustPayouts(totalPayout, prizePot, gamePayouts);
+
+    // See if there is a chop
+    chopPayouts(game.getPlayers(), gamePayouts);
+
+    // TODO check if the game payouts are not the same as the current payouts
+    // flag if the payouts changed
+//    boolean payoutsChanged = false;
+//    Set<GamePayout> currentPayouts = gameRepository.findById(game.getId()).get().getPayouts();
+//    if (gamePayouts.size() != currentPayouts.size()) {
+//      payoutsChanged = true;
+//    } else {
+//       figure this out
+//    }
+//
+//    if (payoutsChanged) {
+//      persistPayouts(gamePayouts, game.getId());
+//    }
+    persistPayouts(gamePayouts, game.getId());
+
+    return gamePayouts;
+  }
+
+  private void adjustPayouts(int totalPayout, int prizePot, List<GamePayout> gamePayouts) {
     if (totalPayout > prizePot) {
       int extra = totalPayout - prizePot;
       while (extra > 0) {
@@ -99,97 +126,61 @@ public class PayoutCalculator {
         }
       }
     }
+  }
 
-    // See if there is a chop
-    List<Integer> chips = null;
-    List<Integer> amounts = null;
-    for (GamePlayer gamePlayer : game.getPlayers()) {
-      if (gamePlayer.getChop() != null) {
-        if (chips == null) {
-          chips = new ArrayList<>();
+  private void chopPayouts(List<GamePlayer> gamePlayers, List<GamePayout> gamePayouts) {
+    List<Integer> chips = new LinkedList<>();
+    outer:
+    for (int i = 1; i <= 10; i++) {
+      for (GamePlayer gamePlayer : gamePlayers) {
+        if (gamePlayer.getPlace() != null && gamePlayer.getPlace() == i) {
+          if (gamePlayer.getChop() == null) {
+            break outer;
+          }
           chips.add(gamePlayer.getChop());
-          amounts = new ArrayList<>();
-          for (GamePayout gamePayout : gamePayouts) {
-            if (gamePayout.getPlace() == gamePlayer.getPlace()) {
-              amounts.add(gamePayout.getAmount());
-              break;
-            }
-          }
-        } else {
-          boolean inserted = false;
-          for (int i = 0; i < chips.size(); ++i) {
-            if (gamePlayer.getChop() >= chips.get(i)) {
-              chips.add(i, gamePlayer.getChop());
-              for (GamePayout gamePayout : gamePayouts) {
-                if (gamePayout.getPlace() == gamePlayer.getPlace()) {
-                  amounts.add(i, gamePayout.getAmount());
-                  inserted = true;
-                  break;
-                }
-              }
-            }
-          }
-          if (!inserted) {
-            chips.add(gamePlayer.getChop());
-            for (GamePayout gamePayout : gamePayouts) {
-              if (gamePayout != null && gamePayout.getPlace() == gamePlayer.getPlace()) {
-                amounts.add(gamePayout.getAmount());
-                break;
-              }
-            }
-          }
         }
       }
     }
 
-    if (chips != null) {
-      // If chips are more than the number of payouts then there
-      // is a problem because even though the top x chopped the
-      // payouts less than that gets paid.
-      int numChopThatGetPaid = Math.min(chips.size(), payouts.size());
-      List<Chop> chops = ChopCalculator.calculate(
-        chips.subList(0, numChopThatGetPaid),
-        amounts.subList(0, numChopThatGetPaid));
-      if (chops != null && chops.size() > 1) {
-        for (Chop chop : chops) {
-          outer:
-          for (GamePlayer player : game.getPlayers()) {
-            if (player.getChop() != null) {
-              for (GamePayout gamePayout : gamePayouts) {
-                if (gamePayout.getAmount() == chop.getOrgAmount()) {
-                  gamePayout.setChopAmount(chop.getChopAmount());
-                  gamePayout.setChopPercent(chop.getPercent());
-                  break outer;
-                }
-              }
-            }
-          }
-        }
-      }
+    if (chips.size() == 0) {
+      return;
     }
 
-    // TODO check if the game payouts are not the same as the current payouts
-    // flag if the payouts changed
-//    boolean payoutsChanged = false;
-//    Set<GamePayout> currentPayouts = gameRepository.findById(game.getId()).get().getPayouts();
-//    if (gamePayouts.size() != currentPayouts.size()) {
-//      payoutsChanged = true;
-//    } else {
-//       figure this out
-//    }
-//
-//    if (payoutsChanged) {
-//      persistPayouts(gamePayouts, game.getId());
-//    }
-    persistPayouts(gamePayouts, game.getId());
+    int sumOriginal = 0;
+    List<Integer> originalPayoutAmounts = new ArrayList<>(chips.size());
+    for (int i = 0; i < chips.size(); i++) {
+      GamePayout gamePayout = gamePayouts.get(i);
+      originalPayoutAmounts.add(gamePayout.getAmount());
+      sumOriginal += gamePayout.getAmount();
+    }
+    List<Double> chopAmountsWithDecmials = ICMCalculator.calculate(originalPayoutAmounts, chips);
 
-    return gamePayouts;
+    // Round the chopped amounts
+    List<Integer> chopAmountsRounded = new ArrayList<>(chips.size());
+    for (Double chopAmountsWithDecmial : chopAmountsWithDecmials) {
+      int chopAmountRounded = (int) Math.round(chopAmountsWithDecmial);
+      chopAmountsRounded.add(chopAmountRounded);
+    }
+
+    // Make sure the sum of the rounded amounts is the same as the sum of the original amounts
+    ChopUtils.adjustTotal(sumOriginal, chopAmountsRounded);
+
+    for (int i = 0; i < chips.size(); i++) {
+      gamePayouts.get(i).setChopAmount(chopAmountsRounded.get(i));
+    }
   }
 
   private void persistPayouts(List<GamePayout> gamePayouts, int gameId) {
     Game game = gameRepository.findById(gameId).get();
     game.setPayouts(gamePayouts);
     gameRepository.save(game);
+  }
+
+  private SettingsModule getSettingsModule() {
+    if (settingsModule == null) {
+      settingsModule = SettingsModuleFactory.getSettingsModule();
+    }
+    return settingsModule;
   }
 
 }

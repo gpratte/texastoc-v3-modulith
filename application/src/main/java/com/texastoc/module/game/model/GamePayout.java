@@ -25,7 +25,7 @@ public class GamePayout {
   private int place;
   private int amount;
   private Integer chopAmount;
-  private Double chopPercent;
+  //private Double chopPercent;
 
   @Override
   public boolean equals(Object o) {
@@ -35,12 +35,11 @@ public class GamePayout {
     return gameId == that.gameId &&
       place == that.place &&
       amount == that.amount &&
-      Objects.equals(chopAmount, that.chopAmount) &&
-      Objects.equals(chopPercent, that.chopPercent);
+      Objects.equals(chopAmount, that.chopAmount);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(gameId, place, amount, chopAmount, chopPercent);
+    return Objects.hash(gameId, place, amount, chopAmount);
   }
 }
