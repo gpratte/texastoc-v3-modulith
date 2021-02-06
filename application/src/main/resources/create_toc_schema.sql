@@ -192,7 +192,10 @@ CREATE TABLE game_player
     first_name                varchar(64) DEFAULT NULL,
     last_name                 varchar(64) DEFAULT NULL,
     email                     varchar(64) DEFAULT NULL,
-    points                    int         DEFAULT NULL,
+    toc_points                int         DEFAULT NULL,
+    toc_chop_points           int         DEFAULT NULL,
+    q_toc_points              int         DEFAULT NULL,
+    q_toc_chop_points         int         DEFAULT NULL,
 
     buy_in_collected          boolean     DEFAULT NULL,
     rebuy_add_on_collected    boolean     DEFAULT NULL,

@@ -138,9 +138,9 @@ public class SeasonCalculator {
         seasonPlayerMap.put(gamePlayer.getPlayerId(), seasonPlayer);
       }
 
-      if (gamePlayer.getPoints() != null && gamePlayer.getPoints() > 0) {
-        seasonPlayer.setPoints(seasonPlayer.getPoints() + gamePlayer.getPoints());
-      }
+//      if (gamePlayer.getPoints() != null && gamePlayer.getPoints() > 0) {
+//        seasonPlayer.setPoints(seasonPlayer.getPoints() + gamePlayer.getPoints());
+//      }
 
       seasonPlayer.setEntries(seasonPlayer.getEntries() + 1);
     }

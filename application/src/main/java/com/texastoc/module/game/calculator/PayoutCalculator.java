@@ -50,13 +50,14 @@ public class PayoutCalculator {
   private List<GamePayout> calculatePayout(int numToPay, Game game) {
     List<GamePayout> gamePayouts = new ArrayList<>(numToPay);
 
-    // If only one player then he gets it all
+    // If only one player then that player gets it all
     if (numToPay == 1) {
       gamePayouts.add(GamePayout.builder()
         .gameId(game.getId())
         .place(1)
         .amount(game.getPrizePotCalculated())
         .build());
+
       persistPayouts(gamePayouts, game.getId());
       return gamePayouts;
     }
@@ -79,7 +80,7 @@ public class PayoutCalculator {
     // Adjust if payouts are more or less than prize pot
     adjustPayouts(totalPayout, prizePot, gamePayouts);
 
-    // See if there is a chop
+    // Apply the chop
     chopPayouts(game.getPlayers(), gamePayouts);
 
     // TODO check if the game payouts are not the same as the current payouts
