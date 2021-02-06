@@ -86,7 +86,7 @@
   <tr>
     <td align="center">$!player.place</td>
     <td>$player.name</td>
-    <td align="center">$!player.points</td>
+    <td align="center">$!player.tocPoints</td>
 #if($game.chopped)
     <td align="center">$!player.chop</td>
 #end
@@ -165,7 +165,7 @@
     </td>
     <td>$seasonPlayer.name</td>
     <td align="center">
-#if($seasonPlayer.points && $seasonPlayer.points > 0)
+    #if($seasonPlayer.points && $seasonPlayer.points > 0)
       $!seasonPlayer.points
 #end
     </td>
