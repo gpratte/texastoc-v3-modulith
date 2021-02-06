@@ -35,6 +35,7 @@ public class PointsCalculator {
     for (GamePlayer gamePlayer : game.getPlayers()) {
       if (gamePlayer.getPlace() != null && gamePlayer.getPlace() < 11) {
         calculationRequired = true;
+        break;
       }
     }
 
@@ -48,7 +49,7 @@ public class PointsCalculator {
     // Apply the chop
     Map<Integer, Integer> placeChopPoints = chopPoints(game.getPlayers(), placePoints);
 
-    // Apply the points to players that participate
+    // Apply the points to players that participate in either annual or quarterly toc
     for (GamePlayer gamePlayer : game.getPlayers()) {
       if (gamePlayer.getPlace() != null && gamePlayer.getPlace() < 11) {
         if (gamePlayer.isAnnualTocParticipant()) {
@@ -152,14 +153,4 @@ public class PointsCalculator {
     }
     return chopPoints;
   }
-
-//  static Comparator<GamePlayer> sortByChop = new Comparator<GamePlayer>() {
-//    @Override
-//    public int compare(GamePlayer o1, GamePlayer o2) {
-//      if (o1.getChop().intValue() == o2.getChop().intValue()) {
-//        return 0;
-//      }
-//      return o1.getChop() - o2.getChop();
-//    }
-//  };
 }
