@@ -7,8 +7,8 @@ Feature: Play a game
     Then the game calculated is <game>
 
     Examples:
-      | game                                                                                                                                                                                                                                                                                                                                                                      |
-      | {"buyInCollected":0,"rebuyAddOnCollected":0,"annualTocCollected":0,"quarterlyTocCollected":0,"totalCollected":0,"annualTocFromRebuyAddOnCalculated":0,"rebuyAddOnLessAnnualTocCalculated":0,"totalCombinedTocCalculated":0,"kittyCalculated":0,"prizePotCalculated":0,"numPlayers":1,"numPaidPlayers":0,"chopped":false,"canRebuy":true,"finalized":false,"payouts":null} |
+      | game                                                                                                                                                                                                                                                                                                                                                                    |
+      | {"buyInCollected":0,"rebuyAddOnCollected":0,"annualTocCollected":0,"quarterlyTocCollected":0,"totalCollected":0,"annualTocFromRebuyAddOnCalculated":0,"rebuyAddOnLessAnnualTocCalculated":0,"totalCombinedTocCalculated":0,"kittyCalculated":0,"prizePotCalculated":0,"numPlayers":1,"numPaidPlayers":0,"chopped":false,"canRebuy":true,"finalized":false,"payouts":[]} |
 
 #  Scenario: add player no buy-in
 #    Given a game is created
