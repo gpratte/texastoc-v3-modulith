@@ -1,5 +1,6 @@
 package com.texastoc.module.game.calculator;
 
+import com.texastoc.module.game.calculator.icm.ICMCalculator;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.repository.GameRepository;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +38,7 @@ public class PointsCalculator {
         break;
       }
     }
+
     if (!calculationRequired) {
       return;
     }
@@ -43,84 +46,28 @@ public class PointsCalculator {
     // Get the points for a game with given number of players
     Map<Integer, Integer> placePoints = calculatePlacePoints(game.getNumPlayers());
 
-    boolean pointsChanged = false;
+    // Apply the chop
+    Map<Integer, Integer> placeChopPoints = chopPoints(game.getPlayers(), placePoints);
+
+    // Apply the points to players that participate in either annual or quarterly toc
     for (GamePlayer gamePlayer : game.getPlayers()) {
-      // Check if game player is in top 10
       if (gamePlayer.getPlace() != null && gamePlayer.getPlace() < 11) {
-        if (gamePlayer.getPoints() == null || gamePlayer.getPoints().intValue() != placePoints.get(gamePlayer.getPlace())) {
-          pointsChanged = true;
-          gamePlayer.setPoints(placePoints.get(gamePlayer.getPlace()));
+        if (gamePlayer.isAnnualTocParticipant()) {
+          gamePlayer.setTocPoints(placePoints.get(gamePlayer.getPlace()));
+          if (placeChopPoints != null && placeChopPoints.get(gamePlayer.getPlace()) != null) {
+            gamePlayer.setTocChopPoints(placeChopPoints.get(gamePlayer.getPlace()));
+          }
         }
-      } else if (gamePlayer.getPoints() != null) {
-        pointsChanged = true;
-        gamePlayer.setPoints(null);
-      }
-    }
-
-    // See if there is a chop
-    boolean chopRequired = false;
-    for (GamePlayer gamePlayer : game.getPlayers()) {
-      if (gamePlayer.getChop() != null) {
-        chopRequired = true;
-        break;
-      }
-    }
-    if (!chopRequired) {
-      if (pointsChanged) {
-        persistPoints(game);
-      }
-      return;
-    }
-
-
-    List<Integer> chips = null;
-    List<Integer> amounts = null;
-    for (GamePlayer gamePlayer : game.getPlayers()) {
-      if (gamePlayer.getChop() != null) {
-        if (chips == null) {
-          chips = new ArrayList<>();
-          chips.add(gamePlayer.getChop());
-          amounts = new ArrayList<>();
-          if (gamePlayer.getPoints() != null) {
-            amounts.add(gamePlayer.getPoints());
-          }
-        } else {
-          boolean inserted = false;
-          for (int i = 0; i < chips.size(); ++i) {
-            if (gamePlayer.getChop() >= chips.get(i)) {
-              chips.add(i, gamePlayer.getChop());
-              if (gamePlayer.getPoints() != null) {
-                amounts.add(i, gamePlayer.getPoints());
-              }
-              inserted = true;
-              break;
-            }
-          }
-          if (!inserted) {
-            chips.add(gamePlayer.getChop());
-            if (gamePlayer.getPoints() != null) {
-              amounts.add(gamePlayer.getPoints());
-            }
+        if (gamePlayer.isQuarterlyTocParticipant()) {
+          gamePlayer.setQTocPoints(placePoints.get(gamePlayer.getPlace()));
+          if (placeChopPoints != null && placeChopPoints.get(gamePlayer.getPlace()) != null) {
+            gamePlayer.setQTocChopPoints(placeChopPoints.get(gamePlayer.getPlace()));
           }
         }
       }
     }
 
-    if (chips != null) {
-      List<Chop> chops = ChopCalculator.calculate(chips, amounts);
-      if (chops != null && chops.size() > 1) {
-        for (Chop chop : chops) {
-          for (GamePlayer gamePlayer : game.getPlayers()) {
-            if (gamePlayer.getPoints() != null &&
-              gamePlayer.getPoints() == chop.getOrgAmount()) {
-              gamePlayer.setPoints(chop.getChopAmount());
-              break;
-            }
-          }
-        }
-      }
-      persistPoints(game);
-    }
+    gameRepository.save(game);
   }
 
   /**
@@ -163,17 +110,47 @@ public class PointsCalculator {
     return placePoints;
   }
 
-  private void persistPoints(Game game) {
-    for (GamePlayer gamePlayer : game.getPlayers()) {
-      boolean isToc = gamePlayer.isAnnualTocParticipant();
-      boolean isQToc = gamePlayer.isQuarterlyTocParticipant();
-
-      if (isToc || isQToc) {
-        gamePlayer.setPoints(gamePlayer.getPoints());
-      } else {
-        gamePlayer.setPoints(null);
+  private Map<Integer, Integer> chopPoints(List<GamePlayer> gamePlayers, Map<Integer, Integer> placePoints) {
+    List<Integer> chips = new LinkedList<>();
+    outer:
+    for (int i = 1; i <= 10; i++) {
+      for (GamePlayer gamePlayer : gamePlayers) {
+        if (gamePlayer.getPlace() != null && gamePlayer.getPlace() == i) {
+          if (gamePlayer.getChop() == null) {
+            break outer;
+          }
+          chips.add(gamePlayer.getChop());
+        }
       }
     }
-    gameRepository.save(game);
+
+    if (chips.size() == 0) {
+      return null;
+    }
+
+    int sumOriginal = 0;
+    List<Integer> originalPoints = new ArrayList<>(chips.size());
+    for (int i = 0; i < chips.size(); i++) {
+      Integer original = placePoints.get(i + 1);
+      originalPoints.add(original);
+      sumOriginal += original;
+    }
+    List<Double> chopPointsWithDecmials = ICMCalculator.calculate(originalPoints, chips);
+
+    // Round the chopped amounts
+    List<Integer> chopAmountsRounded = new ArrayList<>(chips.size());
+    for (Double chopAmountsWithDecmial : chopPointsWithDecmials) {
+      int chopAmountRounded = (int) Math.round(chopAmountsWithDecmial);
+      chopAmountsRounded.add(chopAmountRounded);
+    }
+
+    // Make sure the sum of the rounded amounts is the same as the sum of the original amounts
+    ChopUtils.adjustTotal(sumOriginal, chopAmountsRounded);
+
+    Map<Integer, Integer> chopPoints = new HashMap<>();
+    for (int i = 0; i < chips.size(); i++) {
+      chopPoints.put(i + 1, chopAmountsRounded.get(i));
+    }
+    return chopPoints;
   }
 }

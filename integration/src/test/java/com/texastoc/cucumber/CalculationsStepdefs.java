@@ -255,7 +255,7 @@ public class CalculationsStepdefs extends BaseIntegrationTest {
 
     int pointsCount = 0;
     for (GamePlayer gamePlayer : gamePlayers) {
-      if (gamePlayer.getPoints() != null) {
+      if (gamePlayer.getTocPoints() != null) {
         ++pointsCount;
       }
     }
@@ -278,8 +278,8 @@ public class CalculationsStepdefs extends BaseIntegrationTest {
 
     int totalPoints = 0;
     for (GamePlayer gamePlayer : gamePlayers) {
-      if (gamePlayer.getPoints() != null && gamePlayer.getPoints() > 0) {
-        totalPoints += gamePlayer.getPoints();
+      if (gamePlayer.getTocPoints() != null && gamePlayer.getTocPoints() > 0) {
+        totalPoints += gamePlayer.getTocPoints();
       }
     }
     Assert.assertEquals("total points should be 285", expectedPoints, totalPoints);

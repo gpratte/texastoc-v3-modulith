@@ -184,7 +184,7 @@ public class GamePlayerServiceTest implements TestConstants {
       .lastName("existingLastName")
       .email("existing@mail.com")
       .place(null)
-      .points(null)
+      .tocPoints(null)
       .roundUpdates(false)
       .boughtIn(false)
       .rebought(false)
@@ -213,7 +213,7 @@ public class GamePlayerServiceTest implements TestConstants {
       .lastName("updatedLastName")
       .email("updated@mail.com")
       .place(10)
-      .points(100)
+      .tocPoints(100)
       .roundUpdates(true)
       .boughtIn(true)
       .rebought(true)
@@ -233,7 +233,7 @@ public class GamePlayerServiceTest implements TestConstants {
 
     assertEquals("existingFirstName", savedGamePlayer.getFirstName());
     assertEquals("existingLastName", savedGamePlayer.getLastName());
-    assertNull("game player points should be null", savedGamePlayer.getPoints());
+    assertNull("game player points should be null", savedGamePlayer.getTocPoints());
     assertEquals("game player finish should be 10", 10, savedGamePlayer.getPlace().intValue());
     assertTrue("game player knocked out should be true", savedGamePlayer.isKnockedOut());
     assertTrue("game player round updates should be true", savedGamePlayer.isRoundUpdates());
@@ -482,7 +482,7 @@ public class GamePlayerServiceTest implements TestConstants {
   }
 
   public void assertNewlyCreatedGamePlayer(GamePlayer gamePlayer) {
-    assertNull("game player points should be null", gamePlayer.getPoints());
+    assertNull("game player points should be null", gamePlayer.getTocPoints());
     assertNull("game player finish should be null", gamePlayer.getPlace());
     assertFalse("game player knocked out should be false", gamePlayer.isKnockedOut());
     assertFalse("game player round updates should be false", gamePlayer.isRoundUpdates());

@@ -36,7 +36,10 @@ public class GamePlayer implements Comparable<GamePlayer> {
   private String firstName;
   private String lastName;
   private String email;
-  private Integer points;
+  private Integer tocPoints;
+  private Integer tocChopPoints;
+  private Integer qTocPoints;
+  private Integer qTocChopPoints;
 
   // End with "Collected" for physical money collected.
   // Read-only fields set by the server
