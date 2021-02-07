@@ -162,7 +162,7 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 24-game-payout-calculator-unit-tests
-Unit tests for the PayoutCalculator class.
+## Current Branch: 25-game-points-calculator-unit-tests
+Unit tests for the PointsCalculator class.
 
-Now uses an Independent Chip Model algorithm for chopping payouts.
+Now uses an Independent Chip Model algorithm for chopping points.

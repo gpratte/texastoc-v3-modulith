@@ -1,4 +1,4 @@
-package com.texastoc.module.game.config;
+package com.texastoc.module.clock.config;
 
 import com.texastoc.module.game.model.clock.Round;
 import lombok.Getter;
