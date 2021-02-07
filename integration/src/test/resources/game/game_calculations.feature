@@ -38,7 +38,7 @@ Feature: Play a game
 }
     """
 
-  Scenario: start a game with one player all
+  Scenario: start a game with one player with everything set all
   The player is bought-in, rebought, annual toc participant,
   quarterly toc participant and is in first place
     Given a calculated game is created
@@ -73,8 +73,13 @@ Feature: Play a game
   "numPaidPlayers":1,
   "chopped":false,
   "canRebuy":true,
-  "finalized":false,
-  "payouts":[]
+  "payouts":[
+    {
+      "place":1,
+      "amount":50,
+      "chopAmount":null
+    }
+  ]
 }
     """
 

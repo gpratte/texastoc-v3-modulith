@@ -82,9 +82,11 @@ public class GameHelper {
   // TODO separate thread
   public void recalculate(int gameId) {
     Game game = get(gameId);
-    Game calculatedGame = gameCalculator.calculate(game);
-    payoutCalculator.calculate(calculatedGame);
-    pointsCalculator.calculate(calculatedGame);
+    gameCalculator.calculate(game);
+    game = get(gameId);
+    payoutCalculator.calculate(game);
+    game = get(gameId);
+    pointsCalculator.calculate(game);
   }
 
   // TODO use Spring Integration

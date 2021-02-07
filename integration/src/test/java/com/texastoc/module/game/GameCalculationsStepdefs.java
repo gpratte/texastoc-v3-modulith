@@ -82,7 +82,6 @@ public class GameCalculationsStepdefs extends BaseGameStepdefs {
     assertEquals(expected.getNumPlayers(), actual.getNumPlayers());
     assertEquals(expected.getNumPaidPlayers(), actual.getNumPaidPlayers());
     assertEquals(expected.isChopped(), actual.isChopped());
-    assertEquals(expected.isFinalized(), actual.isFinalized());
 
     // TODO how is this field used?
     //assertEquals(expected.isCanRebuy(), actual.isCanRebuy());
