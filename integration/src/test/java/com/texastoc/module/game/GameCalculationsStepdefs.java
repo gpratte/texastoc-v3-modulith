@@ -1,5 +1,6 @@
 package com.texastoc.module.game;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePayout;
@@ -33,15 +34,27 @@ public class GameCalculationsStepdefs extends BaseGameStepdefs {
     gameId = gameCreated.getId();
   }
 
-  @When("^a player is added without buy-in$")
-  public void addPlayerNoBuyin() throws Exception {
+  @When("^adding players$")
+  public void addPlayerNoBuyin(String json) throws Exception {
+    List<GamePlayer> gamePlayers = OBJECT_MAPPER.readValue(
+      json, new TypeReference<List<GamePlayer>>() {
+      });
     super.getCurrentGame();
-    GamePlayer gamePlayer = GamePlayer.builder()
-      .playerId(GUEST_USER_PLAYER_ID)
-      .gameId(gameId)
-      .build();
     String token = login(USER_EMAIL, USER_PASSWORD);
-    addPlayerToGame(gamePlayer, token);
+    for (GamePlayer gp : gamePlayers) {
+      GamePlayer gamePlayer = GamePlayer.builder()
+        .gameId(gameId)
+        .firstName("first")
+        .lastName("last")
+        .boughtIn(gp.isBoughtIn())
+        .annualTocParticipant(gp.isAnnualTocParticipant())
+        .quarterlyTocParticipant(gp.isQuarterlyTocParticipant())
+        .rebought(gp.isRebought())
+        .place(gp.getPlace())
+        .chop(gp.getChop())
+        .build();
+      addFirstTimePlayerToGame(gamePlayer, token);
+    }
   }
 
   @When("^the current calculated game is retrieved$")
@@ -49,7 +62,7 @@ public class GameCalculationsStepdefs extends BaseGameStepdefs {
     super.getCurrentGame();
   }
 
-  @Then("^the game calculated is (.*)$")
+  @Then("^the game calculated is$")
   public void calcualatedGame(String json) throws Exception {
     Game game = OBJECT_MAPPER.readValue(json, Game.class);
     assertGame(game, gameRetrieved);
