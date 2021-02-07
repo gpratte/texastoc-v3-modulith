@@ -194,8 +194,13 @@ Feature: Play a game
   "payouts":[
     {
       "place":1,
-      "amount":50,
-      "chopAmount":null
+      "amount":357,
+      "chopAmount":280
+    },
+    {
+      "place":2,
+      "amount":193,
+      "chopAmount":270
     }
   ]
 }
