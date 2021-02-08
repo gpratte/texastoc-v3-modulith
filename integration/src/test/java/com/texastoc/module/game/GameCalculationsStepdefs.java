@@ -58,12 +58,22 @@ public class GameCalculationsStepdefs extends BaseGameStepdefs {
     }
   }
 
+  @When("^adding a player$")
+  public void addingPlayer(String json) throws Exception {
+    super.getCurrentGame();
+    String token = login(USER_EMAIL, USER_PASSWORD);
+    GamePlayer gamePlayer = OBJECT_MAPPER.readValue(json, GamePlayer.class);
+    gamePlayer.setGameId(gameId);
+    gamePlayer.setFirstName("first");
+    gamePlayer.setLastName("last");
+    addFirstTimePlayerToGame(gamePlayer, token);
+  }
+
   @When("^updating a player$")
   public void updatePlayer(String json) throws Exception {
     GamePlayer updateGamePlayerInfo = OBJECT_MAPPER.readValue(json, GamePlayer.class);
     super.getCurrentGame();
-    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
-    GamePlayer gamePlayerToUpdate = null;
+    String token = login(USER_EMAIL, USER_PASSWORD);
     for (GamePlayer gp : gameRetrieved.getPlayers()) {
       if (gp.getFirstName().equals(updateGamePlayerInfo.getFirstName()) &&
         gp.getLastName().equals(updateGamePlayerInfo.getLastName())) {
@@ -77,6 +87,14 @@ public class GameCalculationsStepdefs extends BaseGameStepdefs {
         break;
       }
     }
+  }
+
+  @When("^deleting a player$")
+  public void deletePlayer() throws Exception {
+    super.getCurrentGame();
+    String token = login(USER_EMAIL, USER_PASSWORD);
+    GamePlayer gamePlayer = gameRetrieved.getPlayers().get(0);
+    super.deletePlayerFromGame(gameRetrieved.getId(), gamePlayer.getId(), token);
   }
 
   @And("^the current calculated game is retrieved$")

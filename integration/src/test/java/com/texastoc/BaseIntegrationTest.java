@@ -155,14 +155,11 @@ public abstract class BaseIntegrationTest implements TestConstants {
     String gamePlayerAsJson = mapper.writeValueAsString(gamePlayer);
     HttpEntity<String> entity = new HttpEntity<>(gamePlayerAsJson, headers);
 
-//    restTemplate.put(endpoint() + "/games/" + gamePlayer.getGameId() + "/players/" + gamePlayer.getId(), entity);
-
     ResponseEntity<Void> response = restTemplate.exchange(
       endpoint() + "/games/" + gamePlayer.getGameId() + "/players/" + gamePlayer.getId(),
       HttpMethod.PATCH,
       entity,
       Void.class);
-
   }
 
   protected void deletePlayerFromGame(int gameId, int gamePlayerId, String token) throws JsonProcessingException {

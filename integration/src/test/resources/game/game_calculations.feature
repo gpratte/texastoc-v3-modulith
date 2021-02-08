@@ -176,6 +176,274 @@ Feature: Play a game
 }
     """
 
+  Scenario: game with 7 players and then add a player
+  Will result in another payout
+    Given a calculated game is created
+    When adding players
+    """
+[
+  {
+    "boughtIn":true,
+    "annualTocParticipant":false,
+    "quarterlyTocParticipant":false,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  },
+  {
+    "boughtIn":true,
+    "annualTocParticipant":false,
+    "quarterlyTocParticipant":false,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  },
+  {
+    "boughtIn":true,
+    "annualTocParticipant":false,
+    "quarterlyTocParticipant":false,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  },
+  {
+    "boughtIn":true,
+    "annualTocParticipant":false,
+    "quarterlyTocParticipant":false,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  },
+  {
+    "boughtIn":true,
+    "annualTocParticipant":false,
+    "quarterlyTocParticipant":false,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  },
+  {
+    "boughtIn":true,
+    "annualTocParticipant":false,
+    "quarterlyTocParticipant":false,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  },
+  {
+    "boughtIn":true,
+    "annualTocParticipant":false,
+    "quarterlyTocParticipant":false,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  }
+]
+    """
+    And the current calculated game is retrieved
+    Then the game calculated is
+    """
+{
+  "buyInCollected":280,
+  "rebuyAddOnCollected":0,
+  "annualTocCollected":0,
+  "quarterlyTocCollected":0,
+  "totalCollected":280,
+  "annualTocFromRebuyAddOnCalculated":0,
+  "rebuyAddOnLessAnnualTocCalculated":0,
+  "totalCombinedTocCalculated":0,
+  "kittyCalculated":10,
+  "prizePotCalculated":270,
+  "numPlayers":7,
+  "numPaidPlayers":7,
+  "chopped":false,
+  "canRebuy":true,
+  "payouts":[
+    {
+      "place":1,
+      "amount":270,
+      "chopAmount":null
+    }
+  ]
+}
+    """
+    When adding a player
+    """
+{
+  "boughtIn":true,
+  "annualTocParticipant":false,
+  "quarterlyTocParticipant":false,
+  "rebought":false,
+  "place":null,
+  "chop":null
+}
+    """
+    And the current calculated game is retrieved
+    Then the game calculated is
+    """
+{
+  "buyInCollected":320,
+  "rebuyAddOnCollected":0,
+  "annualTocCollected":0,
+  "quarterlyTocCollected":0,
+  "totalCollected":320,
+  "annualTocFromRebuyAddOnCalculated":0,
+  "rebuyAddOnLessAnnualTocCalculated":0,
+  "totalCombinedTocCalculated":0,
+  "kittyCalculated":10,
+  "prizePotCalculated":310,
+  "numPlayers":8,
+  "numPaidPlayers":8,
+  "chopped":false,
+  "canRebuy":true,
+  "payouts":[
+    {
+      "place":1,
+      "amount":201,
+      "chopAmount":null
+    },
+    {
+      "place":2,
+      "amount":109,
+      "chopAmount":null
+    }
+  ]
+}
+    """
+
+  Scenario: game with 8 players and delete a player
+  Will result in one less payout
+    Given a calculated game is created
+    When adding players
+    """
+[
+  {
+    "boughtIn":true,
+    "annualTocParticipant":false,
+    "quarterlyTocParticipant":false,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  },
+  {
+    "boughtIn":true,
+    "annualTocParticipant":false,
+    "quarterlyTocParticipant":false,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  },
+  {
+    "boughtIn":true,
+    "annualTocParticipant":false,
+    "quarterlyTocParticipant":false,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  },
+  {
+    "boughtIn":true,
+    "annualTocParticipant":false,
+    "quarterlyTocParticipant":false,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  },
+  {
+    "boughtIn":true,
+    "annualTocParticipant":false,
+    "quarterlyTocParticipant":false,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  },
+  {
+    "boughtIn":true,
+    "annualTocParticipant":false,
+    "quarterlyTocParticipant":false,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  },
+  {
+    "boughtIn":true,
+    "annualTocParticipant":false,
+    "quarterlyTocParticipant":false,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  },
+  {
+    "boughtIn":true,
+    "annualTocParticipant":false,
+    "quarterlyTocParticipant":false,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  }
+]
+    """
+    And the current calculated game is retrieved
+    Then the game calculated is
+    """
+{
+  "buyInCollected":320,
+  "rebuyAddOnCollected":0,
+  "annualTocCollected":0,
+  "quarterlyTocCollected":0,
+  "totalCollected":320,
+  "annualTocFromRebuyAddOnCalculated":0,
+  "rebuyAddOnLessAnnualTocCalculated":0,
+  "totalCombinedTocCalculated":0,
+  "kittyCalculated":10,
+  "prizePotCalculated":310,
+  "numPlayers":8,
+  "numPaidPlayers":8,
+  "chopped":false,
+  "canRebuy":true,
+  "payouts":[
+    {
+      "place":1,
+      "amount":201,
+      "chopAmount":null
+    },
+    {
+      "place":2,
+      "amount":109,
+      "chopAmount":null
+    }
+  ]
+}
+    """
+    When deleting a player
+    And the current calculated game is retrieved
+    Then the game calculated is
+    """
+{
+  "buyInCollected":280,
+  "rebuyAddOnCollected":0,
+  "annualTocCollected":0,
+  "quarterlyTocCollected":0,
+  "totalCollected":280,
+  "annualTocFromRebuyAddOnCalculated":0,
+  "rebuyAddOnLessAnnualTocCalculated":0,
+  "totalCombinedTocCalculated":0,
+  "kittyCalculated":10,
+  "prizePotCalculated":270,
+  "numPlayers":7,
+  "numPaidPlayers":7,
+  "chopped":false,
+  "canRebuy":true,
+  "payouts":[
+    {
+      "place":1,
+      "amount":270,
+      "chopAmount":null
+    }
+  ]
+}
+    """
+
   Scenario: game with ten players
   Game over with ten players with all but one bought-in, 7 have rebought,
   6 are annual toc participants, 3 are quarterly toc participants
