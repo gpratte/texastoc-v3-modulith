@@ -145,18 +145,25 @@ public abstract class BaseIntegrationTest implements TestConstants {
     return restTemplate.postForObject(endpoint() + "/games/" + gamePlayer.getGameId() + "/players", entity, GamePlayer.class);
   }
 
-//  protected void updatePlayerInGame(int gamePlayerId, UpdateGamePlayerRequest ugpr, String token) throws JsonProcessingException {
-//    HttpHeaders headers = new HttpHeaders();
-//    headers.setContentType(MediaType.APPLICATION_JSON);
-//    headers.set("Authorization", "Bearer " + token);
-//
-//    ObjectMapper mapper = new ObjectMapper();
-//    mapper.registerModule(new JavaTimeModule());
-//    String updateGamePlayerRequestAsJson = mapper.writeValueAsString(ugpr);
-//    HttpEntity<String> entity = new HttpEntity<>(updateGamePlayerRequestAsJson, headers);
-//
-//    restTemplate.put(endpoint() + "/games/" + ugpr.getGameId() + "/players/" + gamePlayerId, entity);
-//  }
+  protected void updatePlayerInGame(GamePlayer gamePlayer, String token) throws JsonProcessingException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.set("Authorization", "Bearer " + token);
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
+    String gamePlayerAsJson = mapper.writeValueAsString(gamePlayer);
+    HttpEntity<String> entity = new HttpEntity<>(gamePlayerAsJson, headers);
+
+//    restTemplate.put(endpoint() + "/games/" + gamePlayer.getGameId() + "/players/" + gamePlayer.getId(), entity);
+
+    ResponseEntity<Void> response = restTemplate.exchange(
+      endpoint() + "/games/" + gamePlayer.getGameId() + "/players/" + gamePlayer.getId(),
+      HttpMethod.PATCH,
+      entity,
+      Void.class);
+
+  }
 
   protected void deletePlayerFromGame(int gameId, int gamePlayerId, String token) throws JsonProcessingException {
     HttpHeaders headers = new HttpHeaders();
@@ -289,7 +296,8 @@ public abstract class BaseIntegrationTest implements TestConstants {
       endpoint() + "/players",
       HttpMethod.GET,
       entity,
-      new ParameterizedTypeReference<List<Player>>() {});
+      new ParameterizedTypeReference<List<Player>>() {
+      });
     return response.getBody();
   }
 

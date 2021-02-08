@@ -83,6 +83,99 @@ Feature: Play a game
 }
     """
 
+  Scenario: game with two players and then update a player
+    Given a calculated game is created
+    When adding players
+    """
+[
+  {
+    "boughtIn":true,
+    "annualTocParticipant":true,
+    "quarterlyTocParticipant":true,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  },
+  {
+    "firstName":"Doyle",
+    "lastName":"Brunson",
+    "boughtIn":true,
+    "annualTocParticipant":false,
+    "quarterlyTocParticipant":false,
+    "rebought":false,
+    "place":null,
+    "chop":null
+  }
+]
+    """
+    And the current calculated game is retrieved
+    Then the game calculated is
+    """
+{
+  "buyInCollected":80,
+  "rebuyAddOnCollected":0,
+  "annualTocCollected":20,
+  "quarterlyTocCollected":20,
+  "totalCollected":120,
+  "annualTocFromRebuyAddOnCalculated":0,
+  "rebuyAddOnLessAnnualTocCalculated":0,
+  "totalCombinedTocCalculated":40,
+  "kittyCalculated":10,
+  "prizePotCalculated":70,
+  "numPlayers":2,
+  "numPaidPlayers":2,
+  "chopped":false,
+  "canRebuy":true,
+  "payouts":[
+    {
+      "place":1,
+      "amount":70,
+      "chopAmount":null
+    }
+  ]
+}
+    """
+    When updating a player
+    """
+{
+  "firstName":"Doyle",
+  "lastName":"Brunson",
+  "boughtIn":true,
+  "annualTocParticipant":false,
+  "quarterlyTocParticipant":false,
+  "rebought":true,
+  "place":null,
+  "chop":null
+}
+    """
+    And the current calculated game is retrieved
+    Then the game calculated is
+    """
+{
+  "buyInCollected":80,
+  "rebuyAddOnCollected":40,
+  "annualTocCollected":20,
+  "quarterlyTocCollected":20,
+  "totalCollected":160,
+  "annualTocFromRebuyAddOnCalculated":0,
+  "rebuyAddOnLessAnnualTocCalculated":40,
+  "totalCombinedTocCalculated":40,
+  "kittyCalculated":10,
+  "prizePotCalculated":110,
+  "numPlayers":2,
+  "numPaidPlayers":2,
+  "chopped":false,
+  "canRebuy":true,
+  "payouts":[
+    {
+      "place":1,
+      "amount":110,
+      "chopAmount":null
+    }
+  ]
+}
+    """
+
   Scenario: game with ten players
   Game over with ten players with all but one bought-in, 7 have rebought,
   6 are annual toc participants, 3 are quarterly toc participants

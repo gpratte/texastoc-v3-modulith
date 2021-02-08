@@ -6,6 +6,7 @@ import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePayout;
 import com.texastoc.module.game.model.GamePlayer;
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
@@ -35,7 +36,7 @@ public class GameCalculationsStepdefs extends BaseGameStepdefs {
   }
 
   @When("^adding players$")
-  public void addPlayerNoBuyin(String json) throws Exception {
+  public void addPlayers(String json) throws Exception {
     List<GamePlayer> gamePlayers = OBJECT_MAPPER.readValue(
       json, new TypeReference<List<GamePlayer>>() {
       });
@@ -44,8 +45,8 @@ public class GameCalculationsStepdefs extends BaseGameStepdefs {
     for (GamePlayer gp : gamePlayers) {
       GamePlayer gamePlayer = GamePlayer.builder()
         .gameId(gameId)
-        .firstName("first")
-        .lastName("last")
+        .firstName(gp.getFirstName() == null ? "first" : gp.getFirstName())
+        .lastName(gp.getLastName() == null ? "last" : gp.getLastName())
         .boughtIn(gp.isBoughtIn())
         .annualTocParticipant(gp.isAnnualTocParticipant())
         .quarterlyTocParticipant(gp.isQuarterlyTocParticipant())
@@ -57,7 +58,28 @@ public class GameCalculationsStepdefs extends BaseGameStepdefs {
     }
   }
 
-  @When("^the current calculated game is retrieved$")
+  @When("^updating a player$")
+  public void updatePlayer(String json) throws Exception {
+    GamePlayer updateGamePlayerInfo = OBJECT_MAPPER.readValue(json, GamePlayer.class);
+    super.getCurrentGame();
+    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
+    GamePlayer gamePlayerToUpdate = null;
+    for (GamePlayer gp : gameRetrieved.getPlayers()) {
+      if (gp.getFirstName().equals(updateGamePlayerInfo.getFirstName()) &&
+        gp.getLastName().equals(updateGamePlayerInfo.getLastName())) {
+        gp.setBoughtIn(updateGamePlayerInfo.isBoughtIn());
+        gp.setAnnualTocParticipant(updateGamePlayerInfo.isAnnualTocParticipant());
+        gp.setQuarterlyTocParticipant(updateGamePlayerInfo.isQuarterlyTocParticipant());
+        gp.setRebought(updateGamePlayerInfo.isRebought());
+        gp.setPlace(updateGamePlayerInfo.getPlace());
+        gp.setChop(updateGamePlayerInfo.getChop());
+        super.updatePlayerInGame(gp, token);
+        break;
+      }
+    }
+  }
+
+  @And("^the current calculated game is retrieved$")
   public void getCurrentGame() throws Exception {
     super.getCurrentGame();
   }
