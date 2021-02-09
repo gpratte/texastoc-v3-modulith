@@ -1,10 +1,7 @@
 package com.texastoc.service;
 
 import com.texastoc.TestConstants;
-import com.texastoc.module.quarterly.repository.QuarterlySeasonPayoutRepository;
-import com.texastoc.module.quarterly.repository.QuarterlySeasonPlayerRepository;
 import com.texastoc.module.quarterly.repository.QuarterlySeasonRepository;
-import com.texastoc.module.quarterly.service.QuarterlySeasonService;
 import com.texastoc.module.season.repository.SeasonHistoryRepository;
 import com.texastoc.module.season.repository.SeasonPayoutRepository;
 import com.texastoc.module.season.repository.SeasonPlayerRepository;
@@ -29,17 +26,11 @@ public class SeasonServiceTest implements TestConstants {
   private SeasonPayoutRepository seasonPayoutRepository;
   @MockBean
   private SeasonHistoryRepository seasonHistoryRepository;
-  @MockBean
-  private QuarterlySeasonPlayerRepository qSeasonPlayerRepository;
-  @MockBean
-  private QuarterlySeasonPayoutRepository qSeasonPayoutRepository;
-  @MockBean
-  private QuarterlySeasonService qSeasonService;
 
   @Before
   public void before() {
     service = new SeasonService(seasonRepository, seasonPlayerRepository, seasonPayoutRepository,
-        seasonHistoryRepository, qSeasonService);
+        seasonHistoryRepository);
   }
 
 //  @Ignore

@@ -7,7 +7,8 @@ import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.game.GameModule;
 import com.texastoc.module.game.GameModuleFactory;
 import com.texastoc.module.game.model.Game;
-import com.texastoc.module.quarterly.service.QuarterlySeasonService;
+import com.texastoc.module.quarterly.QuarterlySeasonModule;
+import com.texastoc.module.quarterly.QuarterlySeasonModuleFactory;
 import com.texastoc.module.season.SeasonModule;
 import com.texastoc.module.season.exception.DuplicateSeasonException;
 import com.texastoc.module.season.exception.GameInProgressException;
@@ -49,21 +50,20 @@ public class SeasonService implements SeasonModule {
   private final SeasonPlayerRepository seasonPlayerRepository;
   private final SeasonPayoutRepository seasonPayoutRepository;
   private final SeasonHistoryRepository seasonHistoryRepository;
-  private final QuarterlySeasonService qSeasonService;
 
   private GameModule gameModule;
   private SettingsModule settingsModule;
+  private QuarterlySeasonModule quarterlySeasonModule;
   private String pastSeasonsAsJson = null;
 
   @Autowired
   public SeasonService(SeasonRepository seasonRepository,
       SeasonPlayerRepository seasonPlayerRepository, SeasonPayoutRepository seasonPayoutRepository,
-      SeasonHistoryRepository seasonHistoryRepository, QuarterlySeasonService qSeasonService) {
+      SeasonHistoryRepository seasonHistoryRepository) {
     this.seasonRepository = seasonRepository;
     this.seasonPlayerRepository = seasonPlayerRepository;
     this.seasonPayoutRepository = seasonPayoutRepository;
     this.seasonHistoryRepository = seasonHistoryRepository;
-    this.qSeasonService = qSeasonService;
   }
 
   @Override
@@ -122,7 +122,7 @@ public class SeasonService implements SeasonModule {
     int seasonId = seasonRepository.save(newSeason);
     newSeason.setId(seasonId);
 
-    qSeasonService.createQuarterlySeasons(seasonId, start, end);
+    getQuarterlySeasonModule().createQuarterlySeasons(seasonId, start, end);
 
     return newSeason;
   }
@@ -272,4 +272,10 @@ public class SeasonService implements SeasonModule {
     return settingsModule;
   }
 
+  private QuarterlySeasonModule getQuarterlySeasonModule() {
+    if (quarterlySeasonModule == null) {
+      quarterlySeasonModule = QuarterlySeasonModuleFactory.getQuarterlySeasonModule();
+    }
+    return quarterlySeasonModule;
+  }
 }
