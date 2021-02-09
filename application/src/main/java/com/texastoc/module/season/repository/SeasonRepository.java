@@ -1,6 +1,12 @@
 package com.texastoc.module.season.repository;
 
 import com.texastoc.module.season.model.Season;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -10,13 +16,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
 
 @Slf4j
 @Repository
@@ -30,9 +29,9 @@ public class SeasonRepository {
   }
 
   private static final String INSERT_SQL = "INSERT INTO season "
-    + " (startDate, endDate, finalized, numGames, numGamesPlayed, buyInCost, rebuyAddOnCost, rebuyAddOnTocDebit, tocPerGame, kittyPerGame, quarterlyTocPerGame, quarterlyTocPayouts) "
-    + " VALUES "
-    + " (:startDate, :endDate, :finalized, :numGames, :numGamesPlayed, :buyInCost, :rebuyAddOnCost, :rebuyAddOnTocDebit, :tocPerGame, :kittyPerGame, :quarterlyTocPerGame, :quarterlyTocPayouts)";
+      + " (startDate, endDate, finalized, numGames, numGamesPlayed, buyInCost, rebuyAddOnCost, rebuyAddOnTocDebit, tocPerGame, kittyPerGame, quarterlyTocPerGame, quarterlyTocPayouts) "
+      + " VALUES "
+      + " (:startDate, :endDate, :finalized, :numGames, :numGamesPlayed, :buyInCost, :rebuyAddOnCost, :rebuyAddOnTocDebit, :tocPerGame, :kittyPerGame, :quarterlyTocPerGame, :quarterlyTocPayouts)";
 
   public int save(Season season) {
     KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -45,7 +44,7 @@ public class SeasonRepository {
     params.addValue("numGamesPlayed", season.getNumGamesPlayed());
     params.addValue("buyInCost", season.getBuyInCost());
     params.addValue("rebuyAddOnCost", season.getRebuyAddOnCost());
-    params.addValue("rebuyAddOnTocDebit", season.getRebuyAddOnTocDebit());
+    params.addValue("rebuyAddOnTocDebit", season.getRebuyAddOnTocDebitCost());
     params.addValue("tocPerGame", season.getTocPerGame());
     params.addValue("kittyPerGame", season.getKittyPerGame());
     params.addValue("quarterlyTocPerGame", season.getQuarterlyTocPerGame());
@@ -59,15 +58,15 @@ public class SeasonRepository {
   }
 
   private static final String UPDATE_SQL = "UPDATE season set " +
-    "buyInCollected=:buyInCollected, rebuyAddOnCollected=:rebuyAddOnCollected, " +
-    "annualTocCollected=:annualTocCollected, totalCollected=:totalCollected, " +
-    "annualTocFromRebuyAddOnCalculated=:annualTocFromRebuyAddOnCalculated, " +
-    "rebuyAddOnLessAnnualTocCalculated=:rebuyAddOnLessAnnualTocCalculated, " +
-    "totalCombinedAnnualTocCalculated=:totalCombinedAnnualTocCalculated, " +
-    "kittyCalculated=:kittyCalculated, prizePotCalculated=:prizePotCalculated, " +
-    "numGamesPlayed=:numGamesPlayed, lastCalculated=:lastCalculated, " +
-    "finalized=:finalized " +
-    " where id=:id";
+      "buyInCollected=:buyInCollected, rebuyAddOnCollected=:rebuyAddOnCollected, " +
+      "annualTocCollected=:annualTocCollected, totalCollected=:totalCollected, " +
+      "annualTocFromRebuyAddOnCalculated=:annualTocFromRebuyAddOnCalculated, " +
+      "rebuyAddOnLessAnnualTocCalculated=:rebuyAddOnLessAnnualTocCalculated, " +
+      "totalCombinedAnnualTocCalculated=:totalCombinedAnnualTocCalculated, " +
+      "kittyCalculated=:kittyCalculated, prizePotCalculated=:prizePotCalculated, " +
+      "numGamesPlayed=:numGamesPlayed, lastCalculated=:lastCalculated, " +
+      "finalized=:finalized " +
+      " where id=:id";
 
   public void update(final Season season) {
 
@@ -76,9 +75,12 @@ public class SeasonRepository {
     params.addValue("rebuyAddOnCollected", season.getRebuyAddOnCollected());
     params.addValue("annualTocCollected", season.getAnnualTocCollected());
     params.addValue("totalCollected", season.getTotalCollected());
-    params.addValue("annualTocFromRebuyAddOnCalculated", season.getAnnualTocFromRebuyAddOnCalculated());
-    params.addValue("rebuyAddOnLessAnnualTocCalculated", season.getRebuyAddOnLessAnnualTocCalculated());
-    params.addValue("totalCombinedAnnualTocCalculated", season.getTotalCombinedAnnualTocCalculated());
+    params.addValue("annualTocFromRebuyAddOnCalculated",
+        season.getAnnualTocFromRebuyAddOnCalculated());
+    params.addValue("rebuyAddOnLessAnnualTocCalculated",
+        season.getRebuyAddOnLessAnnualTocCalculated());
+    params
+        .addValue("totalCombinedAnnualTocCalculated", season.getTotalCombinedAnnualTocCalculated());
     params.addValue("kittyCalculated", season.getKittyCalculated());
     params.addValue("prizePotCalculated", season.getPrizePotCalculated());
     params.addValue("numGamesPlayed", season.getNumGamesPlayed());
@@ -95,7 +97,7 @@ public class SeasonRepository {
 
     try {
       return jdbcTemplate
-        .queryForObject("select * from season where id = :id", params, new SeasonMapper());
+          .queryForObject("select * from season where id = :id", params, new SeasonMapper());
     } catch (Exception e) {
       return null;
     }
@@ -116,7 +118,8 @@ public class SeasonRepository {
 
     try {
       return jdbcTemplate
-        .queryForObject("select lastCalculated from season where id = :id", params, LocalDateTime.class);
+          .queryForObject("select lastCalculated from season where id = :id", params,
+              LocalDateTime.class);
     } catch (Exception e) {
       return null;
     }
@@ -136,16 +139,17 @@ public class SeasonRepository {
   public List<Season> getUnfinalized() {
     MapSqlParameterSource params = new MapSqlParameterSource();
     return jdbcTemplate
-      .query("select * from season where finalized = false", params, new SeasonMapper());
+        .query("select * from season where finalized = false", params, new SeasonMapper());
   }
 
   public List<Season> getMostRecent() {
     MapSqlParameterSource params = new MapSqlParameterSource();
     return jdbcTemplate
-      .query("select * from season order by startDate desc limit 1", params, new SeasonMapper());
+        .query("select * from season order by startDate desc limit 1", params, new SeasonMapper());
   }
 
   private static final class SeasonMapper implements RowMapper<Season> {
+
     @Override
     public Season mapRow(ResultSet rs, int rowNum) {
       Season season = new Season();
@@ -158,7 +162,7 @@ public class SeasonRepository {
         season.setNumGamesPlayed(rs.getInt("numGamesPlayed"));
         season.setBuyInCost(rs.getInt("buyInCost"));
         season.setRebuyAddOnCost(rs.getInt("rebuyAddOnCost"));
-        season.setRebuyAddOnTocDebit(rs.getInt("rebuyAddOnTocDebit"));
+        season.setRebuyAddOnTocDebitCost(rs.getInt("rebuyAddOnTocDebit"));
         season.setTocPerGame(rs.getInt("tocPerGame"));
         season.setKittyPerGame(rs.getInt("kittyPerGame"));
         season.setQuarterlyTocPerGame(rs.getInt("quarterlyTocPerGame"));

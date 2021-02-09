@@ -277,7 +277,7 @@ public class TestUtils implements TestConstants {
     Assert.assertEquals(QUARTERLY_NUM_PAYOUTS, (int) actual.getQuarterlyNumPayouts());
     Assert.assertEquals(GAME_BUY_IN, (int) actual.getBuyInCost());
     Assert.assertEquals(GAME_REBUY, (int) actual.getRebuyAddOnCost());
-    Assert.assertEquals(GAME_REBUY_TOC_DEBIT, (int) actual.getRebuyAddOnTocDebit());
+    Assert.assertEquals(GAME_REBUY_TOC_DEBIT, (int) actual.getRebuyAddOnTocDebitCost());
 
     Assert.assertTrue(actual.getNumGames() == 52 || actual.getNumGames() == 53);
     Assert.assertTrue(actual.getNumGamesPlayed() == 0);

@@ -115,13 +115,14 @@ public class SeasonService implements SeasonModule {
         .quarterlyNumPayouts(tocConfig.getQuarterlyNumPayouts())
         .buyInCost(tocConfig.getRegularBuyInCost())
         .rebuyAddOnCost(tocConfig.getRegularRebuyCost())
-        .rebuyAddOnTocDebit(tocConfig.getRegularRebuyTocDebit())
+        .rebuyAddOnTocDebitCost(tocConfig.getRegularRebuyTocDebit())
         .numGames(numThursdays)
         .build();
 
     int seasonId = seasonRepository.save(newSeason);
     newSeason.setId(seasonId);
 
+    // TODO message instead
     getQuarterlySeasonModule().createQuarterlySeasons(seasonId, start, end);
 
     return newSeason;

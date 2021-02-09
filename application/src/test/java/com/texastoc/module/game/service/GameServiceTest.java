@@ -72,7 +72,7 @@ public class GameServiceTest implements TestConstants {
             .quarterlyNumPayouts(QUARTERLY_NUM_PAYOUTS)
             .buyInCost(GAME_BUY_IN)
             .rebuyAddOnCost(GAME_REBUY)
-            .rebuyAddOnTocDebit(GAME_REBUY_TOC_DEBIT)
+            .rebuyAddOnTocDebitCost(GAME_REBUY_TOC_DEBIT)
             .numGamesPlayed(20)
             .build());
 

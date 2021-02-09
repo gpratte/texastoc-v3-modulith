@@ -59,14 +59,14 @@ public class GameService {
     game.setKittyCost(currentSeason.getKittyPerGame());
     game.setBuyInCost(currentSeason.getBuyInCost());
     game.setRebuyAddOnCost(currentSeason.getRebuyAddOnCost());
-    game.setRebuyAddOnTocDebitCost(currentSeason.getRebuyAddOnTocDebit());
+    game.setRebuyAddOnTocDebitCost(currentSeason.getRebuyAddOnTocDebitCost());
     game.setAnnualTocCost(currentSeason.getTocPerGame());
     game.setQuarterlyTocCost(currentSeason.getQuarterlyTocPerGame());
     game.setSeasonGameNum(currentSeason.getNumGamesPlayed() + 1);
 
     game.setBuyInCost(currentSeason.getBuyInCost());
     game.setRebuyAddOnCost(currentSeason.getRebuyAddOnCost());
-    game.setRebuyAddOnTocDebitCost(currentSeason.getRebuyAddOnTocDebit());
+    game.setRebuyAddOnTocDebitCost(currentSeason.getRebuyAddOnTocDebitCost());
 
     QuarterlySeason currentQSeason = getQuarterlySeasonModule()
         .getQuarterlySeasonByDate(game.getDate());

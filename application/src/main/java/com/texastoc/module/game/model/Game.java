@@ -22,7 +22,7 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Game {
 
-  // Read-only id set when game is created
+  // Read-only id set when created
   @Id
   private int id;
 
@@ -42,7 +42,7 @@ public class Game {
   private int seasonGameNum;
   private int quarterlyGameNum;
 
-  // Game setup variables. End with "Cost" or "Debit"
+  // Setup variables. End with "Cost"
   // Read-only fields set by the server
   private int kittyCost;
   private int buyInCost;
