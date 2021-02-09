@@ -16,8 +16,6 @@ import com.texastoc.module.season.exception.SeasonInProgressException;
 import com.texastoc.module.season.model.HistoricalSeason;
 import com.texastoc.module.season.model.Season;
 import com.texastoc.module.season.repository.SeasonHistoryRepository;
-import com.texastoc.module.season.repository.SeasonPayoutRepository;
-import com.texastoc.module.season.repository.SeasonPlayerRepository;
 import com.texastoc.module.season.repository.SeasonRepository;
 import com.texastoc.module.settings.SettingsModule;
 import com.texastoc.module.settings.SettingsModuleFactory;
@@ -33,7 +31,9 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -47,8 +47,6 @@ public class SeasonService implements SeasonModule {
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   private final SeasonRepository seasonRepository;
-  private final SeasonPlayerRepository seasonPlayerRepository;
-  private final SeasonPayoutRepository seasonPayoutRepository;
   private final SeasonHistoryRepository seasonHistoryRepository;
 
   private GameModule gameModule;
@@ -58,11 +56,8 @@ public class SeasonService implements SeasonModule {
 
   @Autowired
   public SeasonService(SeasonRepository seasonRepository,
-      SeasonPlayerRepository seasonPlayerRepository, SeasonPayoutRepository seasonPayoutRepository,
       SeasonHistoryRepository seasonHistoryRepository) {
     this.seasonRepository = seasonRepository;
-    this.seasonPlayerRepository = seasonPlayerRepository;
-    this.seasonPayoutRepository = seasonPayoutRepository;
     this.seasonHistoryRepository = seasonHistoryRepository;
   }
 
@@ -119,29 +114,30 @@ public class SeasonService implements SeasonModule {
         .numGames(numThursdays)
         .build();
 
-    int seasonId = seasonRepository.save(newSeason);
-    newSeason.setId(seasonId);
+    Season season = seasonRepository.save(newSeason);
 
     // TODO message instead
-    getQuarterlySeasonModule().createQuarterlySeasons(seasonId, start, end);
+    getQuarterlySeasonModule().createQuarterlySeasons(season.getId(), start, end);
 
-    return newSeason;
+    return season;
   }
 
   //  @Cacheable("currentSeasonById")
   @Override
   @Transactional(readOnly = true)
   public Season getSeason(int id) {
-    Season season = seasonRepository.get(id);
-    season.setPlayers(seasonPlayerRepository.getBySeasonId(id));
-    season.setPayouts(seasonPayoutRepository.getBySeasonId(id));
-    season.setEstimatedPayouts(seasonPayoutRepository.getEstimatedBySeasonId(id));
-    return season;
+    Optional<Season> optionalSeason = seasonRepository.findById(id);
+    if (!optionalSeason.isPresent()) {
+      throw new NotFoundException("Season with id " + id + " not found");
+    }
+    return optionalSeason.get();
+
   }
 
   @Transactional(readOnly = true)
   public List<Season> getSeasons() {
-    return seasonRepository.getAll();
+    return StreamSupport.stream(seasonRepository.findAll().spliterator(), false)
+        .collect(Collectors.toList());
   }
 
   @Override
