@@ -1,14 +1,14 @@
 package com.texastoc.service;
 
 import com.texastoc.TestConstants;
-import com.texastoc.module.season.repository.QuarterlySeasonPayoutRepository;
-import com.texastoc.module.season.repository.QuarterlySeasonPlayerRepository;
-import com.texastoc.module.season.repository.QuarterlySeasonRepository;
+import com.texastoc.module.quarterly.repository.QuarterlySeasonPayoutRepository;
+import com.texastoc.module.quarterly.repository.QuarterlySeasonPlayerRepository;
+import com.texastoc.module.quarterly.repository.QuarterlySeasonRepository;
+import com.texastoc.module.quarterly.service.QuarterlySeasonService;
 import com.texastoc.module.season.repository.SeasonHistoryRepository;
 import com.texastoc.module.season.repository.SeasonPayoutRepository;
 import com.texastoc.module.season.repository.SeasonPlayerRepository;
 import com.texastoc.module.season.repository.SeasonRepository;
-import com.texastoc.module.season.service.QuarterlySeasonService;
 import com.texastoc.module.season.service.SeasonService;
 import org.junit.Before;
 import org.junit.Ignore;

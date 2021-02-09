@@ -1,12 +1,12 @@
-package com.texastoc.module.season.service;
+package com.texastoc.module.quarterly.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.texastoc.module.season.QuarterlySeasonModule;
-import com.texastoc.module.season.model.Quarter;
-import com.texastoc.module.season.model.QuarterlySeason;
-import com.texastoc.module.season.repository.QuarterlySeasonPayoutRepository;
-import com.texastoc.module.season.repository.QuarterlySeasonPlayerRepository;
-import com.texastoc.module.season.repository.QuarterlySeasonRepository;
+import com.texastoc.module.quarterly.QuarterlySeasonModule;
+import com.texastoc.module.quarterly.model.Quarter;
+import com.texastoc.module.quarterly.model.QuarterlySeason;
+import com.texastoc.module.quarterly.repository.QuarterlySeasonPayoutRepository;
+import com.texastoc.module.quarterly.repository.QuarterlySeasonPlayerRepository;
+import com.texastoc.module.quarterly.repository.QuarterlySeasonRepository;
 import com.texastoc.module.settings.SettingsModule;
 import com.texastoc.module.settings.SettingsModuleFactory;
 import com.texastoc.module.settings.model.Settings;

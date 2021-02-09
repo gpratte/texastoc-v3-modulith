@@ -1,4 +1,4 @@
-package com.texastoc.module.season.model;
+package com.texastoc.module.quarterly.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

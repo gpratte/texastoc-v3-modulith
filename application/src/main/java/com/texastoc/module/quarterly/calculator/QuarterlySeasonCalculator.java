@@ -1,22 +1,21 @@
-package com.texastoc.module.season.calculator;
+package com.texastoc.module.quarterly.calculator;
 
 import com.texastoc.module.game.GameModule;
 import com.texastoc.module.game.GameModuleFactory;
 import com.texastoc.module.game.model.Game;
-import com.texastoc.module.season.model.QuarterlySeason;
-import com.texastoc.module.season.model.QuarterlySeasonPayout;
-import com.texastoc.module.season.model.QuarterlySeasonPlayer;
-import com.texastoc.module.season.repository.QuarterlySeasonPayoutRepository;
-import com.texastoc.module.season.repository.QuarterlySeasonPlayerRepository;
-import com.texastoc.module.season.repository.QuarterlySeasonRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
+import com.texastoc.module.quarterly.model.QuarterlySeason;
+import com.texastoc.module.quarterly.model.QuarterlySeasonPayout;
+import com.texastoc.module.quarterly.model.QuarterlySeasonPlayer;
+import com.texastoc.module.quarterly.repository.QuarterlySeasonPayoutRepository;
+import com.texastoc.module.quarterly.repository.QuarterlySeasonPlayerRepository;
+import com.texastoc.module.quarterly.repository.QuarterlySeasonRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
@@ -28,7 +27,9 @@ public class QuarterlySeasonCalculator {
 
   private GameModule gameModule;
 
-  public QuarterlySeasonCalculator(QuarterlySeasonRepository qSeasonRepository, QuarterlySeasonPlayerRepository qSeasonPlayerRepository, QuarterlySeasonPayoutRepository qSeasonPayoutRepository) {
+  public QuarterlySeasonCalculator(QuarterlySeasonRepository qSeasonRepository,
+      QuarterlySeasonPlayerRepository qSeasonPlayerRepository,
+      QuarterlySeasonPayoutRepository qSeasonPayoutRepository) {
     this.qSeasonRepository = qSeasonRepository;
     this.qSeasonPlayerRepository = qSeasonPlayerRepository;
     this.qSeasonPayoutRepository = qSeasonPayoutRepository;
@@ -52,7 +53,6 @@ public class QuarterlySeasonCalculator {
     // Persist quarterly season
     qSeasonRepository.update(qSeason);
 
-
     // Calculate quarterly season players
     List<QuarterlySeasonPlayer> players = calculatePlayers(qSeason.getSeasonId(), id);
     qSeason.setPlayers(players);
@@ -64,7 +64,8 @@ public class QuarterlySeasonCalculator {
     }
 
     // Calculate quarterly season payouts
-    List<QuarterlySeasonPayout> payouts = calculatePayouts(qTocCollected, qSeason.getSeasonId(), id);
+    List<QuarterlySeasonPayout> payouts = calculatePayouts(qTocCollected, qSeason.getSeasonId(),
+        id);
     qSeason.setPayouts(payouts);
 
     // Persist quarterly season payouts
@@ -139,23 +140,23 @@ public class QuarterlySeasonCalculator {
     int thirdPlace = pot - firstPlace - secondPlace;
 
     payouts.add(QuarterlySeasonPayout.builder()
-      .seasonId(seasonId)
-      .qSeasonId(qSeasonId)
-      .place(1)
-      .amount(firstPlace)
-      .build());
+        .seasonId(seasonId)
+        .qSeasonId(qSeasonId)
+        .place(1)
+        .amount(firstPlace)
+        .build());
     payouts.add(QuarterlySeasonPayout.builder()
-      .seasonId(seasonId)
-      .qSeasonId(qSeasonId)
-      .place(2)
-      .amount(secondPlace)
-      .build());
+        .seasonId(seasonId)
+        .qSeasonId(qSeasonId)
+        .place(2)
+        .amount(secondPlace)
+        .build());
     payouts.add(QuarterlySeasonPayout.builder()
-      .seasonId(seasonId)
-      .qSeasonId(qSeasonId)
-      .place(3)
-      .amount(thirdPlace)
-      .build());
+        .seasonId(seasonId)
+        .qSeasonId(qSeasonId)
+        .place(3)
+        .amount(thirdPlace)
+        .build());
 
     return payouts;
   }

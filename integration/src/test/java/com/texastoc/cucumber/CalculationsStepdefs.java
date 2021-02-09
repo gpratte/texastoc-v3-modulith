@@ -4,7 +4,7 @@ import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePayout;
 import com.texastoc.module.game.model.GamePlayer;
-import com.texastoc.module.season.model.QuarterlySeasonPlayer;
+import com.texastoc.module.quarterly.model.QuarterlySeasonPlayer;
 import com.texastoc.module.season.model.Season;
 import com.texastoc.module.season.model.SeasonPlayer;
 import io.cucumber.java.en.And;

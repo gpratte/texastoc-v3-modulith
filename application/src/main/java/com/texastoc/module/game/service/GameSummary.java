@@ -5,7 +5,7 @@ import com.texastoc.module.notification.NotificationModule;
 import com.texastoc.module.notification.NotificationModuleFactory;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
-import com.texastoc.module.season.model.QuarterlySeason;
+import com.texastoc.module.quarterly.model.QuarterlySeason;
 import com.texastoc.module.season.model.Season;
 import java.io.StringWriter;
 import java.util.LinkedList;

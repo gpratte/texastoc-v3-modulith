@@ -1,6 +1,6 @@
-package com.texastoc.module.season;
+package com.texastoc.module.quarterly;
 
-import com.texastoc.module.season.service.QuarterlySeasonService;
+import com.texastoc.module.quarterly.service.QuarterlySeasonService;
 import org.springframework.stereotype.Component;
 
 @Component

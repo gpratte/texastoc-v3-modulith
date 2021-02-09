@@ -1,7 +1,12 @@
 package com.texastoc.module.game.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.texastoc.module.season.model.Quarter;
+import com.texastoc.module.quarterly.model.Quarter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,18 +15,13 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Game {
+
   // Read-only id set when game is created
   @Id
   private int id;
