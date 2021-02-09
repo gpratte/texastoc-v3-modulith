@@ -1,7 +1,6 @@
 package com.texastoc.service;
 
 import com.texastoc.TestConstants;
-import com.texastoc.module.season.SeasonService;
 import com.texastoc.module.season.repository.QuarterlySeasonPayoutRepository;
 import com.texastoc.module.season.repository.QuarterlySeasonPlayerRepository;
 import com.texastoc.module.season.repository.QuarterlySeasonRepository;
@@ -9,14 +8,13 @@ import com.texastoc.module.season.repository.SeasonHistoryRepository;
 import com.texastoc.module.season.repository.SeasonPayoutRepository;
 import com.texastoc.module.season.repository.SeasonPlayerRepository;
 import com.texastoc.module.season.repository.SeasonRepository;
+import com.texastoc.module.season.service.QuarterlySeasonService;
+import com.texastoc.module.season.service.SeasonService;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.runner.RunWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
 
 @Ignore
-@RunWith(SpringRunner.class)
 public class SeasonServiceTest implements TestConstants {
 
   private SeasonService service;
@@ -35,10 +33,13 @@ public class SeasonServiceTest implements TestConstants {
   private QuarterlySeasonPlayerRepository qSeasonPlayerRepository;
   @MockBean
   private QuarterlySeasonPayoutRepository qSeasonPayoutRepository;
+  @MockBean
+  private QuarterlySeasonService qSeasonService;
 
   @Before
   public void before() {
-    service = new SeasonService(seasonRepository, qSeasonRepository, seasonPlayerRepository, seasonPayoutRepository, seasonHistoryRepository, qSeasonPlayerRepository, qSeasonPayoutRepository);
+    service = new SeasonService(seasonRepository, seasonPlayerRepository, seasonPayoutRepository,
+        seasonHistoryRepository, qSeasonService);
   }
 
 //  @Ignore

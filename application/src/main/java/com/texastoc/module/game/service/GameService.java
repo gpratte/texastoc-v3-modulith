@@ -6,17 +6,18 @@ import com.texastoc.module.game.repository.GameRepository;
 import com.texastoc.module.player.PlayerModule;
 import com.texastoc.module.player.PlayerModuleFactory;
 import com.texastoc.module.player.model.Player;
+import com.texastoc.module.season.QuarterlySeasonModule;
+import com.texastoc.module.season.QuarterlySeasonModuleFactory;
 import com.texastoc.module.season.SeasonModule;
 import com.texastoc.module.season.SeasonModuleFactory;
 import com.texastoc.module.season.model.QuarterlySeason;
 import com.texastoc.module.season.model.Season;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -27,6 +28,7 @@ public class GameService {
 
   private PlayerModule playerModule;
   private SeasonModule seasonModule;
+  private QuarterlySeasonModule quarterlySeasonModule;
 
   public GameService(GameRepository gameRepository, GameHelper gameHelper) {
     this.gameRepository = gameRepository;
@@ -66,7 +68,8 @@ public class GameService {
     game.setRebuyAddOnCost(currentSeason.getRebuyAddOnCost());
     game.setRebuyAddOnTocDebitCost(currentSeason.getRebuyAddOnTocDebit());
 
-    QuarterlySeason currentQSeason = getSeasonModule().getQuarterlySeasonByDate(game.getDate());
+    QuarterlySeason currentQSeason = getQuarterlySeasonModule()
+        .getQuarterlySeasonByDate(game.getDate());
     game.setQSeasonId(currentQSeason.getId());
     game.setQuarter(currentQSeason.getQuarter());
     game.setQuarterlyGameNum(currentQSeason.getNumGamesPlayed() + 1);
@@ -120,7 +123,8 @@ public class GameService {
     return gameRepository.findByQuarterlySeasonId(qSeasonId);
   }
 
-  @CacheEvict(value = {"currentGame", "currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
+  @CacheEvict(value = {"currentGame", "currentSeason",
+      "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   @Transactional
   public void finalize(int id) {
     // TODO check that the game has the appropriate finishes (e.g. 1st, 2nd, ...)
@@ -142,7 +146,8 @@ public class GameService {
     gameHelper.sendGameSummary(id);
   }
 
-  @CacheEvict(value = {"currentGame", "currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
+  @CacheEvict(value = {"currentGame", "currentSeason",
+      "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   public void unfinalize(int id) {
     // TODO admin only
     Game gameToOpen = get(id);
@@ -151,7 +156,7 @@ public class GameService {
       return;
     }
 
-    Season season = getSeasonModule().getSeasonById(gameToOpen.getSeasonId());
+    Season season = getSeasonModule().getSeason(gameToOpen.getSeasonId());
     if (season.isFinalized()) {
       // TODO throw a unique exception and handle in controller
       throw new RuntimeException("Cannot open a game when season is finalized");
@@ -187,4 +192,10 @@ public class GameService {
     return seasonModule;
   }
 
+  private QuarterlySeasonModule getQuarterlySeasonModule() {
+    if (quarterlySeasonModule == null) {
+      quarterlySeasonModule = QuarterlySeasonModuleFactory.getQuarterlySeasonModule();
+    }
+    return quarterlySeasonModule;
+  }
 }

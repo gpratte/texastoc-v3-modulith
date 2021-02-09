@@ -1,5 +1,6 @@
 package com.texastoc.module.season;
 
+import com.texastoc.module.season.service.SeasonService;
 import org.springframework.stereotype.Component;
 
 @Component

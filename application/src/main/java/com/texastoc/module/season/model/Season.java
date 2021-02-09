@@ -1,6 +1,5 @@
 package com.texastoc.module.season.model;
 
-import com.texastoc.module.game.model.Game;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Season {
-
   private int id;
   private LocalDate start;
   private LocalDate end;
@@ -53,14 +51,11 @@ public class Season {
 
   // Other runtime variables
   private int numGames;
-  private int numGamesPlayed;
+  private Integer numGamesPlayed;
   private LocalDateTime lastCalculated;
   private boolean finalized;
 
   private List<SeasonPlayer> players;
   private List<SeasonPayout> payouts;
   private List<SeasonPayout> estimatedPayouts;
-  private List<QuarterlySeason> quarterlySeasons;
-  private List<Game> games;
-
 }

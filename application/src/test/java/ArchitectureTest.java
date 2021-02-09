@@ -61,6 +61,23 @@ public class ArchitectureTest {
       .check(importedClasses);
   }
 
+  /**
+   * Make sure the non-season modules (player, settings, notification and game) do not access any classes in the following packages
+   * <ul>
+   *   <li>season.calculator</li>
+   *   <li>season.exception</li>
+   *   <li>season.repository</li>
+   *   <li>season.service</li>
+   * </ul>
+   */
+  @Test
+  public void seasonModuleInterfaceAndModel() {
+    JavaClasses importedClasses = new ClassFileImporter().importPackages("com.texastoc.module");
+    noClasses().that().resideInAnyPackage("..player..", "..settings..", "..notification..", "..game..")
+      .should().dependOnClassesThat().resideInAnyPackage("..season.calculator..", "..season.exception..", "..season.repository..", "..season.service..")
+      .check(importedClasses);
+  }
+
   @Test
   public void notificationModuleInterfaceAndModel() {
     JavaClasses importedClasses = new ClassFileImporter().importPackages("com.texastoc.module");
