@@ -63,7 +63,7 @@ public class GameServiceTest implements TestConstants {
   public void testCreateGame() {
     // Arrange
     // Current season
-    when(seasonModule.getCurrentSeason())
+    when(seasonModule.getCurrent())
         .thenReturn(Season.builder()
             .id(16)
             .kittyPerGame(KITTY_PER_GAME)
@@ -172,7 +172,7 @@ public class GameServiceTest implements TestConstants {
   public void testCannotCreateGame() {
     // Arrange
     // Current season
-    when(seasonModule.getCurrentSeason())
+    when(seasonModule.getCurrent())
         .thenReturn(Season.builder()
             .id(16)
             .build());
@@ -343,7 +343,7 @@ public class GameServiceTest implements TestConstants {
         .build();
     Mockito.when(gameHelper.get(1)).thenReturn(gameToUnfinalize);
 
-    when(seasonModule.getSeason(16))
+    when(seasonModule.get(16))
         .thenReturn(Season.builder()
             .id(16)
             .finalized(false)
@@ -395,7 +395,7 @@ public class GameServiceTest implements TestConstants {
             .build());
 
     // Cannot unfinalize because the season is finalized
-    when(seasonModule.getSeason(16))
+    when(seasonModule.get(16))
         .thenReturn(Season.builder()
             .id(16)
             .finalized(true)
@@ -418,7 +418,7 @@ public class GameServiceTest implements TestConstants {
             .finalized(true)
             .build());
 
-    when(seasonModule.getSeason(16))
+    when(seasonModule.get(16))
         .thenReturn(Season.builder()
             .id(16)
             .finalized(false)

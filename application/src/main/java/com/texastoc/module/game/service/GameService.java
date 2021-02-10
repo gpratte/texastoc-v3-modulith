@@ -39,7 +39,7 @@ public class GameService {
   @Transactional
   public Game create(Game game) {
     // TODO bean validation https://www.baeldung.com/javax-validation
-    Season currentSeason = getSeasonModule().getCurrentSeason();
+    Season currentSeason = getSeasonModule().getCurrent();
 
     // TODO check that date is allowed - not before an existing game and not beyond the season.
 
@@ -156,7 +156,7 @@ public class GameService {
       return;
     }
 
-    Season season = getSeasonModule().getSeason(gameToOpen.getSeasonId());
+    Season season = getSeasonModule().get(gameToOpen.getSeasonId());
     if (season.isFinalized()) {
       // TODO throw a unique exception and handle in controller
       throw new RuntimeException("Cannot open a game when season is finalized");

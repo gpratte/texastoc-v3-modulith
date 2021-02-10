@@ -101,7 +101,7 @@ public class GameHelper {
 
   public void sendGameSummary(int id) {
     Game game = get(id);
-    Season season = getSeasonModule().getSeason(game.getSeasonId());
+    Season season = getSeasonModule().get(game.getSeasonId());
     List<Player> players = getPlayerModule().getAll();
     List<QuarterlySeason> quarterlySeasons = getQuarterlySeasonModule()
         .getQuarterlySeasonBySeason(season.getId());

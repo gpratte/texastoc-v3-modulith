@@ -4,7 +4,11 @@ import com.texastoc.module.season.exception.GameInProgressException;
 import com.texastoc.module.season.exception.SeasonInProgressException;
 import com.texastoc.module.season.model.HistoricalSeason;
 import com.texastoc.module.season.model.Season;
+import com.texastoc.module.season.service.HistoricalSeasonService;
 import com.texastoc.module.season.service.SeasonService;
+import java.io.IOException;
+import java.util.List;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,18 +20,17 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
-
 @RestController
 public class SeasonRestController {
 
   private final SeasonService seasonService;
+  private final HistoricalSeasonService historicalSeasonService;
 
   @Autowired
-  public SeasonRestController(SeasonService seasonService) {
+  public SeasonRestController(SeasonService seasonService,
+      HistoricalSeasonService historicalSeasonService) {
     this.seasonService = seasonService;
+    this.historicalSeasonService = historicalSeasonService;
   }
 
   @PreAuthorize("hasRole('ADMIN')")
@@ -38,18 +41,18 @@ public class SeasonRestController {
 
   @GetMapping("/api/v2/seasons/{id}")
   public Season getSeason(@PathVariable("id") int id) {
-    return seasonService.getSeason(id);
+    return seasonService.get(id);
   }
 
   @GetMapping("/api/v2/seasons")
   public List<Season> getSeasons() {
-    return seasonService.getSeasons();
+    return seasonService.getAll();
   }
 
   @GetMapping("/api/v2/seasons/current")
   public Season getCurrentSeason() {
-    int id = seasonService.getCurrentSeason().getId();
-    return seasonService.getSeason(id);
+    int id = seasonService.getCurrent().getId();
+    return seasonService.get(id);
   }
 
   @PreAuthorize("hasRole('ADMIN')")
@@ -66,20 +69,23 @@ public class SeasonRestController {
 
   @GetMapping("/api/v2/seasons/history")
   public List<HistoricalSeason> getPastSeasons() {
-    return seasonService.getPastSeasons();
+    return historicalSeasonService.getPastSeasons();
   }
 
   @ExceptionHandler(value = {GameInProgressException.class})
-  protected void handleGameInProgressException(GameInProgressException ex, HttpServletResponse response) throws IOException {
+  protected void handleGameInProgressException(GameInProgressException ex,
+      HttpServletResponse response) throws IOException {
     response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
   }
 
   @ExceptionHandler(value = {SeasonInProgressException.class})
-  protected void handleSeasonInProgressException(SeasonInProgressException ex, HttpServletResponse response) throws IOException {
+  protected void handleSeasonInProgressException(SeasonInProgressException ex,
+      HttpServletResponse response) throws IOException {
     response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
   }
 
   private static class SeasonStart {
+
     private int startYear;
 
     public int getStartYear() {
