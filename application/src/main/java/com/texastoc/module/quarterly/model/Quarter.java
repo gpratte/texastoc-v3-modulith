@@ -1,4 +1,4 @@
-package com.texastoc.module.season.model;
+package com.texastoc.module.quarterly.model;
 
 public enum Quarter {
   FIRST(1, "1st"), SECOND(2, "2nd"), THIRD(3, "3rd"), FOURTH(4, "4th");

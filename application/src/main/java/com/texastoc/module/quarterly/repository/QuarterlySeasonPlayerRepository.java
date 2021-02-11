@@ -1,6 +1,10 @@
-package com.texastoc.module.season.repository;
+package com.texastoc.module.quarterly.repository;
 
-import com.texastoc.module.season.model.QuarterlySeasonPlayer;
+import com.texastoc.module.quarterly.model.QuarterlySeasonPlayer;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -9,11 +13,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
 
 @Slf4j
 @Repository
@@ -30,11 +29,11 @@ public class QuarterlySeasonPlayerRepository {
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("qSeasonId", qSeasonId);
     List<QuarterlySeasonPlayer> qSeasonPlayers = jdbcTemplate
-      .query("select * from quarterlyseasonplayer"
-          + " where qSeasonId = :qSeasonId"
-          + " order by name",
-        params,
-        new QuarterlySeasonPlayerMapper());
+        .query("select * from quarterlyseasonplayer"
+                + " where qSeasonId = :qSeasonId"
+                + " order by name",
+            params,
+            new QuarterlySeasonPlayerMapper());
     Collections.sort(qSeasonPlayers);
     return qSeasonPlayers;
   }
@@ -44,14 +43,14 @@ public class QuarterlySeasonPlayerRepository {
     params.addValue("qSeasonId", qSeasonId);
 
     jdbcTemplate
-      .update("delete from quarterlyseasonplayer where qSeasonId = :qSeasonId", params);
+        .update("delete from quarterlyseasonplayer where qSeasonId = :qSeasonId", params);
   }
 
   private static final String INSERT_SQL =
-    "INSERT INTO quarterlyseasonplayer "
-      + "(playerId, seasonId, qSeasonId, name, entries, points, place) "
-      + " VALUES "
-      + " (:playerId, :seasonId, :qSeasonId, :name, :entries, :points, :place)";
+      "INSERT INTO quarterlyseasonplayer "
+          + "(playerId, seasonId, qSeasonId, name, entries, points, place) "
+          + " VALUES "
+          + " (:playerId, :seasonId, :qSeasonId, :name, :entries, :points, :place)";
 
   @SuppressWarnings("Duplicates")
   public int save(QuarterlySeasonPlayer qSeasonPlayer) {
@@ -71,7 +70,9 @@ public class QuarterlySeasonPlayerRepository {
     return keyHolder.getKey().intValue();
   }
 
-  private static final class QuarterlySeasonPlayerMapper implements RowMapper<QuarterlySeasonPlayer> {
+  private static final class QuarterlySeasonPlayerMapper implements
+      RowMapper<QuarterlySeasonPlayer> {
+
     @SuppressWarnings("Duplicates")
     public QuarterlySeasonPlayer mapRow(ResultSet rs, int rowNum) {
       QuarterlySeasonPlayer qSeasonPlayer = new QuarterlySeasonPlayer();

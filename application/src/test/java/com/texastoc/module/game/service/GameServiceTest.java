@@ -1,28 +1,5 @@
 package com.texastoc.module.game.service;
 
-import com.google.common.collect.ImmutableList;
-import com.texastoc.TestConstants;
-import com.texastoc.module.game.exception.GameInProgressException;
-import com.texastoc.module.game.model.Game;
-import com.texastoc.module.game.repository.GameRepository;
-import com.texastoc.module.player.PlayerModule;
-import com.texastoc.module.player.model.Player;
-import com.texastoc.module.season.SeasonModule;
-import com.texastoc.module.season.model.Quarter;
-import com.texastoc.module.season.model.QuarterlySeason;
-import com.texastoc.module.season.model.Season;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
-
-import java.time.LocalDate;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -35,7 +12,27 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
+import com.google.common.collect.ImmutableList;
+import com.texastoc.TestConstants;
+import com.texastoc.module.game.exception.GameInProgressException;
+import com.texastoc.module.game.model.Game;
+import com.texastoc.module.game.repository.GameRepository;
+import com.texastoc.module.player.PlayerModule;
+import com.texastoc.module.player.model.Player;
+import com.texastoc.module.quarterly.QuarterlySeasonModule;
+import com.texastoc.module.quarterly.model.Quarter;
+import com.texastoc.module.quarterly.model.QuarterlySeason;
+import com.texastoc.module.season.SeasonModule;
+import com.texastoc.module.season.model.Season;
+import java.time.LocalDate;
+import java.util.List;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.springframework.test.util.ReflectionTestUtils;
+
 public class GameServiceTest implements TestConstants {
 
   private GameService gameService;
@@ -45,6 +42,7 @@ public class GameServiceTest implements TestConstants {
 
   private PlayerModule playerModule;
   private SeasonModule seasonModule;
+  private QuarterlySeasonModule quarterlySeasonModule;
 
   @Before
   public void init() {
@@ -52,6 +50,7 @@ public class GameServiceTest implements TestConstants {
     gameHelper = mock(GameHelper.class);
     playerModule = mock(PlayerModule.class);
     seasonModule = mock(SeasonModule.class);
+    quarterlySeasonModule = mock(QuarterlySeasonModule.class);
     gameService = new GameService(gameRepository, gameHelper);
     ReflectionTestUtils.setField(gameService, "playerModule", playerModule);
     ReflectionTestUtils.setField(gameService, "seasonModule", seasonModule);
@@ -61,48 +60,48 @@ public class GameServiceTest implements TestConstants {
   public void testCreateGame() {
     // Arrange
     // Current season
-    when(seasonModule.getCurrentSeason())
-      .thenReturn(Season.builder()
-        .id(16)
-        .kittyPerGame(KITTY_PER_GAME)
-        .tocPerGame(TOC_PER_GAME)
-        .quarterlyTocPerGame(QUARTERLY_TOC_PER_GAME)
-        .quarterlyNumPayouts(QUARTERLY_NUM_PAYOUTS)
-        .buyInCost(GAME_BUY_IN)
-        .rebuyAddOnCost(GAME_REBUY)
-        .rebuyAddOnTocDebit(GAME_REBUY_TOC_DEBIT)
-        .numGamesPlayed(20)
-        .build());
+    when(seasonModule.getCurrent())
+        .thenReturn(Season.builder()
+            .id(16)
+            .kittyPerGame(KITTY_PER_GAME)
+            .tocPerGame(TOC_PER_GAME)
+            .quarterlyTocPerGame(QUARTERLY_TOC_PER_GAME)
+            .quarterlyNumPayouts(QUARTERLY_NUM_PAYOUTS)
+            .buyInCost(GAME_BUY_IN)
+            .rebuyAddOnCost(GAME_REBUY)
+            .rebuyAddOnTocDebitCost(GAME_REBUY_TOC_DEBIT)
+            .numGamesPlayed(20)
+            .build());
 
     // Other games are finalized
     when(gameRepository.findBySeasonId(16))
-      .thenReturn(ImmutableList.of(Game.builder()
-        .finalized(true)
-        .build()));
+        .thenReturn(ImmutableList.of(Game.builder()
+            .finalized(true)
+            .build()));
 
     // Quarterly season
     LocalDate gameDate = LocalDate.now();
-    when(seasonModule.getQuarterlySeasonByDate(gameDate))
-      .thenReturn(QuarterlySeason.builder()
-        .id(17)
-        .quarter(Quarter.FIRST)
-        .seasonId(16)
-        .numGamesPlayed(8)
-        .build());
+    when(quarterlySeasonModule.getQuarterlySeasonByDate(gameDate))
+        .thenReturn(QuarterlySeason.builder()
+            .id(17)
+            .quarter(Quarter.FIRST)
+            .seasonId(16)
+            .numGamesPlayed(8)
+            .build());
 
     // Host
     Mockito.when(playerModule.get(55))
-      .thenReturn(Player.builder()
-        .id(1)
-        .firstName("Johnny")
-        .lastName("Host The Most")
-        .build());
+        .thenReturn(Player.builder()
+            .id(1)
+            .firstName("Johnny")
+            .lastName("Host The Most")
+            .build());
 
     Game expected = Game.builder()
-      .date(gameDate)
-      .hostId(55)
-      .transportRequired(true)
-      .build();
+        .date(gameDate)
+        .hostId(55)
+        .transportRequired(true)
+        .build();
 
     // Act
     gameService.create(expected);
@@ -123,15 +122,20 @@ public class GameServiceTest implements TestConstants {
     assertEquals("Host id should be 55", expected.getHostId(), actual.getHostId());
     assertEquals("date should be now", expected.getDate(), actual.getDate());
 
-    assertTrue("Host name should be Johnny Host The Most", "Johnny Host The Most".equals(actual.getHostName()));
+    assertTrue("Host name should be Johnny Host The Most",
+        "Johnny Host The Most".equals(actual.getHostName()));
     assertEquals("Quarter should be first", Quarter.FIRST, actual.getQuarter());
     assertNull("last calculated should be null", actual.getLastCalculated());
 
     // Game setup variables
-    assertEquals("transport required", expected.isTransportRequired(), actual.isTransportRequired());
-    assertEquals("Kitty cost should be amount set for season", KITTY_PER_GAME, (int) actual.getKittyCost());
-    assertEquals("Annual TOC be amount set for season", TOC_PER_GAME, (int) actual.getAnnualTocCost());
-    assertEquals("Quarterly TOC be amount set for season", QUARTERLY_TOC_PER_GAME, (int) actual.getQuarterlyTocCost());
+    assertEquals("transport required", expected.isTransportRequired(),
+        actual.isTransportRequired());
+    assertEquals("Kitty cost should be amount set for season", KITTY_PER_GAME,
+        (int) actual.getKittyCost());
+    assertEquals("Annual TOC be amount set for season", TOC_PER_GAME,
+        (int) actual.getAnnualTocCost());
+    assertEquals("Quarterly TOC be amount set for season", QUARTERLY_TOC_PER_GAME,
+        (int) actual.getQuarterlyTocCost());
 
     // Game runtime variables
     assertNull("not started", actual.getStarted());
@@ -143,59 +147,64 @@ public class GameServiceTest implements TestConstants {
     assertEquals("No quarterly toc collected", 0, (int) actual.getQuarterlyTocCollected());
     assertEquals("total collected", 0, (int) actual.getTotalCollected());
 
-    assertEquals("no annualTocFromRebuyAddOnCalculated", 0, (int) actual.getAnnualTocFromRebuyAddOnCalculated());
-    assertEquals("no rebuyAddOnLessAnnualTocCalculated", 0, (int) actual.getRebuyAddOnLessAnnualTocCalculated());
+    assertEquals("no annualTocFromRebuyAddOnCalculated", 0,
+        (int) actual.getAnnualTocFromRebuyAddOnCalculated());
+    assertEquals("no rebuyAddOnLessAnnualTocCalculated", 0,
+        (int) actual.getRebuyAddOnLessAnnualTocCalculated());
     assertEquals("no totalCombinedTocCalculated", 0, (int) actual.getTotalCombinedTocCalculated());
     assertEquals("No kitty calculated", 0, (int) actual.getKittyCalculated());
     assertEquals("no prizePotCalculated", 0, (int) actual.getPrizePotCalculated());
 
     Assert.assertFalse("not finalized", actual.isFinalized());
 
-    assertEquals("Buy in cost should be amount set for season", GAME_BUY_IN, (int) actual.getBuyInCost());
-    assertEquals("Rebuy cost should be amount set for season", GAME_REBUY, (int) actual.getRebuyAddOnCost());
-    assertEquals("Rebuy Toc debit cost should be amount set for season", GAME_REBUY_TOC_DEBIT, (int) actual.getRebuyAddOnTocDebitCost());
+    assertEquals("Buy in cost should be amount set for season", GAME_BUY_IN,
+        (int) actual.getBuyInCost());
+    assertEquals("Rebuy cost should be amount set for season", GAME_REBUY,
+        (int) actual.getRebuyAddOnCost());
+    assertEquals("Rebuy Toc debit cost should be amount set for season", GAME_REBUY_TOC_DEBIT,
+        (int) actual.getRebuyAddOnTocDebitCost());
   }
 
   @Test
   public void testCannotCreateGame() {
     // Arrange
     // Current season
-    when(seasonModule.getCurrentSeason())
-      .thenReturn(Season.builder()
-        .id(16)
-        .build());
+    when(seasonModule.getCurrent())
+        .thenReturn(Season.builder()
+            .id(16)
+            .build());
 
     // One other games is not finalized
     when(gameRepository.findBySeasonId(16))
-      .thenReturn(ImmutableList.of(Game.builder()
-        .finalized(false)
-        .build()));
+        .thenReturn(ImmutableList.of(Game.builder()
+            .finalized(false)
+            .build()));
 
     // Act & Assert
     assertThatThrownBy(() -> {
       gameService.create(new Game());
     }).isInstanceOf(GameInProgressException.class)
-      .hasMessageContaining("There is a game in progress");
+        .hasMessageContaining("There is a game in progress");
   }
 
   @Test
   public void testUpdateGame() {
     // Arrange
     Mockito.when(gameHelper.get(1)).thenReturn(Game.builder()
-      .id(1)
-      .hostId(0)
-      .date(LocalDate.now().minusDays(1))
-      .transportRequired(false)
-      .finalized(false)
-      .build());
+        .id(1)
+        .hostId(0)
+        .date(LocalDate.now().minusDays(1))
+        .transportRequired(false)
+        .finalized(false)
+        .build());
 
     LocalDate now = LocalDate.now();
     Game expected = Game.builder()
-      .id(1)
-      .hostId(2)
-      .date(now)
-      .transportRequired(true)
-      .build();
+        .id(1)
+        .hostId(2)
+        .date(now)
+        .transportRequired(true)
+        .build();
 
     // Act
     gameService.update(expected);
@@ -208,8 +217,8 @@ public class GameServiceTest implements TestConstants {
   public void testGetBySeasonId() {
     // Arrange
     when(gameRepository.findBySeasonId(1))
-      .thenReturn(ImmutableList.of(Game.builder().id(1).build(),
-        Game.builder().id(2).build()));
+        .thenReturn(ImmutableList.of(Game.builder().id(1).build(),
+            Game.builder().id(2).build()));
 
     // Act
     List<Game> games = gameService.getBySeasonId(1);
@@ -254,9 +263,9 @@ public class GameServiceTest implements TestConstants {
     when(seasonModule.getCurrentSeasonId()).thenReturn(1);
 
     when(gameRepository.findBySeasonId(1))
-      .thenReturn(ImmutableList.of(Game.builder().id(1).build(),
-        Game.builder().id(2).build(),
-        Game.builder().id(3).build()));
+        .thenReturn(ImmutableList.of(Game.builder().id(1).build(),
+            Game.builder().id(2).build(),
+            Game.builder().id(3).build()));
 
     // Act
     List<Game> games = gameService.getBySeasonId(null);
@@ -269,8 +278,8 @@ public class GameServiceTest implements TestConstants {
   public void testGetByQuarterlySeasonId() {
     // Arrange
     when(gameRepository.findByQuarterlySeasonId(1))
-      .thenReturn(ImmutableList.of(Game.builder().id(1).build(),
-        Game.builder().id(2).build()));
+        .thenReturn(ImmutableList.of(Game.builder().id(1).build(),
+            Game.builder().id(2).build()));
 
     // Act
     List<Game> games = gameService.getByQuarterlySeasonId(1);
@@ -283,11 +292,11 @@ public class GameServiceTest implements TestConstants {
   public void testFinalize() {
     // Arrange
     Mockito.when(gameHelper.get(1))
-      .thenReturn(Game.builder()
-        .id(1)
-        .qSeasonId(1)
-        .seasonId(1)
-        .build());
+        .thenReturn(Game.builder()
+            .id(1)
+            .qSeasonId(1)
+            .seasonId(1)
+            .build());
 
     // Act
     gameService.finalize(1);
@@ -308,11 +317,11 @@ public class GameServiceTest implements TestConstants {
   public void testAlreadyFinalize() {
     // Arrange
     Mockito.when(gameHelper.get(1))
-      .thenReturn(Game.builder()
-        .id(1)
-        .seasonId(16)
-        .finalized(true)
-        .build());
+        .thenReturn(Game.builder()
+            .id(1)
+            .seasonId(16)
+            .finalized(true)
+            .build());
 
     // Act
     gameService.finalize(1);
@@ -325,24 +334,24 @@ public class GameServiceTest implements TestConstants {
   public void testUnfinalize() {
     // Arrange
     Game gameToUnfinalize = Game.builder()
-      .id(1)
-      .seasonId(16)
-      .finalized(true)
-      .build();
+        .id(1)
+        .seasonId(16)
+        .finalized(true)
+        .build();
     Mockito.when(gameHelper.get(1)).thenReturn(gameToUnfinalize);
 
-    when(seasonModule.getSeasonById(16))
-      .thenReturn(Season.builder()
-        .id(16)
-        .finalized(false)
-        .build());
+    when(seasonModule.get(16))
+        .thenReturn(Season.builder()
+            .id(16)
+            .finalized(false)
+            .build());
 
     // Other games are finalized
     when(gameRepository.findBySeasonId(16))
-      .thenReturn(ImmutableList.of(Game.builder()
-        .finalized(true)
-        .build(),
-        gameToUnfinalize));
+        .thenReturn(ImmutableList.of(Game.builder()
+                .finalized(true)
+                .build(),
+            gameToUnfinalize));
 
     // Act
     gameService.unfinalize(1);
@@ -359,11 +368,11 @@ public class GameServiceTest implements TestConstants {
   public void testAlreadyUnfinalize() {
     // Arrange
     Mockito.when(gameHelper.get(1))
-      .thenReturn(Game.builder()
-        .id(1)
-        .seasonId(16)
-        .finalized(false)
-        .build());
+        .thenReturn(Game.builder()
+            .id(1)
+            .seasonId(16)
+            .finalized(false)
+            .build());
 
     // Act
     gameService.unfinalize(1);
@@ -376,55 +385,53 @@ public class GameServiceTest implements TestConstants {
   public void testCannotUnfinalized() {
     // Arrange
     Mockito.when(gameHelper.get(1))
-      .thenReturn(Game.builder()
-        .id(1)
-        .seasonId(16)
-        .finalized(true)
-        .build());
+        .thenReturn(Game.builder()
+            .id(1)
+            .seasonId(16)
+            .finalized(true)
+            .build());
 
     // Cannot unfinalize because the season is finalized
-    when(seasonModule.getSeasonById(16))
-      .thenReturn(Season.builder()
-        .id(16)
-        .finalized(true)
-        .build());
-
+    when(seasonModule.get(16))
+        .thenReturn(Season.builder()
+            .id(16)
+            .finalized(true)
+            .build());
 
     // Act & Assert
     assertThatThrownBy(() -> {
       gameService.unfinalize(1);
     }).isInstanceOf(RuntimeException.class)
-      .hasMessageContaining("Cannot open a game when season is finalized");
+        .hasMessageContaining("Cannot open a game when season is finalized");
   }
 
   @Test
   public void testCannotUnfinalized2() {
     // Arrange
     Mockito.when(gameHelper.get(1))
-      .thenReturn(Game.builder()
-        .id(1)
-        .seasonId(16)
-        .finalized(true)
-        .build());
+        .thenReturn(Game.builder()
+            .id(1)
+            .seasonId(16)
+            .finalized(true)
+            .build());
 
-    when(seasonModule.getSeasonById(16))
-      .thenReturn(Season.builder()
-        .id(16)
-        .finalized(false)
-        .build());
+    when(seasonModule.get(16))
+        .thenReturn(Season.builder()
+            .id(16)
+            .finalized(false)
+            .build());
 
     // One other game is unfinalized
     when(gameRepository.findBySeasonId(16))
-      .thenReturn(ImmutableList.of(Game.builder()
-        .finalized(false)
-        .build()));
-
+        .thenReturn(ImmutableList.of(Game.builder()
+            .finalized(false)
+            .build()));
 
     // Act & Assert
     assertThatThrownBy(() -> {
       gameService.unfinalize(1);
     }).isInstanceOf(GameInProgressException.class)
-      .hasMessageContaining("There is a game in progress");
+        .hasMessageContaining("There is a game in progress");
   }
 
 }

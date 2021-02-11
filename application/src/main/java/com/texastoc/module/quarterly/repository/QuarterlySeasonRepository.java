@@ -1,7 +1,12 @@
-package com.texastoc.module.season.repository;
+package com.texastoc.module.quarterly.repository;
 
-import com.texastoc.module.season.model.Quarter;
-import com.texastoc.module.season.model.QuarterlySeason;
+import com.texastoc.module.quarterly.model.Quarter;
+import com.texastoc.module.quarterly.model.QuarterlySeason;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -11,12 +16,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.util.List;
 
 @Slf4j
 @Repository
@@ -30,9 +29,9 @@ public class QuarterlySeasonRepository {
   }
 
   private static final String INSERT_SQL = "INSERT INTO quarterlyseason "
-    + " (seasonId, startDate, endDate, finalized, quarter, numGames, numGamesPlayed, qTocCollected, qTocPerGame, numPayouts) "
-    + " VALUES "
-    + " (:seasonId, :startDate, :endDate, :finalized, :quarter, :numGames, :numGamesPlayed, :qTocCollected, :qTocPerGame, :numPayouts)";
+      + " (seasonId, startDate, endDate, finalized, quarter, numGames, numGamesPlayed, qTocCollected, qTocPerGame, numPayouts) "
+      + " VALUES "
+      + " (:seasonId, :startDate, :endDate, :finalized, :quarter, :numGames, :numGamesPlayed, :qTocCollected, :qTocPerGame, :numPayouts)";
 
   @SuppressWarnings("Duplicates")
   public int save(QuarterlySeason quarterlySeason) {
@@ -59,12 +58,12 @@ public class QuarterlySeasonRepository {
   }
 
   private static final String UPDATE_SQL = "UPDATE quarterlyseason set " +
-    "seasonId=:seasonId, startDate=:startDate, endDate=:endDate, " +
-    "finalized=:finalized, quarter=:quarter, numGames=:numGames, " +
-    "numGamesPlayed=:numGamesPlayed, qTocCollected=:qTocCollected, " +
-    "qTocPerGame=:qTocPerGame, numPayouts=:numPayouts, " +
-    "lastCalculated=:lastCalculated " +
-    " where id=:id";
+      "seasonId=:seasonId, startDate=:startDate, endDate=:endDate, " +
+      "finalized=:finalized, quarter=:quarter, numGames=:numGames, " +
+      "numGamesPlayed=:numGamesPlayed, qTocCollected=:qTocCollected, " +
+      "qTocPerGame=:qTocPerGame, numPayouts=:numPayouts, " +
+      "lastCalculated=:lastCalculated " +
+      " where id=:id";
 
   @SuppressWarnings("Duplicates")
   public void update(final QuarterlySeason qSeason) {
@@ -92,7 +91,8 @@ public class QuarterlySeasonRepository {
 
     try {
       return jdbcTemplate
-        .queryForObject("select * from quarterlyseason where id = :id", params, new QuarterlySeasonMapper());
+          .queryForObject("select * from quarterlyseason where id = :id", params,
+              new QuarterlySeasonMapper());
     } catch (Exception e) {
       return null;
     }
@@ -100,15 +100,17 @@ public class QuarterlySeasonRepository {
 
   public List<QuarterlySeason> getBySeasonId(int seasonId) {
     return jdbcTemplate.query("select * from quarterlyseason "
-        + " where seasonId=" + seasonId + " order by quarter",
-      new QuarterlySeasonMapper());
+            + " where seasonId=" + seasonId + " order by quarter",
+        new QuarterlySeasonMapper());
   }
 
   public QuarterlySeason getCurrent() {
     MapSqlParameterSource params = new MapSqlParameterSource();
     // This is a bit of a hack. Ideally there would only be one current season. But the tests create multiple quarterly seasons in the same date range. Hence get all the quarterly seasons that encompass the date and take the lastest one (the one with the highest id).
 
-    List<QuarterlySeason> qSeasons = jdbcTemplate.query("select * from quarterlyseason where CURRENT_DATE >= startDate and CURRENT_DATE <= endDate order by id desc", params, new QuarterlySeasonMapper());
+    List<QuarterlySeason> qSeasons = jdbcTemplate.query(
+        "select * from quarterlyseason where CURRENT_DATE >= startDate and CURRENT_DATE <= endDate order by id desc",
+        params, new QuarterlySeasonMapper());
 
     if (qSeasons.size() > 0) {
       return qSeasons.get(0);
@@ -120,7 +122,9 @@ public class QuarterlySeasonRepository {
   public QuarterlySeason getByDate(LocalDate date) {
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("date", date);
-    List<QuarterlySeason> qSeasons = jdbcTemplate.query("select * from quarterlyseason where :date >= startDate and :date <= endDate order by id desc", params, new QuarterlySeasonMapper());
+    List<QuarterlySeason> qSeasons = jdbcTemplate.query(
+        "select * from quarterlyseason where :date >= startDate and :date <= endDate order by id desc",
+        params, new QuarterlySeasonMapper());
 
     if (qSeasons.size() > 0) {
       return qSeasons.get(0);
@@ -130,6 +134,7 @@ public class QuarterlySeasonRepository {
   }
 
   private static final class QuarterlySeasonMapper implements RowMapper<QuarterlySeason> {
+
     @SuppressWarnings("Duplicates")
     public QuarterlySeason mapRow(ResultSet rs, int rowNum) {
       QuarterlySeason quarterly = new QuarterlySeason();

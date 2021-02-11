@@ -7,8 +7,8 @@ public class SeasonModuleFactory {
 
   private static SeasonModule SEASON_MODULE;
 
-  public SeasonModuleFactory(SeasonService seasonService) {
-    SEASON_MODULE = seasonService;
+  public SeasonModuleFactory(SeasonModuleImpl seasonModuleImpl) {
+    SEASON_MODULE = seasonModuleImpl;
   }
 
   /**

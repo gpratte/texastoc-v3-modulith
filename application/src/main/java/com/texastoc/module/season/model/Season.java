@@ -1,36 +1,44 @@
 package com.texastoc.module.season.model;
 
-import com.texastoc.module.game.model.Game;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
+import org.springframework.data.annotation.Id;
 
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Season {
 
+  // Read-only id set when created
+  @Id
   private int id;
+
+  // Read-only fields set by the server
   private LocalDate start;
   private LocalDate end;
 
-  // From TocConfig
+  // Read-only fields set by the server (set from TocConfig)
   private int kittyPerGame;
   private int tocPerGame;
   private int quarterlyTocPerGame;
   private int quarterlyNumPayouts;
+
+  // Setup variables. End with "Cost"
+  // Read-only fields set by the server
   private int buyInCost;
   private int rebuyAddOnCost;
-  private int rebuyAddOnTocDebit;
+  private int rebuyAddOnTocDebitCost;
 
-  // Runtime variables. End with "Collected" for physical money in
-  // money in for game buy-in
+  // End with "Collected" for physical money collected
+  // Read-only fields set by the server
   private int buyInCollected;
   // money in for rebuy add on
   private int rebuyAddOnCollected;
@@ -39,8 +47,8 @@ public class Season {
   // all physical money collected which is buy-in, rebuy add on, annual toc
   private int totalCollected;
 
-  // Runtime variables. End with "Calculated" for the where the money goes
-  // rebuy add on that goes to annual TOC
+  // End with "Calculated" for the where the money goes.
+  // Read-only fields set by the server
   private int annualTocFromRebuyAddOnCalculated;
   // rebuy add on minus amount that goes to annual toc
   private int rebuyAddOnLessAnnualTocCalculated;
@@ -52,6 +60,7 @@ public class Season {
   private int prizePotCalculated;
 
   // Other runtime variables
+  // Read-only fields set by the server
   private int numGames;
   private int numGamesPlayed;
   private LocalDateTime lastCalculated;
@@ -60,7 +69,4 @@ public class Season {
   private List<SeasonPlayer> players;
   private List<SeasonPayout> payouts;
   private List<SeasonPayout> estimatedPayouts;
-  private List<QuarterlySeason> quarterlySeasons;
-  private List<Game> games;
-
 }

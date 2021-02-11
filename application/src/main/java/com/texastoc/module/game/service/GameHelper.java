@@ -11,18 +11,20 @@ import com.texastoc.module.game.repository.GameRepository;
 import com.texastoc.module.player.PlayerModule;
 import com.texastoc.module.player.PlayerModuleFactory;
 import com.texastoc.module.player.model.Player;
+import com.texastoc.module.quarterly.QuarterlySeasonModule;
+import com.texastoc.module.quarterly.QuarterlySeasonModuleFactory;
+import com.texastoc.module.quarterly.model.QuarterlySeason;
 import com.texastoc.module.season.SeasonModule;
 import com.texastoc.module.season.SeasonModuleFactory;
 import com.texastoc.module.season.model.Season;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -38,8 +40,11 @@ public class GameHelper {
 
   private PlayerModule playerModule;
   private SeasonModule seasonModule;
+  private QuarterlySeasonModule quarterlySeasonModule;
 
-  public GameHelper(GameRepository gameRepository, GameCalculator gameCalculator, PayoutCalculator payoutCalculator, PointsCalculator pointsCalculator, WebSocketConnector webSocketConnector) {
+  public GameHelper(GameRepository gameRepository, GameCalculator gameCalculator,
+      PayoutCalculator payoutCalculator, PointsCalculator pointsCalculator,
+      WebSocketConnector webSocketConnector) {
     this.gameRepository = gameRepository;
     this.gameCalculator = gameCalculator;
     this.payoutCalculator = payoutCalculator;
@@ -96,9 +101,11 @@ public class GameHelper {
 
   public void sendGameSummary(int id) {
     Game game = get(id);
-    Season season = seasonModule.getSeasonById(game.getSeasonId());
+    Season season = getSeasonModule().get(game.getSeasonId());
     List<Player> players = getPlayerModule().getAll();
-    GameSummary gameSummary = new GameSummary(game, season, players);
+    List<QuarterlySeason> quarterlySeasons = getQuarterlySeasonModule()
+        .getQuarterlySeasonBySeason(season.getId());
+    GameSummary gameSummary = new GameSummary(game, season, quarterlySeasons, players);
     // TODO use Spring Integration
     new Thread(gameSummary).start();
   }
@@ -117,8 +124,16 @@ public class GameHelper {
     return seasonModule;
   }
 
+  private QuarterlySeasonModule getQuarterlySeasonModule() {
+    if (quarterlySeasonModule == null) {
+      quarterlySeasonModule = QuarterlySeasonModuleFactory.getQuarterlySeasonModule();
+    }
+    return quarterlySeasonModule;
+  }
+
   // TODO use Spring Integration
   private class GameSender implements Callable<Void> {
+
     @Override
     public Void call() throws Exception {
       webSocketConnector.sendGame(getCurrent());
