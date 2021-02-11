@@ -162,5 +162,5 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 26-game-calculation-integration-tests
-Integration tests for calculating a game (game/payout/points calculations).
+## Current Branch: 27-season-module
+Now have a season module with the same packaging as the other modules. Moved the season repository from JdbcTemplate to Spring Data JDBC. Still have two other repositories to switch but that will be for a later branch. Also have one unit test for creating a season.
