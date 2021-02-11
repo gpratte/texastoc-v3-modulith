@@ -100,7 +100,8 @@ public class SeasonService {
     Season season = seasonRepository.save(newSeason);
 
     // TODO message instead
-    getQuarterlySeasonModule().createQuarterlySeasons(season.getId(), start, end);
+    getQuarterlySeasonModule()
+        .createQuarterlySeasons(season.getId(), season.getStart(), season.getEnd());
 
     return season;
   }

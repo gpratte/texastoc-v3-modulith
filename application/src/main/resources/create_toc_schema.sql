@@ -57,11 +57,11 @@ CREATE TABLE quarterlyseason
     endDate        date      DEFAULT NULL,
     finalized      boolean   DEFAULT NULL,
     quarter        int NOT NULL,
-    numGames       int       DEFAULT NULL,
-    numGamesPlayed int       DEFAULT NULL,
-    qTocCollected  int       DEFAULT NULL,
-    qTocPerGame    int       DEFAULT NULL,
-    numPayouts     int NOT NULL,
+    numGames       int       DEFAULT 0,
+    numGamesPlayed int       DEFAULT 0,
+    qTocCollected  int       DEFAULT 0,
+    qTocPerGame    int       DEFAULT 0,
+    numPayouts     int       DEFAULT 0,
     lastCalculated timestamp DEFAULT NULL,
     PRIMARY KEY (id)
 );

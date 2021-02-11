@@ -62,7 +62,7 @@ public class Season {
   // Other runtime variables
   // Read-only fields set by the server
   private int numGames;
-  private Integer numGamesPlayed;
+  private int numGamesPlayed;
   private LocalDateTime lastCalculated;
   private boolean finalized;
 

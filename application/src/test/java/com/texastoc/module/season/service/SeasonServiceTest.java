@@ -1,65 +1,124 @@
-package com.texastoc.service;
+package com.texastoc.module.season.service;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.texastoc.TestConstants;
-import com.texastoc.module.quarterly.repository.QuarterlySeasonRepository;
-import com.texastoc.module.season.repository.SeasonHistoryRepository;
+import com.texastoc.TestUtils;
+import com.texastoc.module.quarterly.QuarterlySeasonModule;
+import com.texastoc.module.season.model.Season;
 import com.texastoc.module.season.repository.SeasonRepository;
-import com.texastoc.module.season.service.SeasonService;
+import com.texastoc.module.settings.SettingsModule;
+import com.texastoc.module.settings.model.SystemSettings;
+import com.texastoc.module.settings.model.TocConfig;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.Before;
-import org.junit.Ignore;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.springframework.test.util.ReflectionTestUtils;
 
-@Ignore
 public class SeasonServiceTest implements TestConstants {
 
-  private SeasonService service;
+  private SeasonService seasonService;
 
-  @MockBean
   private SeasonRepository seasonRepository;
-  @MockBean
-  private QuarterlySeasonRepository qSeasonRepository;
-  @MockBean
-  private SeasonHistoryRepository seasonHistoryRepository;
+  private SettingsModule settingsModule;
+  private QuarterlySeasonModule quarterlySeasonModule;
 
   @Before
   public void before() {
-    service = new SeasonService(seasonRepository);
+    seasonRepository = mock(SeasonRepository.class);
+    seasonService = new SeasonService(seasonRepository);
+    settingsModule = mock(SettingsModule.class);
+    ReflectionTestUtils.setField(seasonService, "settingsModule", settingsModule);
+    quarterlySeasonModule = mock(QuarterlySeasonModule.class);
+    ReflectionTestUtils.setField(seasonService, "quarterlySeasonModule", quarterlySeasonModule);
   }
 
-//  @Ignore
-//  @Test
-//  public void testCreateSeason() {
-//
-//    // Arrange
-//    LocalDate now = LocalDate.now();
-//    LocalDate start = LocalDate.of(now.getYear(), Month.MAY, 1);
-//
-//    Mockito.when(seasonRepository.save((Season) notNull())).thenReturn(1);
-//    Mockito.when(qSeasonRepository.save((QuarterlySeason) notNull())).thenReturn(1);
-////    Mockito.when(configRepository.get()).thenReturn(TestConstants.getTocConfig());
-//
-//    // Act
-//    Season actual = service.createSeason(start.getYear());
-//
-//    // Assert
-//    TestUtils.assertCreatedSeason(start, actual);
-//
-//    // Season repository called once
-//    Mockito.verify(seasonRepository, Mockito.times(1)).save(Mockito.any(Season.class));
-//
-//    // Season argument has same start time
-//    ArgumentCaptor<Season> seasonArg = ArgumentCaptor.forClass(Season.class);
-//    Mockito.verify(seasonRepository).save(seasonArg.capture());
-//    Assert.assertEquals(start, seasonArg.getValue().getStart());
-//
-//    // Config repository called one times
-////    Mockito.verify(configRepository, Mockito.times(1)).get();
-//
-//    // Quarterly season repository called four times
-//    Mockito.verify(qSeasonRepository, Mockito.times(4)).save(Mockito.any(QuarterlySeason.class));
-//
-//  }
-//
+  @Test
+  public void testCreateSeason() {
+
+    // Arrange
+    LocalDate now = LocalDate.now();
+    LocalDate start = LocalDate.of(now.getYear(), Month.MAY, 1);
+
+    Map<Integer, TocConfig> tocConfigMap = new HashMap<>();
+    tocConfigMap.put(now.getYear(), TestConstants.getTocConfig());
+    SystemSettings systemSettings = new SystemSettings();
+    systemSettings.setTocConfigs(tocConfigMap);
+    when(settingsModule.get()).thenReturn(systemSettings);
+
+    LocalDate started = LocalDate.now();
+    LocalDate ended = started.plusDays(1);
+    Season savedSeason = Season.builder()
+        .id(11)
+        .start(started)
+        .end(ended)
+        .build();
+    when(seasonRepository.save(any())).thenReturn(savedSeason);
+
+    // Act
+    Season actual = seasonService.createSeason(start.getYear());
+
+    // Assert
+    TestUtils.assertCreatedSeason(start, actual);
+
+    ArgumentCaptor<Season> seasonArg = ArgumentCaptor.forClass(Season.class);
+    verify(seasonRepository, Mockito.times(1)).save(seasonArg.capture());
+    Season season = seasonArg.getValue();
+
+    assertEquals(start, seasonArg.getValue().getStart());
+
+    assertEquals(KITTY_PER_GAME, season.getKittyPerGame());
+    assertEquals(TOC_PER_GAME, season.getTocPerGame());
+    assertEquals(QUARTERLY_TOC_PER_GAME, season.getQuarterlyTocPerGame());
+    assertEquals(QUARTERLY_NUM_PAYOUTS, season.getQuarterlyNumPayouts());
+
+    assertEquals(GAME_BUY_IN, season.getBuyInCost());
+    assertEquals(GAME_REBUY, season.getRebuyAddOnCost());
+    assertEquals(GAME_REBUY_TOC_DEBIT, season.getRebuyAddOnTocDebitCost());
+
+    assertEquals(0, season.getBuyInCollected());
+    assertEquals(0, season.getRebuyAddOnCollected());
+    assertEquals(0, season.getAnnualTocCollected());
+    assertEquals(0, season.getTotalCollected());
+
+    assertEquals(0, season.getAnnualTocFromRebuyAddOnCalculated());
+    assertEquals(0, season.getRebuyAddOnLessAnnualTocCalculated());
+    assertEquals(0, season.getTotalCombinedAnnualTocCalculated());
+    assertEquals(0, season.getKittyCalculated());
+    assertEquals(0, season.getPrizePotCalculated());
+
+    assertTrue(season.getNumGames() == 52 || season.getNumGames() == 53);
+    assertEquals(0, season.getNumGamesPlayed());
+    assertNull(season.getLastCalculated());
+    assertFalse(season.isFinalized());
+
+    assertTrue(season.getPlayers() == null || season.getPlayers().size() == 0);
+    assertTrue(season.getPayouts() == null || season.getPayouts().size() == 0);
+    assertTrue(season.getEstimatedPayouts() == null || season.getEstimatedPayouts().size() == 0);
+
+    ArgumentCaptor<Integer> seasonIdArg = ArgumentCaptor.forClass(Integer.class);
+    ArgumentCaptor<LocalDate> startArg = ArgumentCaptor.forClass(LocalDate.class);
+    ArgumentCaptor<LocalDate> endArg = ArgumentCaptor.forClass(LocalDate.class);
+    verify(quarterlySeasonModule, times(1))
+        .createQuarterlySeasons(seasonIdArg.capture(), startArg.capture(), endArg.capture());
+    assertEquals(11, seasonIdArg.getValue().intValue());
+    assertEquals(started, startArg.getValue());
+    assertEquals(ended, endArg.getValue());
+  }
+
 //  @Test
 //  public void testGetSeason() {
 //
