@@ -36,7 +36,7 @@ public class SeasonRestController {
   @PreAuthorize("hasRole('ADMIN')")
   @PostMapping("/api/v2/seasons")
   public Season createSeason(@RequestBody SeasonStart seasonStart) {
-    return seasonService.createSeason(seasonStart.getStartYear());
+    return seasonService.create(seasonStart.getStartYear());
   }
 
   @GetMapping("/api/v2/seasons/{id}")

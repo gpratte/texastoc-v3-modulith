@@ -1,5 +1,11 @@
 package com.texastoc.module.game.service;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.texastoc.TestConstants;
 import com.texastoc.module.game.exception.SeatingException;
 import com.texastoc.module.game.model.Game;
@@ -10,18 +16,11 @@ import com.texastoc.module.game.model.Seating;
 import com.texastoc.module.game.model.SeatsPerTable;
 import com.texastoc.module.game.model.TableRequest;
 import com.texastoc.module.game.repository.GameRepository;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.Before;
+import org.junit.Test;
 
 public class SeatingServiceTest implements TestConstants {
 
@@ -44,15 +43,15 @@ public class SeatingServiceTest implements TestConstants {
     List<GamePlayer> gamePlayers = new LinkedList<>();
     for (int i = 0; i < 2; i++) {
       gamePlayers.add(GamePlayer.builder()
-        .id(i+1)
-        .boughtIn(true)
-        .build());
+          .id(i + 1)
+          .boughtIn(true)
+          .build());
     }
 
     Game game = Game.builder()
-      .id(111)
-      .players(gamePlayers)
-      .build();
+        .id(111)
+        .players(gamePlayers)
+        .build();
     when(gameRepository.findById(111)).thenReturn(Optional.of(game));
 
     // Act
@@ -107,19 +106,19 @@ public class SeatingServiceTest implements TestConstants {
     List<GamePlayer> gamePlayers = new LinkedList<>();
     for (int i = 0; i < 8; i++) {
       gamePlayers.add(GamePlayer.builder()
-        .id(i+1)
-        .boughtIn(true)
-        .build());
+          .id(i + 1)
+          .boughtIn(true)
+          .build());
     }
     // 1 players with no buy-in
     gamePlayers.add(GamePlayer.builder()
-      .boughtIn(false)
-      .build());
+        .boughtIn(false)
+        .build());
 
     Game game = Game.builder()
-      .id(111)
-      .players(gamePlayers)
-      .build();
+        .id(111)
+        .players(gamePlayers)
+        .build();
     when(gameRepository.findById(111)).thenReturn(Optional.of(game));
 
     // Act
@@ -211,22 +210,22 @@ public class SeatingServiceTest implements TestConstants {
     List<GamePlayer> gamePlayers = new LinkedList<>();
     for (int i = 0; i < 10; i++) {
       gamePlayers.add(GamePlayer.builder()
-        .id(i+1)
-        .boughtIn(true)
-        .build());
+          .id(i + 1)
+          .boughtIn(true)
+          .build());
     }
     // 2 players with no buy-in
     gamePlayers.add(GamePlayer.builder()
-      .boughtIn(false)
-      .build());
+        .boughtIn(false)
+        .build());
     gamePlayers.add(GamePlayer.builder()
-      .boughtIn(false)
-      .build());
+        .boughtIn(false)
+        .build());
 
     Game game = Game.builder()
-      .id(111)
-      .players(gamePlayers)
-      .build();
+        .id(111)
+        .players(gamePlayers)
+        .build();
     when(gameRepository.findById(111)).thenReturn(Optional.of(game));
 
     // Act
@@ -280,21 +279,21 @@ public class SeatingServiceTest implements TestConstants {
     List<GamePlayer> gamePlayers = new LinkedList<>();
     for (int i = 0; i < 2; i++) {
       gamePlayers.add(GamePlayer.builder()
-        .id(i+1)
-        .boughtIn(true)
-        .build());
+          .id(i + 1)
+          .boughtIn(true)
+          .build());
     }
 
     Game game = Game.builder()
-      .id(111)
-      .players(gamePlayers)
-      .build();
+        .id(111)
+        .players(gamePlayers)
+        .build();
     when(gameRepository.findById(111)).thenReturn(Optional.of(game));
 
     // Act and Assert
     assertThatThrownBy(() -> {
-      Seating seated = seatingService.seatGamePlayers(seating);
+      seatingService.seatGamePlayers(seating);
     }).isInstanceOf(SeatingException.class)
-      .hasMessageContaining("Requested invalid table number 7");
+        .hasMessageContaining("Requested invalid table number 7");
   }
 }

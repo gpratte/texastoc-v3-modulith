@@ -45,13 +45,9 @@ public class SeasonService {
     this.seasonRepository = seasonRepository;
   }
 
-  public int getCurrentSeasonId() {
-    return getCurrent().getId();
-  }
-
   //  @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   @Transactional
-  public Season createSeason(int startYear) {
+  public Season create(int startYear) {
     LocalDate start = LocalDate.of(startYear, Month.MAY.getValue(), 1);
     try {
       Season currentSeason = getCurrent();
@@ -117,12 +113,6 @@ public class SeasonService {
 
   }
 
-  @Transactional(readOnly = true)
-  public List<Season> getAll() {
-    return StreamSupport.stream(seasonRepository.findAll().spliterator(), false)
-        .collect(Collectors.toList());
-  }
-
   //  @Cacheable("currentSeason")
   @Transactional(readOnly = true)
   public Season getCurrent() {
@@ -138,10 +128,20 @@ public class SeasonService {
     }
 
     if (season == null) {
-      throw new NotFoundException("Could not find current season");
+      throw new NotFoundException("Current season not found");
     }
 
     return season;
+  }
+
+  @Transactional(readOnly = true)
+  public int getCurrentId() {
+    return getCurrent().getId();
+  }
+
+  public List<Season> getAll() {
+    return StreamSupport.stream(seasonRepository.findAll().spliterator(), false)
+        .collect(Collectors.toList());
   }
 
   //  @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
