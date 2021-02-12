@@ -45,6 +45,7 @@ public class SeasonService {
     this.seasonRepository = seasonRepository;
   }
 
+  // TODO caching
   //  @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   @Transactional
   public Season create(int startYear) {
@@ -146,13 +147,13 @@ public class SeasonService {
 
   //  @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   @Transactional
-  public void endSeason(int seasonId) {
+  public void end(int seasonId) {
     Season season = get(seasonId);
     // Make sure no games are open
     List<Game> games = getGameModule().getBySeasonId(seasonId);
     for (Game game : games) {
       if (!game.isFinalized()) {
-        throw new GameInProgressException("There is a game in progress.");
+        throw new GameInProgressException("There is a game in progress");
       }
     }
 
@@ -173,8 +174,13 @@ public class SeasonService {
 
   //  @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   @Transactional
-  public void openSeason(int seasonId) {
+  public void open(int seasonId) {
     Season season = get(seasonId);
+
+    if (!season.isFinalized()) {
+      return;
+    }
+
     season.setFinalized(false);
     seasonRepository.save(season);
 

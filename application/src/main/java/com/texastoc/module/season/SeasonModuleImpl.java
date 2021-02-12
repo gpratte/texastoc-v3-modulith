@@ -41,12 +41,12 @@ public class SeasonModuleImpl implements SeasonModule {
 
   @Override
   public void end(int seasonId) {
-    seasonService.endSeason(seasonId);
+    seasonService.end(seasonId);
   }
 
   @Override
   public void open(int seasonId) {
-    seasonService.openSeason(seasonId);
+    seasonService.open(seasonId);
   }
 
   @Override
