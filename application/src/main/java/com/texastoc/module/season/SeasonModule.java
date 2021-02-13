@@ -6,17 +6,17 @@ import java.util.List;
 
 public interface SeasonModule {
 
-  Season createSeason(int startYear);
-
-  int getCurrentSeasonId();
+  Season create(int startYear);
 
   Season get(int id);
 
   Season getCurrent();
 
-  void endSeason(int seasonId);
+  int getCurrentId();
 
-  void openSeason(int seasonId);
+  void end(int seasonId);
+
+  void open(int seasonId);
 
   List<HistoricalSeason> getPastSeasons();
 

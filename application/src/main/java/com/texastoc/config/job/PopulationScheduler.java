@@ -79,7 +79,7 @@ public class PopulationScheduler {
         default:
           year = now.getYear();
       }
-      Season season = seasonService.createSeason(year);
+      Season season = seasonService.create(year);
       createGames(season);
       log.info("Done populating");
     } catch (Exception e) {

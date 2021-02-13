@@ -112,7 +112,7 @@ public class GameService {
   @Transactional(readOnly = true)
   public List<Game> getBySeasonId(Integer seasonId) {
     if (seasonId == null) {
-      seasonId = getSeasonModule().getCurrentSeasonId();
+      seasonId = getSeasonModule().getCurrentId();
     }
 
     return gameRepository.findBySeasonId(seasonId);

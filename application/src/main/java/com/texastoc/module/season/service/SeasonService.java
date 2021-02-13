@@ -45,13 +45,10 @@ public class SeasonService {
     this.seasonRepository = seasonRepository;
   }
 
-  public int getCurrentSeasonId() {
-    return getCurrent().getId();
-  }
-
+  // TODO caching
   //  @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   @Transactional
-  public Season createSeason(int startYear) {
+  public Season create(int startYear) {
     LocalDate start = LocalDate.of(startYear, Month.MAY.getValue(), 1);
     try {
       Season currentSeason = getCurrent();
@@ -117,12 +114,6 @@ public class SeasonService {
 
   }
 
-  @Transactional(readOnly = true)
-  public List<Season> getAll() {
-    return StreamSupport.stream(seasonRepository.findAll().spliterator(), false)
-        .collect(Collectors.toList());
-  }
-
   //  @Cacheable("currentSeason")
   @Transactional(readOnly = true)
   public Season getCurrent() {
@@ -138,21 +129,31 @@ public class SeasonService {
     }
 
     if (season == null) {
-      throw new NotFoundException("Could not find current season");
+      throw new NotFoundException("Current season not found");
     }
 
     return season;
   }
 
+  @Transactional(readOnly = true)
+  public int getCurrentId() {
+    return getCurrent().getId();
+  }
+
+  public List<Season> getAll() {
+    return StreamSupport.stream(seasonRepository.findAll().spliterator(), false)
+        .collect(Collectors.toList());
+  }
+
   //  @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   @Transactional
-  public void endSeason(int seasonId) {
+  public void end(int seasonId) {
     Season season = get(seasonId);
     // Make sure no games are open
     List<Game> games = getGameModule().getBySeasonId(seasonId);
     for (Game game : games) {
       if (!game.isFinalized()) {
-        throw new GameInProgressException("There is a game in progress.");
+        throw new GameInProgressException("There is a game in progress");
       }
     }
 
@@ -173,8 +174,13 @@ public class SeasonService {
 
   //  @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   @Transactional
-  public void openSeason(int seasonId) {
+  public void open(int seasonId) {
     Season season = get(seasonId);
+
+    if (!season.isFinalized()) {
+      return;
+    }
+
     season.setFinalized(false);
     seasonRepository.save(season);
 

@@ -260,7 +260,7 @@ public class GameServiceTest implements TestConstants {
   @Test
   public void testGetByNoSeasonId() {
     // Arrange
-    when(seasonModule.getCurrentSeasonId()).thenReturn(1);
+    when(seasonModule.getCurrentId()).thenReturn(1);
 
     when(gameRepository.findBySeasonId(1))
         .thenReturn(ImmutableList.of(Game.builder().id(1).build(),

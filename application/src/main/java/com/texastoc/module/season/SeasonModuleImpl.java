@@ -20,13 +20,8 @@ public class SeasonModuleImpl implements SeasonModule {
   }
 
   @Override
-  public Season createSeason(int startYear) {
-    return seasonService.createSeason(startYear);
-  }
-
-  @Override
-  public int getCurrentSeasonId() {
-    return seasonService.getCurrentSeasonId();
+  public Season create(int startYear) {
+    return seasonService.create(startYear);
   }
 
   @Override
@@ -40,13 +35,18 @@ public class SeasonModuleImpl implements SeasonModule {
   }
 
   @Override
-  public void endSeason(int seasonId) {
-    seasonService.endSeason(seasonId);
+  public int getCurrentId() {
+    return seasonService.getCurrentId();
   }
 
   @Override
-  public void openSeason(int seasonId) {
-    seasonService.openSeason(seasonId);
+  public void end(int seasonId) {
+    seasonService.end(seasonId);
+  }
+
+  @Override
+  public void open(int seasonId) {
+    seasonService.open(seasonId);
   }
 
   @Override

@@ -64,7 +64,7 @@ public class GameHelper {
   }
 
   public Game getCurrent() {
-    int seasonId = getSeasonModule().getCurrentSeasonId();
+    int seasonId = getSeasonModule().getCurrentId();
     List<Game> games = gameRepository.findUnfinalizedBySeasonId(seasonId);
     if (games.size() > 0) {
       return games.get(0);
