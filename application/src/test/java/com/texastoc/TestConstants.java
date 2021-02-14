@@ -306,15 +306,15 @@ public interface TestConstants {
 
     SeasonPayoutRange seasonPayoutRange = new SeasonPayoutRange();
     ranges.add(seasonPayoutRange);
-    seasonPayoutRange.setLowRange(5000);
-    seasonPayoutRange.setHighRange(7000);
+    seasonPayoutRange.setLowRange(3000);
+    seasonPayoutRange.setHighRange(5000);
 
     List<SeasonPayoutPlace> guaranteed = new LinkedList<>();
     seasonPayoutRange.setGuaranteed(guaranteed);
     SeasonPayoutPlace seasonPayoutPlace = new SeasonPayoutPlace();
     guaranteed.add(seasonPayoutPlace);
     seasonPayoutPlace.setPlace(1);
-    seasonPayoutPlace.setAmount(1400);
+    seasonPayoutPlace.setAmount(700);
     seasonPayoutPlace.setPercent(20);
 
     List<SeasonPayoutPlace> finalTable = new LinkedList<>();
@@ -323,19 +323,19 @@ public interface TestConstants {
     seasonPayoutPlace = new SeasonPayoutPlace();
     finalTable.add(seasonPayoutPlace);
     seasonPayoutPlace.setPlace(2);
-    seasonPayoutPlace.setAmount(1350);
+    seasonPayoutPlace.setAmount(600);
     seasonPayoutPlace.setPercent(20);
 
     seasonPayoutPlace = new SeasonPayoutPlace();
     finalTable.add(seasonPayoutPlace);
     seasonPayoutPlace.setPlace(3);
-    seasonPayoutPlace.setAmount(1150);
+    seasonPayoutPlace.setAmount(450);
     seasonPayoutPlace.setPercent(16);
 
     seasonPayoutPlace = new SeasonPayoutPlace();
     finalTable.add(seasonPayoutPlace);
     seasonPayoutPlace.setPlace(4);
-    seasonPayoutPlace.setAmount(1100);
+    seasonPayoutPlace.setAmount(350);
     seasonPayoutPlace.setPercent(14);
 
     seasonPayoutPlace = new SeasonPayoutPlace();

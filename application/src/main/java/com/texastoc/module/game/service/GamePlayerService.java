@@ -10,8 +10,6 @@ import com.texastoc.module.player.PlayerModuleFactory;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -153,19 +151,6 @@ public class GamePlayerService {
       gameHelper.recalculate(game.getId());
       gameHelper.sendUpdatedGame();
     }
-  }
-
-  // TODO tests
-  public List<GamePlayer> getAnnualTocGamePlayersBySeasonId(int seasonId) {
-    List<GamePlayer> gamePlayers = new LinkedList<>();
-    List<Game> games = gameRepository.findBySeasonId(seasonId);
-    games.forEach(game -> {
-      gamePlayers.addAll(game.getPlayers().stream()
-        .filter(GamePlayer::isAnnualTocParticipant)
-        .collect(Collectors.toList())
-      );
-    });
-    return gamePlayers;
   }
 
   private GamePlayer createGamePlayerWorker(GamePlayer gamePlayer, Game game) {

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -30,7 +31,7 @@ public class SeasonCalculator {
   private GameModule gameModule;
 
   public SeasonCalculator(SeasonRepository seasonRepository,
-      SeasonPayoutSettingsRepository seasonPayoutSettingsRepository) {
+    SeasonPayoutSettingsRepository seasonPayoutSettingsRepository) {
     this.seasonRepository = seasonRepository;
     this.seasonPayoutSettingsRepository = seasonPayoutSettingsRepository;
   }
@@ -54,6 +55,7 @@ public class SeasonCalculator {
     int kittyCalculated = 0;
     int prizePotCalculated = 0;
 
+    List<GamePlayer> gameAnnualTocPlayers = new LinkedList<>();
     for (Game game : games) {
       buyInCollected += game.getBuyInCollected();
       rebuyAddOnCollected += game.getRebuyAddOnCollected();
@@ -63,9 +65,14 @@ public class SeasonCalculator {
       annualTocFromRebuyAddOnCalculated += game.getAnnualTocFromRebuyAddOnCalculated();
       rebuyAddOnLessAnnualTocCalculated += game.getRebuyAddOnLessAnnualTocCalculated();
       totalCombinedAnnualTocCalculated +=
-          game.getAnnualTocCollected() + game.getAnnualTocFromRebuyAddOnCalculated();
+        game.getAnnualTocCollected() + game.getAnnualTocFromRebuyAddOnCalculated();
       kittyCalculated += game.getKittyCalculated();
       prizePotCalculated += game.getPrizePotCalculated();
+
+      gameAnnualTocPlayers.addAll(game.getPlayers().stream()
+        .filter(GamePlayer::isAnnualTocParticipant)
+        .collect(Collectors.toList())
+      );
     }
 
     season.setBuyInCollected(buyInCollected);
@@ -82,13 +89,12 @@ public class SeasonCalculator {
     season.setLastCalculated(LocalDateTime.now());
 
     // Calculate season players
-    List<GamePlayer> gamePlayers = getGameModule().getAnnualTocGamePlayersBySeasonId(id);
-    List<SeasonPlayer> players = calculatePlayers(id, gamePlayers);
+    List<SeasonPlayer> players = calculatePlayers(id, gameAnnualTocPlayers);
     season.setPlayers(players);
 
     // Calculate current payouts and estimated payouts
     SeasonPayoutSettings seasonPayoutSettings = seasonPayoutSettingsRepository
-        .getBySeasonId(season.getId());
+      .getBySeasonId(season.getId());
     int total = season.getTotalCombinedAnnualTocCalculated();
     if (season.getNumGamesPlayed() == season.getNumGames()) {
       season.setPayouts(calculatePayouts(total, season.getId(), false, seasonPayoutSettings));
@@ -98,7 +104,7 @@ public class SeasonCalculator {
       double seasonTocAmountPerGame = total / (double) season.getNumGamesPlayed();
       int estimatedTotal = (int) (seasonTocAmountPerGame * season.getNumGames());
       season.setEstimatedPayouts(
-          calculatePayouts(estimatedTotal, season.getId(), true, seasonPayoutSettings));
+        calculatePayouts(estimatedTotal, season.getId(), true, seasonPayoutSettings));
     }
 
     // Persist season
@@ -112,10 +118,10 @@ public class SeasonCalculator {
       SeasonPlayer seasonPlayer = seasonPlayerMap.get(gamePlayer.getPlayerId());
       if (seasonPlayer == null) {
         seasonPlayer = SeasonPlayer.builder()
-            .playerId(gamePlayer.getPlayerId())
-            .seasonId(id)
-            .name(gamePlayer.getName())
-            .build();
+          .playerId(gamePlayer.getPlayerId())
+          .seasonId(id)
+          .name(gamePlayer.getName())
+          .build();
         seasonPlayerMap.put(gamePlayer.getPlayerId(), seasonPlayer);
       }
 
@@ -152,7 +158,7 @@ public class SeasonCalculator {
   }
 
   private List<SeasonPayout> calculatePayouts(int seasonTocAmount, int seasonId, boolean estimated,
-      SeasonPayoutSettings seasonPayoutSettings) {
+    SeasonPayoutSettings seasonPayoutSettings) {
     List<SeasonPayout> seasonPayouts = new LinkedList<>();
 
     List<SeasonPayoutRange> ranges = seasonPayoutSettings.getRanges();

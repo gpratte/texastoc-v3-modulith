@@ -17,7 +17,7 @@ public class GameModuleImpl implements GameModule {
   private final SeatingService seatingService;
 
   public GameModuleImpl(GameService gameService, GamePlayerService gamePlayerService,
-      SeatingService seatingService) {
+    SeatingService seatingService) {
     this.gameService = gameService;
     this.gamePlayerService = gamePlayerService;
     this.seatingService = seatingService;
@@ -101,10 +101,5 @@ public class GameModuleImpl implements GameModule {
   @Override
   public void notifySeating(int gameId) {
     seatingService.notifySeating(gameId);
-  }
-
-  @Override
-  public List<GamePlayer> getAnnualTocGamePlayersBySeasonId(int seasonId) {
-    return gamePlayerService.getAnnualTocGamePlayersBySeasonId(seasonId);
   }
 }

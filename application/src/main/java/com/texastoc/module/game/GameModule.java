@@ -184,12 +184,4 @@ public interface GameModule {
    * @param gameId the game Id
    */
   void notifySeating(int gameId);
-
-  /**
-   * Get each game player for a season that has participated in the annual toc
-   *
-   * @param seasonId
-   * @return
-   */
-  List<GamePlayer> getAnnualTocGamePlayersBySeasonId(int seasonId);
 }
