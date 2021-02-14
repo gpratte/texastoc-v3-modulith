@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
 import com.texastoc.TestConstants;
+import com.texastoc.module.game.event.GameEventProducer;
 import com.texastoc.module.game.exception.GameInProgressException;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.repository.GameRepository;
@@ -51,7 +52,8 @@ public class GameServiceTest implements TestConstants {
     playerModule = mock(PlayerModule.class);
     seasonModule = mock(SeasonModule.class);
     quarterlySeasonModule = mock(QuarterlySeasonModule.class);
-    gameService = new GameService(gameRepository, gameHelper);
+    GameEventProducer gameEventProducer = mock(GameEventProducer.class);
+    gameService = new GameService(gameRepository, gameHelper, gameEventProducer);
     ReflectionTestUtils.setField(gameService, "playerModule", playerModule);
     ReflectionTestUtils.setField(gameService, "seasonModule", seasonModule);
   }

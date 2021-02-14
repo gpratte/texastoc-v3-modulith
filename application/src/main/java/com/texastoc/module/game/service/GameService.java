@@ -1,5 +1,6 @@
 package com.texastoc.module.game.service;
 
+import com.texastoc.module.game.event.GameEventProducer;
 import com.texastoc.module.game.exception.GameInProgressException;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.repository.GameRepository;
@@ -14,8 +15,6 @@ import com.texastoc.module.season.SeasonModuleFactory;
 import com.texastoc.module.season.model.Season;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,17 +24,21 @@ public class GameService {
 
   private final GameRepository gameRepository;
   private final GameHelper gameHelper;
+  private final GameEventProducer gameEventProducer;
 
   private PlayerModule playerModule;
   private SeasonModule seasonModule;
   private QuarterlySeasonModule quarterlySeasonModule;
 
-  public GameService(GameRepository gameRepository, GameHelper gameHelper) {
+  public GameService(GameRepository gameRepository, GameHelper gameHelper,
+      GameEventProducer gameEventProducer) {
     this.gameRepository = gameRepository;
     this.gameHelper = gameHelper;
+    this.gameEventProducer = gameEventProducer;
   }
 
-  @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
+  // TODO cache
+  //@CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
   @Transactional
   public Game create(Game game) {
     // TODO bean validation https://www.baeldung.com/javax-validation
@@ -80,7 +83,7 @@ public class GameService {
     return game;
   }
 
-  @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
+  //@CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
   @Transactional
   public void update(Game game) {
     // TODO bean validation https://www.baeldung.com/javax-validation
@@ -99,13 +102,13 @@ public class GameService {
   }
 
   @Transactional(readOnly = true)
-  @Cacheable("currentGame")
+  //@Cacheable("currentGame")
   public Game getCurrent() {
     return gameHelper.getCurrent();
   }
 
 
-  @CacheEvict(value = "currentGame", allEntries = true)
+  //@CacheEvict(value = "currentGame", allEntries = true)
   public void clearCacheGame() {
   }
 
@@ -123,8 +126,8 @@ public class GameService {
     return gameRepository.findByQuarterlySeasonId(qSeasonId);
   }
 
-  @CacheEvict(value = {"currentGame", "currentSeason",
-      "currentSeasonById"}, allEntries = true, beforeInvocation = false)
+  //  @CacheEvict(value = {"currentGame", "currentSeason",
+//      "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   @Transactional
   public void finalize(int id) {
     // TODO check that the game has the appropriate finishes (e.g. 1st, 2nd, ...)
@@ -146,8 +149,8 @@ public class GameService {
     gameHelper.sendGameSummary(id);
   }
 
-  @CacheEvict(value = {"currentGame", "currentSeason",
-      "currentSeasonById"}, allEntries = true, beforeInvocation = false)
+  //  @CacheEvict(value = {"currentGame", "currentSeason",
+//      "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   public void unfinalize(int id) {
     // TODO admin only
     Game gameToOpen = get(id);

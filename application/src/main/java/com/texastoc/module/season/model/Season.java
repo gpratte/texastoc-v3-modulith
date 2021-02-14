@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 
 @Builder
 @Data
@@ -26,6 +27,7 @@ public class Season {
   private LocalDate end;
 
   // Read-only fields set by the server (set from TocConfig)
+  // TODO should end in "Cost"
   private int kittyPerGame;
   private int tocPerGame;
   private int quarterlyTocPerGame;
@@ -66,7 +68,10 @@ public class Season {
   private LocalDateTime lastCalculated;
   private boolean finalized;
 
+  @Transient
   private List<SeasonPlayer> players;
+  @Transient
   private List<SeasonPayout> payouts;
+  @Transient
   private List<SeasonPayout> estimatedPayouts;
 }
