@@ -4,7 +4,6 @@ import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.model.Seating;
-
 import java.util.List;
 
 public interface GameModule {
@@ -17,6 +16,7 @@ public interface GameModule {
    *   <li>transportRequired</li>
    * </ul>
    * If transportRequired is not provided the default value is false.
+   *
    * @param game a game with the hostId, date and transportRequired fields set
    * @return the newly created game
    */
@@ -30,6 +30,7 @@ public interface GameModule {
    *   <li>transportRequired</li>
    * </ul>
    * If transportRequired is not provided the default value is false.
+   *
    * @param game a game with the hostId, date and transportRequired fields set
    * @throws NotFoundException
    */
@@ -37,6 +38,7 @@ public interface GameModule {
 
   /**
    * Get a game
+   *
    * @param id the game Id
    * @return the game
    * @throws NotFoundException
@@ -44,17 +46,19 @@ public interface GameModule {
   Game get(int id);
 
   /**
-   * Get the current game. The current game is the only game for the current season
-   * that is not finalized. If no unfinalized game is found the the most current
-   * game of the current season will be returned.
+   * Get the current game. The current game is the only game for the current season that is not
+   * finalized. If no unfinalized game is found the the most current game of the current season will
+   * be returned.
+   *
    * @return the current game
    * @throws NotFoundException
    */
   Game getCurrent();
 
   /**
-   * Get the games for the given season Id. If the season Id is null then get the games
-   * of the current season.
+   * Get the games for the given season Id. If the season Id is null then get the games of the
+   * current season.
+   *
    * @param seasonId the season Id
    * @return the games for the corresponding season
    * @throws NotFoundException
@@ -63,6 +67,7 @@ public interface GameModule {
 
   /**
    * Get the games for the given quarterly season Id.
+   *
    * @param qSeasonId the quarterly season Id
    * @return the games for the corresponding quarterly season
    * @throws NotFoundException
@@ -71,6 +76,7 @@ public interface GameModule {
 
   /**
    * Finalize (end) the game.
+   *
    * @param id the game Id
    * @throws NotFoundException
    */
@@ -78,6 +84,7 @@ public interface GameModule {
 
   /**
    * Unfinalize (reopen) a game. Restricted to admins only.
+   *
    * @param id the game Id
    * @throws NotFoundException
    */
@@ -91,6 +98,7 @@ public interface GameModule {
    *   <li>annualTocCollected</li>
    *   <li>quarterlyTocCollected</li>
    * </ul>
+   *
    * @param gamePlayer a game player with at least playerId
    * @return the newly created game player
    */
@@ -106,6 +114,7 @@ public interface GameModule {
    *   <li>annualTocCollected</li>
    *   <li>quarterlyTocCollected</li>
    * </ul>
+   *
    * @param gamePlayer a game player with at least either firstName or lastName set
    * @return the newly created first time game player
    */
@@ -123,6 +132,7 @@ public interface GameModule {
    *   <li>quarterlyTocCollected</li>
    *   <li>chop</li>
    * </ul>
+   *
    * @param gamePlayer the game player some or none of the pertinent fields
    * @throws NotFoundException
    */
@@ -130,7 +140,8 @@ public interface GameModule {
 
   /**
    * Toggles the knocked out field of the game player
-   * @param gameId the game Id
+   *
+   * @param gameId       the game Id
    * @param gamePlayerId the game player Id
    * @throws NotFoundException
    */
@@ -138,7 +149,8 @@ public interface GameModule {
 
   /**
    * Toggles the rebuy field of the game player
-   * @param gameId the game Id
+   *
+   * @param gameId       the game Id
    * @param gamePlayerId the game player Id
    * @throws NotFoundException
    */
@@ -146,7 +158,8 @@ public interface GameModule {
 
   /**
    * Deletes the game player
-   * @param gameId the game Id
+   *
+   * @param gameId       the game Id
    * @param gamePlayerId the game player Id
    * @throws NotFoundException
    */
@@ -158,6 +171,7 @@ public interface GameModule {
    *   <li>numSeatsPerTable</li>
    *   <li>tableRequests</li>
    * </ul>
+   *
    * @param seating the seating with the perinent fields
    * @return the seating with the tables
    * @throws NotFoundException
@@ -165,7 +179,8 @@ public interface GameModule {
   Seating seatGamePlayers(Seating seating);
 
   /**
-   * Notify the game player as to where to find their seat
+   * Notify the game players as to where to find their seat
+   *
    * @param gameId the game Id
    */
   void notifySeating(int gameId);

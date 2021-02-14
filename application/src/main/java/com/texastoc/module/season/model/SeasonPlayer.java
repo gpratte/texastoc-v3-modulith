@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 
 @Builder
 @Data
@@ -11,14 +12,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SeasonPlayer implements Comparable<SeasonPlayer> {
 
+  // Read-only id set when game player is created
+  @Id
   private int id;
+
+  // Read/write fields from API
+  private boolean forfeit;
+
+  // Read-only id set from server
   private int playerId;
   private int seasonId;
   private String name;
   private int entries;
   private int points;
   private Integer place;
-  private boolean forfeit;
 
   @Override
   public int compareTo(SeasonPlayer other) {

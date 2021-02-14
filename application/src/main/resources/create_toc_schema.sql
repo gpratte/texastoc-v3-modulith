@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS season;
 DROP TABLE IF EXISTS quarterlyseason;
-DROP TABLE IF EXISTS seasonplayer;
+DROP TABLE IF EXISTS season_player;
 DROP TABLE IF EXISTS quarterlyseasonplayer;
 DROP TABLE IF EXISTS role;
 DROP TABLE IF EXISTS player;
@@ -13,7 +13,8 @@ DROP TABLE IF EXISTS game_payout;
 DROP TABLE IF EXISTS game;
 DROP TABLE IF EXISTS seating;
 DROP TABLE IF EXISTS quarterlyseasonpayout;
-DROP TABLE IF EXISTS seasonpayout;
+DROP TABLE IF EXISTS season_payout;
+DROP TABLE IF EXISTS season_estimated_payout;
 DROP TABLE IF EXISTS seasonpayoutsettings;
 DROP TABLE IF EXISTS toc_config;
 DROP TABLE IF EXISTS settings;
@@ -66,18 +67,20 @@ CREATE TABLE quarterlyseason
     PRIMARY KEY (id)
 );
 
-CREATE TABLE seasonplayer
+CREATE TABLE season_player
 (
-    id       int NOT NULL AUTO_INCREMENT,
-    playerId int NOT NULL,
-    seasonId int NOT NULL,
-    name     varchar(64) DEFAULT NULL,
-    entries  int         DEFAULT 0,
-    points   int         DEFAULT 0,
-    place    int         DEFAULT 0,
-    forfeit  boolean     DEFAULT FALSE,
+    id         int NOT NULL AUTO_INCREMENT,
+    player_id  int NOT NULL,
+    season_id  int NOT NULL,
+    name       varchar(64) DEFAULT NULL,
+    entries    int         DEFAULT 0,
+    points     int         DEFAULT 0,
+    place      int         DEFAULT 0,
+    forfeit    boolean     DEFAULT FALSE,
+    season     int NOT NULL,
+    season_key int NOT NULL,
     PRIMARY KEY (id),
-    UNIQUE KEY SPlayer_Unique (playerId, seasonId)
+    UNIQUE KEY Season_Player_Unique (player_id, season_id)
 );
 
 CREATE TABLE quarterlyseasonplayer
@@ -91,7 +94,7 @@ CREATE TABLE quarterlyseasonplayer
     points    int         DEFAULT 0,
     place     int         DEFAULT NULL,
     PRIMARY KEY (id),
-    UNIQUE KEY QSPlayer_Unique (playerId, seasonId, qSeasonId)
+    UNIQUE KEY Quarterly_Season_Player_Unique (playerId, seasonId, qSeasonId)
 );
 
 CREATE TABLE player
@@ -128,45 +131,45 @@ ALTER TABLE seating
 
 CREATE TABLE game
 (
-    id                                      int  NOT NULL AUTO_INCREMENT,
-    host_id                                 int         DEFAULT NULL,
-    game_date                               date NOT NULL,
-    transport_required                      boolean     DEFAULT FALSE,
+    id                                      int       NOT NULL AUTO_INCREMENT,
+    host_id                                 int            DEFAULT NULL,
+    game_date                               date      NOT NULL,
+    transport_required                      boolean        DEFAULT FALSE,
 
-    host_name                               varchar(64) DEFAULT NULL,
-    season_id                               int  NOT NULL,
-    q_season_id                             int  NOT NULL,
-    quarter                                 varchar(16) DEFAULT NULL,
-    season_game_num                         int         DEFAULT NULL,
-    quarterly_game_num                      int         DEFAULT NULL,
+    host_name                               varchar(64)    DEFAULT NULL,
+    season_id                               int       NOT NULL,
+    q_season_id                             int       NOT NULL,
+    quarter                                 varchar(16)    DEFAULT NULL,
+    season_game_num                         int            DEFAULT NULL,
+    quarterly_game_num                      int            DEFAULT NULL,
 
-    kitty_cost                              int         DEFAULT 0,
-    buy_in_cost                             int         DEFAULT 0,
-    rebuy_add_on_cost                       int         DEFAULT 0,
-    rebuy_add_on_toc_debit_cost             int         DEFAULT 0,
-    annual_toc_cost                         int         DEFAULT 0,
-    quarterly_toc_cost                      int         DEFAULT 0,
+    kitty_cost                              int            DEFAULT 0,
+    buy_in_cost                             int            DEFAULT 0,
+    rebuy_add_on_cost                       int            DEFAULT 0,
+    rebuy_add_on_toc_debit_cost             int            DEFAULT 0,
+    annual_toc_cost                         int            DEFAULT 0,
+    quarterly_toc_cost                      int            DEFAULT 0,
 
-    buy_in_collected                        int         DEFAULT 0,
-    rebuy_add_on_collected                  int         DEFAULT 0,
-    annual_toc_collected                    int         DEFAULT 0,
-    quarterly_toc_collected                 int         DEFAULT 0,
-    total_collected                         int         DEFAULT 0,
+    buy_in_collected                        int            DEFAULT 0,
+    rebuy_add_on_collected                  int            DEFAULT 0,
+    annual_toc_collected                    int            DEFAULT 0,
+    quarterly_toc_collected                 int            DEFAULT 0,
+    total_collected                         int            DEFAULT 0,
 
-    annual_toc_from_rebuy_add_on_calculated int         DEFAULT 0,
-    rebuy_add_on_less_annual_toc_calculated int         DEFAULT 0,
-    total_combined_toc_calculated           int         DEFAULT 0,
-    kitty_calculated                        int         DEFAULT 0,
-    prize_pot_calculated                    int         DEFAULT 0,
+    annual_toc_from_rebuy_add_on_calculated int            DEFAULT 0,
+    rebuy_add_on_less_annual_toc_calculated int            DEFAULT 0,
+    total_combined_toc_calculated           int            DEFAULT 0,
+    kitty_calculated                        int            DEFAULT 0,
+    prize_pot_calculated                    int            DEFAULT 0,
 
-    num_players                             int         DEFAULT 0,
-    num_paid_players                        int         DEFAULT 0,
+    num_players                             int            DEFAULT 0,
+    num_paid_players                        int            DEFAULT 0,
     started                                 timestamp NULL DEFAULT NULL,
-    last_calculated                         timestamp   DEFAULT NULL,
-    chopped                                 boolean     DEFAULT TRUE,
-    can_rebuy                               boolean     DEFAULT TRUE,
-    finalized                               boolean     DEFAULT FALSE,
-    payout_delta                            int         DEFAULT NULL,
+    last_calculated                         timestamp      DEFAULT NULL,
+    chopped                                 boolean        DEFAULT TRUE,
+    can_rebuy                               boolean        DEFAULT TRUE,
+    finalized                               boolean        DEFAULT FALSE,
+    payout_delta                            int            DEFAULT NULL,
     seating_id                              int,
     PRIMARY KEY (id)
 );
@@ -287,17 +290,19 @@ CREATE TABLE quarterlyseasonpayout
 );
 
 
-CREATE TABLE seasonpayout
+CREATE TABLE season_payout
 (
     id         int NOT NULL AUTO_INCREMENT,
-    seasonId   int NOT NULL,
+    season_id  int NOT NULL,
     place      int NOT NULL,
     amount     int     DEFAULT NULL,
-    guarenteed boolean DEFAULT false,
+    guaranteed boolean DEFAULT false,
     estimated  boolean DEFAULT false,
     cash       boolean DEFAULT false,
+    season     int NOT NULL,
+    season_key int NOT NULL,
     PRIMARY KEY (id),
-    UNIQUE KEY SPayout_Unique (seasonId, place, estimated)
+    UNIQUE KEY Season_Payout_Unique (season_id, place, estimated)
 );
 
 CREATE TABLE seasonpayoutsettings

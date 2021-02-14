@@ -1,11 +1,14 @@
 package com.texastoc;
 
+import com.texastoc.module.season.model.SeasonPayoutRange;
+import com.texastoc.module.season.model.SeasonPayoutRange.SeasonPayoutPlace;
+import com.texastoc.module.season.model.SeasonPayoutSettings;
 import com.texastoc.module.settings.model.Payout;
 import com.texastoc.module.settings.model.SystemSettings;
 import com.texastoc.module.settings.model.TocConfig;
-
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -292,5 +295,55 @@ public interface TestConstants {
     settings.setPayouts(TestUtils.getPayouts());
     settings.setTocConfigs(tocMap);
     return settings;
+  }
+
+  static SeasonPayoutSettings getSeasonPayoutSettings(int seasonId) {
+    SeasonPayoutSettings seasonPayoutSettings = new SeasonPayoutSettings();
+    seasonPayoutSettings.setSeasonId(seasonId);
+
+    List<SeasonPayoutRange> ranges = new LinkedList<>();
+    seasonPayoutSettings.setRanges(ranges);
+
+    SeasonPayoutRange seasonPayoutRange = new SeasonPayoutRange();
+    ranges.add(seasonPayoutRange);
+    seasonPayoutRange.setLowRange(3000);
+    seasonPayoutRange.setHighRange(5000);
+
+    List<SeasonPayoutPlace> guaranteed = new LinkedList<>();
+    seasonPayoutRange.setGuaranteed(guaranteed);
+    SeasonPayoutPlace seasonPayoutPlace = new SeasonPayoutPlace();
+    guaranteed.add(seasonPayoutPlace);
+    seasonPayoutPlace.setPlace(1);
+    seasonPayoutPlace.setAmount(700);
+    seasonPayoutPlace.setPercent(20);
+
+    List<SeasonPayoutPlace> finalTable = new LinkedList<>();
+    seasonPayoutRange.setFinalTable(finalTable);
+
+    seasonPayoutPlace = new SeasonPayoutPlace();
+    finalTable.add(seasonPayoutPlace);
+    seasonPayoutPlace.setPlace(2);
+    seasonPayoutPlace.setAmount(600);
+    seasonPayoutPlace.setPercent(20);
+
+    seasonPayoutPlace = new SeasonPayoutPlace();
+    finalTable.add(seasonPayoutPlace);
+    seasonPayoutPlace.setPlace(3);
+    seasonPayoutPlace.setAmount(450);
+    seasonPayoutPlace.setPercent(16);
+
+    seasonPayoutPlace = new SeasonPayoutPlace();
+    finalTable.add(seasonPayoutPlace);
+    seasonPayoutPlace.setPlace(4);
+    seasonPayoutPlace.setAmount(350);
+    seasonPayoutPlace.setPercent(14);
+
+    seasonPayoutPlace = new SeasonPayoutPlace();
+    finalTable.add(seasonPayoutPlace);
+    seasonPayoutPlace.setPlace(5);
+    seasonPayoutPlace.setAmount(0);
+    seasonPayoutPlace.setPercent(30);
+
+    return seasonPayoutSettings;
   }
 }

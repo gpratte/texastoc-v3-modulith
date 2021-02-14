@@ -162,5 +162,5 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 29-game-finalized-event
-Now the game service will send a game finalized event that both the season module and the quarterly season module listen to.
+## Current Branch: 30-season-calculator
+Now have a working season calculator with unit tests.

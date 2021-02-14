@@ -6,9 +6,8 @@ import com.texastoc.module.game.model.Seating;
 import com.texastoc.module.game.service.GamePlayerService;
 import com.texastoc.module.game.service.GameService;
 import com.texastoc.module.game.service.SeatingService;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 @Component
 public class GameModuleImpl implements GameModule {
@@ -17,7 +16,8 @@ public class GameModuleImpl implements GameModule {
   private final GamePlayerService gamePlayerService;
   private final SeatingService seatingService;
 
-  public GameModuleImpl(GameService gameService, GamePlayerService gamePlayerService, SeatingService seatingService) {
+  public GameModuleImpl(GameService gameService, GamePlayerService gamePlayerService,
+    SeatingService seatingService) {
     this.gameService = gameService;
     this.gamePlayerService = gamePlayerService;
     this.seatingService = seatingService;

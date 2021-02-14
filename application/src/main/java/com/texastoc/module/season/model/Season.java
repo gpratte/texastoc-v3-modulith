@@ -9,7 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 
 @Builder
 @Data
@@ -68,10 +68,10 @@ public class Season {
   private LocalDateTime lastCalculated;
   private boolean finalized;
 
-  @Transient
+  @MappedCollection
   private List<SeasonPlayer> players;
-  @Transient
+  @MappedCollection
   private List<SeasonPayout> payouts;
-  @Transient
+  @MappedCollection
   private List<SeasonPayout> estimatedPayouts;
 }

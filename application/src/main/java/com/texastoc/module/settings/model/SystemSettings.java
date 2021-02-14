@@ -5,16 +5,17 @@ import java.util.Map;
 
 public class SystemSettings extends Settings {
 
+  private Map<Integer, List<Payout>> payouts;
+
   public SystemSettings() {
     super();
   }
 
-  public SystemSettings(int id, Version version, Map<Integer, TocConfig> tocConfigs, Map<Integer, List<Payout>> payouts) {
+  public SystemSettings(int id, Version version, Map<Integer, TocConfig> tocConfigs,
+      Map<Integer, List<Payout>> payouts) {
     super(id, version, tocConfigs);
     this.payouts = payouts;
   }
-
-  private Map<Integer, List<Payout>> payouts;
 
   public Map<Integer, List<Payout>> getPayouts() {
     return payouts;
