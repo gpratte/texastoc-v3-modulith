@@ -82,23 +82,31 @@ public class SeasonCalculator {
     season.setLastCalculated(LocalDateTime.now());
 
     // Calculate season players
-    List<SeasonPlayer> players = calculatePlayers(id);
+    List<GamePlayer> gamePlayers = getGameModule().getAnnualTocGamePlayersBySeasonId(id);
+    List<SeasonPlayer> players = calculatePlayers(id, gamePlayers);
     season.setPlayers(players);
 
-    // Calculate season current and estimated payouts
-    season.setPayouts(calculateSeasonPayouts(season));
-    season.setEstimatedPayouts(calculateEstimatedSeasonPayouts(season));
+    // Calculate current payouts and estimated payouts
+    SeasonPayoutSettings seasonPayoutSettings = seasonPayoutSettingsRepository
+        .getBySeasonId(season.getId());
+    int total = season.getTotalCombinedAnnualTocCalculated();
+    if (season.getNumGamesPlayed() == season.getNumGames()) {
+      season.setPayouts(calculatePayouts(total, season.getId(), false, seasonPayoutSettings));
+      season.setEstimatedPayouts(Collections.emptyList());
+    } else {
+      season.setPayouts(Collections.emptyList());
+      double seasonTocAmountPerGame = total / (double) season.getNumGamesPlayed();
+      int estimatedTotal = (int) (seasonTocAmountPerGame * season.getNumGames());
+      season.setEstimatedPayouts(
+          calculatePayouts(estimatedTotal, season.getId(), true, seasonPayoutSettings));
+    }
 
     // Persist season
     seasonRepository.save(season);
   }
 
-  private List<SeasonPlayer> calculatePlayers(int id) {
+  private List<SeasonPlayer> calculatePlayers(int id, List<GamePlayer> gamePlayers) {
     Map<Integer, SeasonPlayer> seasonPlayerMap = new HashMap<>();
-
-    // TODO figure this out
-    //List<GamePlayer> gamePlayers = gamePlayerRepository.selectAnnualTocPlayersBySeasonId(id);
-    List<GamePlayer> gamePlayers = Collections.emptyList();
 
     for (GamePlayer gamePlayer : gamePlayers) {
       SeasonPlayer seasonPlayer = seasonPlayerMap.get(gamePlayer.getPlayerId());
@@ -111,9 +119,9 @@ public class SeasonCalculator {
         seasonPlayerMap.put(gamePlayer.getPlayerId(), seasonPlayer);
       }
 
-//      if (gamePlayer.getPoints() != null && gamePlayer.getPoints() > 0) {
-//        seasonPlayer.setPoints(seasonPlayer.getPoints() + gamePlayer.getPoints());
-//      }
+      if (gamePlayer.getTocPoints() != null && gamePlayer.getTocPoints() > 0) {
+        seasonPlayer.setPoints(seasonPlayer.getPoints() + gamePlayer.getTocPoints());
+      }
 
       seasonPlayer.setEntries(seasonPlayer.getEntries() + 1);
     }
@@ -143,32 +151,6 @@ public class SeasonCalculator {
     return seasonPlayers;
   }
 
-  private List<SeasonPayout> calculateSeasonPayouts(Season season) {
-    if (season.getNumGamesPlayed() == season.getNumGames()) {
-      SeasonPayoutSettings seasonPayoutSettings = seasonPayoutSettingsRepository
-          .getBySeasonId(season.getId());
-      return calculatePayouts(season.getTotalCombinedAnnualTocCalculated(), season.getId(), false,
-          seasonPayoutSettings);
-    } else {
-      return Collections.emptyList();
-    }
-  }
-
-  private List<SeasonPayout> calculateEstimatedSeasonPayouts(Season season) {
-    if (season.getNumGamesPlayed() != season.getNumGames()) {
-      SeasonPayoutSettings seasonPayoutSettings = seasonPayoutSettingsRepository
-          .getBySeasonId(season.getId());
-      // Estimate the season TOC amount and payouts
-      double seasonTocAmountPerGame =
-          (double) season.getTotalCombinedAnnualTocCalculated() / (double) season
-              .getNumGamesPlayed();
-      int estimatedSeasonTocAmount = (int) (seasonTocAmountPerGame * season.getNumGames());
-      return calculatePayouts(estimatedSeasonTocAmount, season.getId(), true, seasonPayoutSettings);
-    } else {
-      return Collections.emptyList();
-    }
-  }
-
   private List<SeasonPayout> calculatePayouts(int seasonTocAmount, int seasonId, boolean estimated,
       SeasonPayoutSettings seasonPayoutSettings) {
     List<SeasonPayout> seasonPayouts = new LinkedList<>();
@@ -184,14 +166,14 @@ public class SeasonCalculator {
         for (SeasonPayoutPlace place : range.getGuaranteed()) {
           SeasonPayout seasonPayout = calculatePayout(place, amountToDivy);
           seasonPayout.setSeasonId(seasonId);
-          seasonPayout.setGuarenteed(true);
+          seasonPayout.setGuaranteed(true);
           seasonPayout.setEstimated(estimated);
           seasonPayouts.add(seasonPayout);
         }
         for (SeasonPayoutPlace place : range.getFinalTable()) {
           SeasonPayout seasonPayout = calculatePayout(place, amountToDivy);
           seasonPayout.setSeasonId(seasonId);
-          seasonPayout.setGuarenteed(false);
+          seasonPayout.setGuaranteed(false);
           seasonPayout.setEstimated(estimated);
           seasonPayouts.add(seasonPayout);
         }

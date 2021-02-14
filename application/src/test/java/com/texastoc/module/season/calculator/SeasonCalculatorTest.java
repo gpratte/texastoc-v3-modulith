@@ -1,77 +1,85 @@
 package com.texastoc.module.season.calculator;
 
-import com.texastoc.TestConstants;
-import org.junit.Ignore;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-@Ignore
-@RunWith(SpringRunner.class)
+import com.texastoc.TestConstants;
+import com.texastoc.module.game.GameModule;
+import com.texastoc.module.season.model.Season;
+import com.texastoc.module.season.repository.SeasonPayoutSettingsRepository;
+import com.texastoc.module.season.repository.SeasonRepository;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Optional;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.springframework.test.util.ReflectionTestUtils;
+
 public class SeasonCalculatorTest implements TestConstants {
 
-//  private GameCalculator gameCalculator;
-//  private SeasonCalculator seasonCalculator;
-//
-//  private Random random = new Random(System.currentTimeMillis());
-//
-//  @MockBean
-//  private GameRepository gameRepository;
-//  @MockBean
-//  private SeasonRepository seasonRepository;
-//  @MockBean
-//  private SeasonPlayerRepository seasonPlayerRepository;
-//  @MockBean
-//  private SeasonPayoutRepository seasonPayoutRepository;
-//  @MockBean
-//  private SeasonPayoutSettingsRepository seasonPayoutSettingsRepository;
-//  @MockBean
-//  private SeasonService seasonService;
-//
-//  @Before
-//  public void before() {
-//    seasonCalculator = new SeasonCalculator(gameRepository, seasonRepository, seasonPlayerRepository, seasonPayoutRepository, seasonPayoutSettingsRepository);
-//    gameCalculator = new GameCalculator(gameRepository, seasonService);
-//  }
-//
-//  @Ignore
-//  @Test
-//  public void testNoGames() {
-//
-//    Season currentSeason = Season.builder()
-//      .id(1)
-//      .build();
-//    Mockito.when(seasonRepository.get(1)).thenReturn(currentSeason);
-//
-//    Mockito.when(gameRepository.getBySeasonId(1)).thenReturn(Collections.emptyList());
-//
-//    Season season = seasonCalculator.calculate(1);
-//
-//    Assert.assertNotNull("season returned from calculator should not be null", season);
-//
-//    Mockito.verify(seasonRepository, Mockito.times(1)).get(1);
-//    Mockito.verify(gameRepository, Mockito.times(1)).getBySeasonId(1);
-//
-//    Assert.assertEquals("season id should be 1", 1, (int) season.getId());
-//    Assert.assertEquals("numGamesPlayed should be 0", 0, (int) season.getNumGamesPlayed());
-//    Assert.assertEquals("buyInCollected should be 0", 0, (int) season.getBuyInCollected());
-//    Assert.assertEquals("rebuyAddOnCollected should be 0", 0, (int) season.getRebuyAddOnCollected());
-//    Assert.assertEquals("annualTocCollected should be 0", 0, (int) season.getAnnualTocCollected());
-//    Assert.assertEquals("totalCollected should be 0", 0, (int) season.getTotalCollected());
-//
-//    Assert.assertEquals("annualTocFromRebuyAddOnCalculated should be 0", 0, (int) season.getAnnualTocFromRebuyAddOnCalculated());
-//    Assert.assertEquals("rebuyAddOnLessAnnualTocCalculated should be 0", 0, (int) season.getRebuyAddOnLessAnnualTocCalculated());
-//    Assert.assertEquals("totalCombinedAnnualTocCalculated should be 0", 0, (int) season.getTotalCombinedAnnualTocCalculated());
-//    Assert.assertEquals("kittyCalculated should be 0", 0, (int) season.getKittyCalculated());
-//    Assert.assertEquals("prizePotCalculated should be 0", 0, (int) season.getPrizePotCalculated());
-//
-//    Assert.assertEquals("numGamesPlayed should be 0", 0, (int) season.getNumGamesPlayed());
-//
-//    Assert.assertTrue("last calculated should be within the last few seconds", season.getLastCalculated().isAfter(LocalDateTime.now().minusSeconds(3)));
-//
-//    Assert.assertEquals("players 0", 0, season.getPlayers().size());
-//    Assert.assertEquals("payouts 0", 0, season.getPayouts().size());
-//  }
-//
+  private SeasonCalculator seasonCalculator;
+
+  private SeasonRepository seasonRepository;
+  private SeasonPayoutSettingsRepository seasonPayoutSettingsRepository;
+  private GameModule gameModule;
+
+  @Before
+  public void before() {
+    seasonRepository = mock(SeasonRepository.class);
+    seasonPayoutSettingsRepository = mock(SeasonPayoutSettingsRepository.class);
+    seasonCalculator = new SeasonCalculator(seasonRepository, seasonPayoutSettingsRepository);
+    gameModule = mock(GameModule.class);
+    ReflectionTestUtils.setField(seasonCalculator, "gameModule", gameModule);
+  }
+
+  @Test
+  public void testNoGames() {
+    // Arrange
+    when(seasonRepository.findById(1))
+        .thenReturn(Optional.of(Season.builder().id(1).build()));
+    when(gameModule.getBySeasonId(1)).thenReturn(Collections.emptyList());
+    when(gameModule.getAnnualTocGamePlayersBySeasonId(1)).thenReturn(Collections.emptyList());
+    when(seasonPayoutSettingsRepository.getBySeasonId(1))
+        .thenReturn(TestConstants.getSeasonPayoutSettings(1));
+
+    // Act
+    seasonCalculator.calculate(1);
+
+    // Assert
+    ArgumentCaptor<Season> seasonArg = ArgumentCaptor.forClass(Season.class);
+    Mockito.verify(seasonRepository, Mockito.times(1)).save(seasonArg.capture());
+    Season season = seasonArg.getValue();
+
+    assertEquals("season id should be 1", 1, (int) season.getId());
+    assertEquals("numGamesPlayed should be 0", 0, (int) season.getNumGamesPlayed());
+    assertEquals("buyInCollected should be 0", 0, (int) season.getBuyInCollected());
+    assertEquals("rebuyAddOnCollected should be 0", 0, (int) season.getRebuyAddOnCollected());
+    assertEquals("annualTocCollected should be 0", 0, (int) season.getAnnualTocCollected());
+    assertEquals("totalCollected should be 0", 0, (int) season.getTotalCollected());
+
+    assertEquals("annualTocFromRebuyAddOnCalculated should be 0", 0,
+        (int) season.getAnnualTocFromRebuyAddOnCalculated());
+    assertEquals("rebuyAddOnLessAnnualTocCalculated should be 0", 0,
+        (int) season.getRebuyAddOnLessAnnualTocCalculated());
+    assertEquals("totalCombinedAnnualTocCalculated should be 0", 0,
+        (int) season.getTotalCombinedAnnualTocCalculated());
+    assertEquals("kittyCalculated should be 0", 0, (int) season.getKittyCalculated());
+    assertEquals("prizePotCalculated should be 0", 0, (int) season.getPrizePotCalculated());
+
+    assertEquals("numGamesPlayed should be 0", 0, (int) season.getNumGamesPlayed());
+
+    Assert.assertTrue("last calculated should be within the last few seconds",
+        season.getLastCalculated().isAfter(LocalDateTime.now().minusSeconds(3)));
+
+    assertEquals(0, season.getPlayers().size());
+    assertEquals(0, season.getPayouts().size());
+    assertEquals(0, season.getEstimatedPayouts().size());
+  }
+
 //  @Ignore
 //  @Test
 //  public void test1Game() {
