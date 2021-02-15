@@ -10,7 +10,10 @@ import com.texastoc.module.quarterly.QuarterlySeasonModuleFactory;
 import com.texastoc.module.season.exception.DuplicateSeasonException;
 import com.texastoc.module.season.exception.GameInProgressException;
 import com.texastoc.module.season.exception.SeasonInProgressException;
+import com.texastoc.module.season.model.HistoricalSeason;
+import com.texastoc.module.season.model.HistoricalSeason.HistoricalSeasonPlayer;
 import com.texastoc.module.season.model.Season;
+import com.texastoc.module.season.repository.SeasonHistoryRepository;
 import com.texastoc.module.season.repository.SeasonRepository;
 import com.texastoc.module.settings.SettingsModule;
 import com.texastoc.module.settings.SettingsModuleFactory;
@@ -19,6 +22,7 @@ import com.texastoc.module.settings.model.TocConfig;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,14 +39,17 @@ public class SeasonService {
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   private final SeasonRepository seasonRepository;
+  private final SeasonHistoryRepository seasonHistoryRepository;
 
   private GameModule gameModule;
   private SettingsModule settingsModule;
   private QuarterlySeasonModule quarterlySeasonModule;
 
   @Autowired
-  public SeasonService(SeasonRepository seasonRepository) {
+  public SeasonService(SeasonRepository seasonRepository,
+    SeasonHistoryRepository seasonHistoryRepository) {
     this.seasonRepository = seasonRepository;
+    this.seasonHistoryRepository = seasonHistoryRepository;
   }
 
   // TODO caching
@@ -82,23 +89,23 @@ public class SeasonService {
     }
 
     Season newSeason = Season.builder()
-        .start(start)
-        .end(end)
-        .kittyPerGame(tocConfig.getKittyDebit())
-        .tocPerGame(tocConfig.getAnnualTocCost())
-        .quarterlyTocPerGame(tocConfig.getQuarterlyTocCost())
-        .quarterlyNumPayouts(tocConfig.getQuarterlyNumPayouts())
-        .buyInCost(tocConfig.getRegularBuyInCost())
-        .rebuyAddOnCost(tocConfig.getRegularRebuyCost())
-        .rebuyAddOnTocDebitCost(tocConfig.getRegularRebuyTocDebit())
-        .numGames(numThursdays)
-        .build();
+      .start(start)
+      .end(end)
+      .kittyPerGame(tocConfig.getKittyDebit())
+      .tocPerGame(tocConfig.getAnnualTocCost())
+      .quarterlyTocPerGame(tocConfig.getQuarterlyTocCost())
+      .quarterlyNumPayouts(tocConfig.getQuarterlyNumPayouts())
+      .buyInCost(tocConfig.getRegularBuyInCost())
+      .rebuyAddOnCost(tocConfig.getRegularRebuyCost())
+      .rebuyAddOnTocDebitCost(tocConfig.getRegularRebuyTocDebit())
+      .numGames(numThursdays)
+      .build();
 
     Season season = seasonRepository.save(newSeason);
 
     // TODO message instead
     getQuarterlySeasonModule()
-        .createQuarterlySeasons(season.getId(), season.getStart(), season.getEnd());
+      .createQuarterlySeasons(season.getId(), season.getStart(), season.getEnd());
 
     return season;
   }
@@ -142,7 +149,7 @@ public class SeasonService {
 
   public List<Season> getAll() {
     return StreamSupport.stream(seasonRepository.findAll().spliterator(), false)
-        .collect(Collectors.toList());
+      .collect(Collectors.toList());
   }
 
   //  @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
@@ -160,16 +167,23 @@ public class SeasonService {
     season.setFinalized(true);
     seasonRepository.save(season);
 
-    // TODO
     // Clear out the historical season
-//    seasonHistoryRepository.deletePlayersById(seasonId);
-//    seasonHistoryRepository.deleteById(seasonId);
+    seasonHistoryRepository.deleteById(seasonId);
     // Set the historical season
-//    seasonHistoryRepository.save(seasonId, season.getStart(), season.getEnd());
-//    season.getPlayers()
-//        .forEach(seasonPlayer -> seasonHistoryRepository
-//            .savePlayer(seasonId, seasonPlayer.getName(), seasonPlayer.getPoints(),
-//                seasonPlayer.getEntries()));
+    List<HistoricalSeasonPlayer> hsPlayers = new LinkedList<>();
+    HistoricalSeason historicalSeason = HistoricalSeason.builder()
+      .seasonId(seasonId)
+      .startYear(Integer.toString(season.getStart().getYear()))
+      .endYear(Integer.toString(season.getEnd().getYear()))
+      .players(hsPlayers)
+      .build();
+    season.getPlayers()
+      .forEach(seasonPlayer -> hsPlayers.add(HistoricalSeasonPlayer.builder()
+        .name(seasonPlayer.getName())
+        .points(seasonPlayer.getPoints())
+        .entries(seasonPlayer.getEntries())
+        .build()));
+    seasonHistoryRepository.save(historicalSeason);
   }
 
   //  @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
@@ -184,10 +198,8 @@ public class SeasonService {
     season.setFinalized(false);
     seasonRepository.save(season);
 
-    // TODO
     // Clear out the historical season
-    //seasonHistoryRepository.deletePlayersById(seasonId);
-    //seasonHistoryRepository.deleteById(seasonId);
+    seasonHistoryRepository.deleteById(seasonId);
   }
 
   private LocalDate findNextThursday(LocalDate day) {
