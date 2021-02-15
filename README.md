@@ -162,5 +162,5 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 30-season-calculator
-Now have a working season calculator with unit tests.
+## Current Branch: 31-season-payout-settings
+Refactored SeasonPayoutSettings from JdbcTemplate to Spring Data JDBC.
