@@ -81,10 +81,10 @@ public class SeasonServiceTest implements TestConstants {
     LocalDate started = LocalDate.now();
     LocalDate ended = started.plusDays(1);
     Season savedSeason = Season.builder()
-      .id(11)
-      .start(started)
-      .end(ended)
-      .build();
+        .id(11)
+        .start(started)
+        .end(ended)
+        .build();
     when(seasonRepository.save(any())).thenReturn(savedSeason);
 
     // Act
@@ -127,13 +127,11 @@ public class SeasonServiceTest implements TestConstants {
     assertTrue(season.getEstimatedPayouts() == null || season.getEstimatedPayouts().size() == 0);
 
     ArgumentCaptor<Integer> seasonIdArg = ArgumentCaptor.forClass(Integer.class);
-    ArgumentCaptor<LocalDate> startArg = ArgumentCaptor.forClass(LocalDate.class);
-    ArgumentCaptor<LocalDate> endArg = ArgumentCaptor.forClass(LocalDate.class);
+    ArgumentCaptor<Integer> startArg = ArgumentCaptor.forClass(Integer.class);
     verify(quarterlySeasonModule, times(1))
-      .createQuarterlySeasons(seasonIdArg.capture(), startArg.capture(), endArg.capture());
+        .create(seasonIdArg.capture(), startArg.capture());
     assertEquals(11, seasonIdArg.getValue().intValue());
-    assertEquals(started, startArg.getValue());
-    assertEquals(ended, endArg.getValue());
+    assertEquals(started.getYear(), startArg.getValue().intValue());
   }
 
   @Test
@@ -160,7 +158,7 @@ public class SeasonServiceTest implements TestConstants {
     assertThatThrownBy(() -> {
       seasonService.get(1);
     }).isInstanceOf(NotFoundException.class)
-      .hasMessageContaining("Season with id 1 not found");
+        .hasMessageContaining("Season with id 1 not found");
   }
 
   @Test
@@ -209,13 +207,13 @@ public class SeasonServiceTest implements TestConstants {
     assertThatThrownBy(() -> {
       seasonService.getCurrent();
     }).isInstanceOf(NotFoundException.class)
-      .hasMessageContaining("Current season not found");
+        .hasMessageContaining("Current season not found");
 
     // Act and Assert
     assertThatThrownBy(() -> {
       seasonService.getCurrentId();
     }).isInstanceOf(NotFoundException.class)
-      .hasMessageContaining("Current season not found");
+        .hasMessageContaining("Current season not found");
   }
 
   @Test
@@ -259,23 +257,23 @@ public class SeasonServiceTest implements TestConstants {
     // Arrange
     List<SeasonPlayer> players = new ArrayList<>(2);
     SeasonPlayer player1 = SeasonPlayer.builder()
-      .name("ready player one")
-      .points(100)
-      .entries(1)
-      .build();
+        .name("ready player one")
+        .points(100)
+        .entries(1)
+        .build();
     players.add(player1);
     SeasonPlayer player2 = SeasonPlayer.builder()
-      .name("ready player two")
-      .points(0)
-      .entries(2)
-      .build();
+        .name("ready player two")
+        .points(0)
+        .entries(2)
+        .build();
     players.add(player2);
     Season currentSeason = Season.builder()
-      .id(1)
-      .start(LocalDate.of(2020, 1, 1))
-      .end(LocalDate.of(2021, 1, 1))
-      .players(players)
-      .build();
+        .id(1)
+        .start(LocalDate.of(2020, 1, 1))
+        .end(LocalDate.of(2021, 1, 1))
+        .players(players)
+        .build();
 
     when(seasonRepository.findById(1)).thenReturn(Optional.of(currentSeason));
     when(gameModule.getBySeasonId(1)).thenReturn(Collections.emptyList());
@@ -292,7 +290,7 @@ public class SeasonServiceTest implements TestConstants {
     verify(seasonHistoryRepository, Mockito.times(1)).deleteById(1);
 
     ArgumentCaptor<HistoricalSeason> historicalSeasonArg = ArgumentCaptor
-      .forClass(HistoricalSeason.class);
+        .forClass(HistoricalSeason.class);
     verify(seasonHistoryRepository, Mockito.times(1)).save(historicalSeasonArg.capture());
     HistoricalSeason historicalSeason = historicalSeasonArg.getValue();
     assertEquals("2020", historicalSeason.getStartYear());
@@ -300,15 +298,15 @@ public class SeasonServiceTest implements TestConstants {
     assertEquals(2, historicalSeason.getPlayers().size());
 
     HistoricalSeasonPlayer hsp1 = HistoricalSeasonPlayer.builder()
-      .name(player1.getName())
-      .points(player1.getPoints())
-      .entries(player1.getEntries())
-      .build();
+        .name(player1.getName())
+        .points(player1.getPoints())
+        .entries(player1.getEntries())
+        .build();
     HistoricalSeasonPlayer hsp2 = HistoricalSeasonPlayer.builder()
-      .name(player2.getName())
-      .points(player2.getPoints())
-      .entries(player2.getEntries())
-      .build();
+        .name(player2.getName())
+        .points(player2.getPoints())
+        .entries(player2.getEntries())
+        .build();
     assertThat(historicalSeason.getPlayers()).containsExactlyInAnyOrder(hsp1, hsp2);
   }
 
@@ -321,7 +319,7 @@ public class SeasonServiceTest implements TestConstants {
     assertThatThrownBy(() -> {
       seasonService.end(1);
     }).isInstanceOf(NotFoundException.class)
-      .hasMessageContaining("Season with id 1 not found");
+        .hasMessageContaining("Season with id 1 not found");
   }
 
   @Test
@@ -329,23 +327,23 @@ public class SeasonServiceTest implements TestConstants {
     // Arrange
     when(seasonRepository.findById(1)).thenReturn(Optional.of(Season.builder().id(1).build()));
     when(gameModule.getBySeasonId(1)).thenReturn(Arrays.asList(Game.builder()
-      .finalized(false)
-      .build()));
+        .finalized(false)
+        .build()));
 
     // Act and Assert
     assertThatThrownBy(() -> {
       seasonService.end(1);
     }).isInstanceOf(GameInProgressException.class)
-      .hasMessageContaining("There is a game in progress");
+        .hasMessageContaining("There is a game in progress");
   }
 
   @Test
   public void openSeason() {
     // Arrange
     when(seasonRepository.findById(1)).thenReturn(Optional.of(Season.builder()
-      .id(1)
-      .finalized(true)
-      .build()));
+        .id(1)
+        .finalized(true)
+        .build()));
 
     // Act
     seasonService.open(1);
@@ -368,16 +366,16 @@ public class SeasonServiceTest implements TestConstants {
     assertThatThrownBy(() -> {
       seasonService.open(1);
     }).isInstanceOf(NotFoundException.class)
-      .hasMessageContaining("Season with id 1 not found");
+        .hasMessageContaining("Season with id 1 not found");
   }
 
   @Test
   public void openAlreadyOpenedSeason() {
     // Arrange
     when(seasonRepository.findById(1)).thenReturn(Optional.of(Season.builder()
-      .id(1)
-      .finalized(false)
-      .build()));
+        .id(1)
+        .finalized(false)
+        .build()));
 
     // Act
     seasonService.open(1);

@@ -104,7 +104,7 @@ public class GameHelper {
     Season season = getSeasonModule().get(game.getSeasonId());
     List<Player> players = getPlayerModule().getAll();
     List<QuarterlySeason> quarterlySeasons = getQuarterlySeasonModule()
-        .getQuarterlySeasonBySeason(season.getId());
+        .getBySeasonId(season.getId());
     GameSummary gameSummary = new GameSummary(game, season, quarterlySeasons, players);
     // TODO use Spring Integration
     new Thread(gameSummary).start();
