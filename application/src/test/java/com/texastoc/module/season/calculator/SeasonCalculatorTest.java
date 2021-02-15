@@ -49,8 +49,8 @@ public class SeasonCalculatorTest implements TestConstants {
     when(seasonRepository.findById(1))
       .thenReturn(Optional.of(Season.builder().id(1).build()));
     when(gameModule.getBySeasonId(1)).thenReturn(Collections.emptyList());
-    when(seasonPayoutSettingsRepository.getBySeasonId(1))
-      .thenReturn(TestConstants.getSeasonPayoutSettings(1));
+    when(seasonPayoutSettingsRepository.findBySeasonId(1))
+      .thenReturn(Collections.singletonList(TestConstants.getSeasonPayoutSettings(1)));
 
     // Act
     seasonCalculator.calculate(1);
@@ -94,8 +94,8 @@ public class SeasonCalculatorTest implements TestConstants {
         .id(1)
         .numGames(52)
         .build()));
-    when(seasonPayoutSettingsRepository.getBySeasonId(1))
-      .thenReturn(TestConstants.getSeasonPayoutSettings(1));
+    when(seasonPayoutSettingsRepository.findBySeasonId(1))
+      .thenReturn(Collections.singletonList(TestConstants.getSeasonPayoutSettings(1)));
 
     // 10 players bought in
     int boughtIn = 10 * GAME_BUY_IN;
@@ -139,7 +139,7 @@ public class SeasonCalculatorTest implements TestConstants {
     }
     game.setPlayers(gameSeasonPlayers);
 
-    when(gameModule.getBySeasonId(1)).thenReturn(Arrays.asList(game));
+    when(gameModule.getBySeasonId(1)).thenReturn(Collections.singletonList(game));
 
     // Act
     seasonCalculator.calculate(1);
@@ -202,8 +202,8 @@ public class SeasonCalculatorTest implements TestConstants {
         .id(1)
         .numGames(52)
         .build()));
-    when(seasonPayoutSettingsRepository.getBySeasonId(1))
-      .thenReturn(TestConstants.getSeasonPayoutSettings(1));
+    when(seasonPayoutSettingsRepository.findBySeasonId(1))
+      .thenReturn(Collections.singletonList(TestConstants.getSeasonPayoutSettings(1)));
 
     // Game 1
     // 10 players bought in

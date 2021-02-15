@@ -1,7 +1,7 @@
 package com.texastoc;
 
+import com.texastoc.module.season.model.SeasonPayoutPlace;
 import com.texastoc.module.season.model.SeasonPayoutRange;
-import com.texastoc.module.season.model.SeasonPayoutRange.SeasonPayoutPlace;
 import com.texastoc.module.season.model.SeasonPayoutSettings;
 import com.texastoc.module.settings.model.Payout;
 import com.texastoc.module.settings.model.SystemSettings;

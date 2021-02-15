@@ -15,7 +15,7 @@ DROP TABLE IF EXISTS seating;
 DROP TABLE IF EXISTS quarterlyseasonpayout;
 DROP TABLE IF EXISTS season_payout;
 DROP TABLE IF EXISTS season_estimated_payout;
-DROP TABLE IF EXISTS seasonpayoutsettings;
+DROP TABLE IF EXISTS season_payout_settings;
 DROP TABLE IF EXISTS toc_config;
 DROP TABLE IF EXISTS settings;
 DROP TABLE IF EXISTS version;
@@ -305,11 +305,11 @@ CREATE TABLE season_payout
     UNIQUE KEY Season_Payout_Unique (season_id, place, estimated)
 );
 
-CREATE TABLE seasonpayoutsettings
+CREATE TABLE season_payout_settings
 (
-    id       int           NOT NULL AUTO_INCREMENT,
-    seasonId int           NOT NULL,
-    settings varchar(8192) NOT NULL,
+    id        int           NOT NULL AUTO_INCREMENT,
+    season_id int           NOT NULL,
+    settings  varchar(8192) NOT NULL,
     PRIMARY KEY (id)
 );
 

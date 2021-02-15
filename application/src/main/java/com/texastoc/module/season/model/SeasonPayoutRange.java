@@ -1,8 +1,7 @@
 package com.texastoc.module.season.model;
 
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class SeasonPayoutRange {
@@ -11,11 +10,4 @@ public class SeasonPayoutRange {
   private int highRange;
   private List<SeasonPayoutPlace> guaranteed;
   private List<SeasonPayoutPlace> finalTable;
-
-  @Data
-  public static class SeasonPayoutPlace {
-    private int place;
-    private int amount;
-    private int percent;
-  }
 }

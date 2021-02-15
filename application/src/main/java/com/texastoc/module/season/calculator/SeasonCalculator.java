@@ -1,13 +1,14 @@
 package com.texastoc.module.season.calculator;
 
+import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.game.GameModule;
 import com.texastoc.module.game.GameModuleFactory;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.season.model.Season;
 import com.texastoc.module.season.model.SeasonPayout;
+import com.texastoc.module.season.model.SeasonPayoutPlace;
 import com.texastoc.module.season.model.SeasonPayoutRange;
-import com.texastoc.module.season.model.SeasonPayoutRange.SeasonPayoutPlace;
 import com.texastoc.module.season.model.SeasonPayoutSettings;
 import com.texastoc.module.season.model.SeasonPlayer;
 import com.texastoc.module.season.repository.SeasonPayoutSettingsRepository;
@@ -93,8 +94,13 @@ public class SeasonCalculator {
     season.setPlayers(players);
 
     // Calculate current payouts and estimated payouts
-    SeasonPayoutSettings seasonPayoutSettings = seasonPayoutSettingsRepository
-      .getBySeasonId(season.getId());
+    List<SeasonPayoutSettings> seasonPayoutSettingss = seasonPayoutSettingsRepository
+      .findBySeasonId(season.getId());
+    if (seasonPayoutSettingss.size() < 1) {
+      throw new NotFoundException(
+        "Could not find the SeasonPayoutSettings for season " + season.getId());
+    }
+    SeasonPayoutSettings seasonPayoutSettings = seasonPayoutSettingss.get(0);
     int total = season.getTotalCombinedAnnualTocCalculated();
     if (season.getNumGamesPlayed() == season.getNumGames()) {
       season.setPayouts(calculatePayouts(total, season.getId(), false, seasonPayoutSettings));
