@@ -14,6 +14,7 @@ public interface GameModule {
    *   <li>hostId</li>
    *   <li>date</li>
    *   <li>transportRequired</li>
+   *
    * </ul>
    * If transportRequired is not provided the default value is false.
    *
@@ -101,6 +102,7 @@ public interface GameModule {
    *
    * @param gamePlayer a game player with at least playerId
    * @return the newly created game player
+   * @throws NotFoundException
    */
   GamePlayer createGamePlayer(GamePlayer gamePlayer);
 
@@ -117,6 +119,7 @@ public interface GameModule {
    *
    * @param gamePlayer a game player with at least either firstName or lastName set
    * @return the newly created first time game player
+   * @throws NotFoundException
    */
   GamePlayer createFirstTimeGamePlayer(GamePlayer gamePlayer);
 
@@ -182,6 +185,7 @@ public interface GameModule {
    * Notify the game players as to where to find their seat
    *
    * @param gameId the game Id
+   * @throws NotFoundException
    */
   void notifySeating(int gameId);
 }

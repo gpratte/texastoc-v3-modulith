@@ -13,8 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +28,6 @@ public class HistoricalSeasonService {
 
   private String pastSeasonsAsJson = null;
 
-  @Autowired
   public HistoricalSeasonService(SeasonHistoryRepository seasonHistoryRepository) {
     this.seasonHistoryRepository = seasonHistoryRepository;
   }
@@ -38,21 +37,19 @@ public class HistoricalSeasonService {
     String json = getPastSeasonsAsJson();
     try {
       historicalSeasonsFromJson = OBJECT_MAPPER
-          .readValue(json, new TypeReference<List<HistoricalSeason>>() {
-          });
+        .readValue(json, new TypeReference<List<HistoricalSeason>>() {
+        });
     } catch (JsonProcessingException e) {
       log.warn("Could not deserialize historical seasons json");
       historicalSeasonsFromJson = new LinkedList<>();
     }
 
-    List<HistoricalSeason> historicalSeasons = seasonHistoryRepository.getAll();
-    historicalSeasons.forEach(historicalSeason -> historicalSeason
-        .setPlayers(seasonHistoryRepository.getAllPlayers(historicalSeason.getSeasonId())));
+    List<HistoricalSeason> historicalSeasons = StreamSupport
+      .stream(seasonHistoryRepository.findAll().spliterator(), false).collect(Collectors.toList());
 
     historicalSeasons.addAll(historicalSeasonsFromJson);
     return historicalSeasons;
   }
-
 
   private String getPastSeasonsAsJson() {
     if (pastSeasonsAsJson != null) {
@@ -65,7 +62,7 @@ public class HistoricalSeasonService {
       return null;
     }
     try (BufferedReader bf = new BufferedReader(
-        new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+      new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
       pastSeasonsAsJson = bf.lines().collect(Collectors.joining());
       return pastSeasonsAsJson;
     } catch (IOException e) {

@@ -19,8 +19,8 @@ DROP TABLE IF EXISTS season_payout_settings;
 DROP TABLE IF EXISTS toc_config;
 DROP TABLE IF EXISTS settings;
 DROP TABLE IF EXISTS version;
-DROP TABLE IF EXISTS historicalseasonplayer;
-DROP TABLE IF EXISTS historicalseason;
+DROP TABLE IF EXISTS historical_season_player;
+DROP TABLE IF EXISTS historical_season;
 
 CREATE TABLE season
 (
@@ -346,23 +346,24 @@ CREATE TABLE toc_config
 alter table toc_config
     add constraint fk_toc_config_settings foreign key (settings) references settings (id);
 
-CREATE TABLE historicalseasonplayer
+CREATE TABLE historical_season
 (
-    id        int NOT NULL AUTO_INCREMENT,
-    seasonId  int NOT NULL,
-    firstName varchar(64),
-    lastName  varchar(64),
-    name      varchar(64),
-    points    int,
-    entries   int,
+    id         int NOT NULL AUTO_INCREMENT,
+    season_id  int NOT NULL,
+    start_year int DEFAULT NULL,
+    end_year   int DEFAULT NULL,
     PRIMARY KEY (id)
 );
 
-CREATE TABLE historicalseason
+CREATE TABLE historical_season_player
 (
-    id        int NOT NULL AUTO_INCREMENT,
-    seasonId  int NOT NULL,
-    startYear int DEFAULT NULL,
-    endYear   int DEFAULT NULL,
+    id                    int NOT NULL AUTO_INCREMENT,
+    season_id             int NOT NULL,
+    name                  varchar(64),
+    points                int,
+    entries               int,
+    historical_season     int NOT NULL,
+    historical_season_key int NOT NULL,
     PRIMARY KEY (id)
 );
+
