@@ -1,4 +1,4 @@
-package com.texastoc.service.calculator;
+package com.texastoc.module.quarterly.calculator;
 
 import com.texastoc.TestConstants;
 import org.junit.Ignore;

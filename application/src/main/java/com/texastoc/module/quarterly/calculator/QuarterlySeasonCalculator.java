@@ -6,8 +6,6 @@ import com.texastoc.module.game.model.Game;
 import com.texastoc.module.quarterly.model.QuarterlySeason;
 import com.texastoc.module.quarterly.model.QuarterlySeasonPayout;
 import com.texastoc.module.quarterly.model.QuarterlySeasonPlayer;
-import com.texastoc.module.quarterly.repository.QuarterlySeasonPayoutRepository;
-import com.texastoc.module.quarterly.repository.QuarterlySeasonPlayerRepository;
 import com.texastoc.module.quarterly.repository.QuarterlySeasonRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,21 +20,15 @@ import org.springframework.stereotype.Component;
 public class QuarterlySeasonCalculator {
 
   private final QuarterlySeasonRepository qSeasonRepository;
-  private final QuarterlySeasonPlayerRepository qSeasonPlayerRepository;
-  private final QuarterlySeasonPayoutRepository qSeasonPayoutRepository;
 
   private GameModule gameModule;
 
-  public QuarterlySeasonCalculator(QuarterlySeasonRepository qSeasonRepository,
-      QuarterlySeasonPlayerRepository qSeasonPlayerRepository,
-      QuarterlySeasonPayoutRepository qSeasonPayoutRepository) {
+  public QuarterlySeasonCalculator(QuarterlySeasonRepository qSeasonRepository) {
     this.qSeasonRepository = qSeasonRepository;
-    this.qSeasonPlayerRepository = qSeasonPlayerRepository;
-    this.qSeasonPayoutRepository = qSeasonPayoutRepository;
   }
 
   public QuarterlySeason calculate(int id) {
-    QuarterlySeason qSeason = qSeasonRepository.getById(id);
+    QuarterlySeason qSeason = qSeasonRepository.findById(id).get();
 
     // Calculate quarterly season
     List<Game> games = getGameModule().getByQuarterlySeasonId(id);
@@ -50,29 +42,17 @@ public class QuarterlySeasonCalculator {
     qSeason.setQTocCollected(qTocCollected);
     qSeason.setLastCalculated(LocalDateTime.now());
 
-    // Persist quarterly season
-    qSeasonRepository.update(qSeason);
-
     // Calculate quarterly season players
     List<QuarterlySeasonPlayer> players = calculatePlayers(qSeason.getSeasonId(), id);
     qSeason.setPlayers(players);
-
-    // Persist quarterly season players
-    qSeasonPlayerRepository.deleteByQSeasonId(id);
-    for (QuarterlySeasonPlayer player : players) {
-      qSeasonPlayerRepository.save(player);
-    }
 
     // Calculate quarterly season payouts
     List<QuarterlySeasonPayout> payouts = calculatePayouts(qTocCollected, qSeason.getSeasonId(),
         id);
     qSeason.setPayouts(payouts);
 
-    // Persist quarterly season payouts
-    qSeasonPayoutRepository.deleteByQSeasonId(id);
-    for (QuarterlySeasonPayout payout : payouts) {
-      qSeasonPayoutRepository.save(payout);
-    }
+    // Persist quarterly season
+    qSeasonRepository.save(qSeason);
 
     return qSeason;
   }

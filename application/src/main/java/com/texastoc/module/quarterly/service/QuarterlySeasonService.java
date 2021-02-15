@@ -1,11 +1,10 @@
 package com.texastoc.module.quarterly.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.quarterly.QuarterlySeasonModule;
 import com.texastoc.module.quarterly.model.Quarter;
 import com.texastoc.module.quarterly.model.QuarterlySeason;
-import com.texastoc.module.quarterly.repository.QuarterlySeasonPayoutRepository;
-import com.texastoc.module.quarterly.repository.QuarterlySeasonPlayerRepository;
 import com.texastoc.module.quarterly.repository.QuarterlySeasonRepository;
 import com.texastoc.module.settings.SettingsModule;
 import com.texastoc.module.settings.SettingsModuleFactory;
@@ -27,18 +26,12 @@ public class QuarterlySeasonService implements QuarterlySeasonModule {
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   private final QuarterlySeasonRepository qSeasonRepository;
-  private final QuarterlySeasonPlayerRepository qSeasonPlayerRepository;
-  private final QuarterlySeasonPayoutRepository qSeasonPayoutRepository;
 
   private SettingsModule settingsModule;
 
   @Autowired
-  public QuarterlySeasonService(QuarterlySeasonRepository qSeasonRepository,
-      QuarterlySeasonPlayerRepository qSeasonPlayerRepository,
-      QuarterlySeasonPayoutRepository qSeasonPayoutRepository) {
+  public QuarterlySeasonService(QuarterlySeasonRepository qSeasonRepository) {
     this.qSeasonRepository = qSeasonRepository;
-    this.qSeasonPlayerRepository = qSeasonPlayerRepository;
-    this.qSeasonPayoutRepository = qSeasonPayoutRepository;
   }
 
   @Override
@@ -48,7 +41,11 @@ public class QuarterlySeasonService implements QuarterlySeasonModule {
 
   @Override
   public QuarterlySeason getQuarterlySeasonByDate(LocalDate date) {
-    return qSeasonRepository.getByDate(date);
+    List<QuarterlySeason> qSeasons = qSeasonRepository.findByDate(date);
+    if (qSeasons.size() > 0) {
+      return qSeasons.get(0);
+    }
+    throw new NotFoundException("Could not find a quarterly for date " + date);
   }
 
   @Override
