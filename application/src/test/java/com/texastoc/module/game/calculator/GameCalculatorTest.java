@@ -1,22 +1,21 @@
 package com.texastoc.module.game.calculator;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+
 import com.texastoc.TestConstants;
 import com.texastoc.TestUtils;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.repository.GameRepository;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 public class GameCalculatorTest implements TestConstants {
 
@@ -258,32 +257,41 @@ public class GameCalculatorTest implements TestConstants {
     Mockito.verify(gameRepository, Mockito.times(1)).save(argument.capture());
     Game gameCalculated = argument.getValue();
 
-    assertEquals("number of game players should be 8", 8, (int) gameCalculated.getNumPlayers());
+    assertEquals("number of game players should be 8", 8, gameCalculated.getNumPlayers());
 
-    assertEquals("buy-in collected should be 48", 48, (int) gameCalculated.getBuyInCollected());
-    assertEquals("rebuy add on collected should be 20", 20, (int) gameCalculated.getRebuyAddOnCollected());
-    assertEquals("annual toc collected should be 32", 32, (int) gameCalculated.getAnnualTocCollected());
-    assertEquals("quarterly toc collected should be 28", 28, (int) gameCalculated.getQuarterlyTocCollected());
-    assertEquals("total collected should be 128", 128, (int) gameCalculated.getTotalCollected());
+    assertEquals("buy-in collected should be 48", 48, gameCalculated.getBuyInCollected());
+    assertEquals("rebuy add on collected should be 20", 20,
+      gameCalculated.getRebuyAddOnCollected());
+    assertEquals("annual toc collected should be 32", 32, gameCalculated.getAnnualTocCollected());
+    assertEquals("quarterly toc collected should be 28", 28,
+      gameCalculated.getQuarterlyTocCollected());
+    assertEquals("total collected should be 128", 128, gameCalculated.getTotalCollected());
 
-    assertEquals("kitty calculated should be 9", 9, (int) gameCalculated.getKittyCalculated());
-    assertEquals("annual Toc from rebuy add on calculated should be 8", 8, (int) gameCalculated.getAnnualTocFromRebuyAddOnCalculated());
-    assertEquals("rebuy add on less annual Toc calculated should be 12", 12, (int) gameCalculated.getRebuyAddOnLessAnnualTocCalculated());
-    assertEquals("total combined toc calculated should be 68", 68, (int) gameCalculated.getTotalCombinedTocCalculated());
-    assertEquals("prize pot calculated should be 51", 51, (int) gameCalculated.getPrizePotCalculated());
+    assertEquals("kitty calculated should be 9", 9, gameCalculated.getKittyCalculated());
+    assertEquals("annual Toc from rebuy add on calculated should be 8", 8,
+      gameCalculated.getAnnualTocFromRebuyAddOnCalculated());
+    assertEquals("rebuy add on less annual Toc calculated should be 12", 12,
+      gameCalculated.getRebuyAddOnLessAnnualTocCalculated());
+    assertEquals("total combined toc calculated should be 68", 68,
+      gameCalculated.getTotalCombinedTocCalculated());
+    assertEquals("prize pot calculated should be 51", 51, gameCalculated.getPrizePotCalculated());
   }
 
   private void assertGameNoPlayers(Game gameCalculated) {
-    assertEquals("buy-in collected should be 0", 0, (int) gameCalculated.getBuyInCollected());
-    assertEquals("rebuy add on collected should be 0", 0, (int) gameCalculated.getRebuyAddOnCollected());
-    assertEquals("annual toc collected should be 0", 0, (int) gameCalculated.getAnnualTocCollected());
-    assertEquals("quarterly toc collected should be 0", 0, (int) gameCalculated.getQuarterlyTocCollected());
-    assertEquals("total collected should be 0", 0, (int) gameCalculated.getTotalCollected());
+    assertEquals("buy-in collected should be 0", 0, gameCalculated.getBuyInCollected());
+    assertEquals("rebuy add on collected should be 0", 0, gameCalculated.getRebuyAddOnCollected());
+    assertEquals("annual toc collected should be 0", 0, gameCalculated.getAnnualTocCollected());
+    assertEquals("quarterly toc collected should be 0", 0,
+      gameCalculated.getQuarterlyTocCollected());
+    assertEquals("total collected should be 0", 0, gameCalculated.getTotalCollected());
 
-    assertEquals("rebuy add on toc calculated should be 0", 0, (int) gameCalculated.getAnnualTocFromRebuyAddOnCalculated());
-    assertEquals("rebuy add on less toc calculated should be 0", 0, (int) gameCalculated.getRebuyAddOnLessAnnualTocCalculated());
-    assertEquals("total toc calculated should be 0", 0, (int) gameCalculated.getTotalCombinedTocCalculated());
-    assertEquals("kitty calculated should be 0", 0, (int) gameCalculated.getKittyCalculated());
-    assertEquals("prize pot should be 0", 0, (int) gameCalculated.getPrizePotCalculated());
+    assertEquals("rebuy add on toc calculated should be 0", 0,
+      gameCalculated.getAnnualTocFromRebuyAddOnCalculated());
+    assertEquals("rebuy add on less toc calculated should be 0", 0,
+      gameCalculated.getRebuyAddOnLessAnnualTocCalculated());
+    assertEquals("total toc calculated should be 0", 0,
+      gameCalculated.getTotalCombinedTocCalculated());
+    assertEquals("kitty calculated should be 0", 0, gameCalculated.getKittyCalculated());
+    assertEquals("prize pot should be 0", 0, gameCalculated.getPrizePotCalculated());
   }
 }

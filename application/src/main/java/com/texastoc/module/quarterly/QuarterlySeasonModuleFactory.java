@@ -20,7 +20,7 @@ public class QuarterlySeasonModuleFactory {
    */
   public static QuarterlySeasonModule getQuarterlySeasonModule() throws IllegalStateException {
     if (QUARTERLY_SEASON_MODULE == null) {
-      throw new IllegalStateException("Season module instance not ready");
+      throw new IllegalStateException("Quarterly season module instance not ready");
     }
     return QUARTERLY_SEASON_MODULE;
   }
