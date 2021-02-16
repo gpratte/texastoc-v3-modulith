@@ -27,7 +27,7 @@ public class QuarterlySeasonCalculator {
     this.qSeasonRepository = qSeasonRepository;
   }
 
-  public QuarterlySeason calculate(int id) {
+  public void calculate(int id) {
     QuarterlySeason qSeason = qSeasonRepository.findById(id).get();
 
     // Calculate quarterly season
@@ -53,8 +53,6 @@ public class QuarterlySeasonCalculator {
 
     // Persist quarterly season
     qSeasonRepository.save(qSeason);
-
-    return qSeason;
   }
 
   private List<QuarterlySeasonPlayer> calculatePlayers(int seasonId, int qSeasonId) {

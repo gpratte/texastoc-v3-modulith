@@ -1,61 +1,70 @@
 package com.texastoc.module.quarterly.calculator;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.texastoc.TestConstants;
-import org.junit.Ignore;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
+import com.texastoc.module.game.GameModule;
+import com.texastoc.module.quarterly.model.QuarterlySeason;
+import com.texastoc.module.quarterly.repository.QuarterlySeasonRepository;
+import java.util.Collections;
+import java.util.Optional;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.test.util.ReflectionTestUtils;
 
-@Ignore
-@RunWith(SpringRunner.class)
-public class QuarterlyCalculatorTest implements TestConstants {
+public class QuarterlySeasonCalculatorTest implements TestConstants {
 
-//  private QuarterlySeasonCalculator qSeasonCalculator;
-//  private GameCalculator gameCalculator;
-//
-//  private Random random = new Random(System.currentTimeMillis());
-//
-//  @MockBean
-//  private GameRepository gameRepository;
-//  @MockBean
-//  private QuarterlySeasonRepository qSeasonRepository;
-//  @MockBean
-//  private QuarterlySeasonPlayerRepository qSeasonPlayerRepository;
-//  @MockBean
-//  private QuarterlySeasonPayoutRepository qSeasonPayoutRepository;
-//  @MockBean
-//  private SeasonService seasonService;
-//
-//  @Before
-//  public void before() {
-//    qSeasonCalculator = new QuarterlySeasonCalculator(qSeasonRepository, gameRepository, qSeasonPlayerRepository, qSeasonPayoutRepository);
-//    gameCalculator = new GameCalculator(gameRepository, seasonService);
-//  }
-//
-//  @Test
-//  public void testNoGames() {
-//
-//    QuarterlySeason currentSeason = QuarterlySeason.builder()
-//      .id(1)
-//      .build();
-//    Mockito.when(qSeasonRepository.getById(1)).thenReturn(currentSeason);
-//
-//    Mockito.when(gamePlayerRepository.selectQuarterlyTocPlayersByQuarterlySeasonId(1)).thenReturn(Collections.emptyList());
-//
-//    QuarterlySeason qSeason = qSeasonCalculator.calculate(1);
-//
-//    Mockito.verify(qSeasonRepository, Mockito.times(1)).getById(1);
-//    Mockito.verify(gamePlayerRepository, Mockito.times(1)).selectQuarterlyTocPlayersByQuarterlySeasonId(1);
-//
-//    Assert.assertNotNull("quarterly season not null", qSeason);
-//    Assert.assertEquals("quarterly season id 1", 1, (int) qSeason.getId());
-//
-//    Assert.assertEquals("quarter has no games played", 0, qSeason.getNumGamesPlayed());
-//    Assert.assertEquals("qTocCollected is 0", 0, qSeason.getQTocCollected());
-//
-//    Assert.assertEquals("players 0", 0, qSeason.getPlayers().size());
-//    Assert.assertEquals("payouts 0", 0, qSeason.getPayouts().size());
-//  }
-//
+  private QuarterlySeasonCalculator calculator;
+
+  private QuarterlySeasonRepository repository;
+  private GameModule gameModule;
+
+  @Before
+  public void setup() {
+    repository = mock(QuarterlySeasonRepository.class);
+    calculator = new QuarterlySeasonCalculator(repository);
+    gameModule = mock(GameModule.class);
+    ReflectionTestUtils.setField(calculator, "gameModule", gameModule);
+  }
+
+  @Test
+  public void testNoGames() {
+    // Arrange
+    QuarterlySeason currentSeason = QuarterlySeason.builder()
+        .id(1)
+        .build();
+    when(repository.findById(1)).thenReturn(Optional.of(currentSeason));
+    when(gameModule.getByQuarterlySeasonId(1)).thenReturn(
+        Collections.emptyList());
+
+    // Act
+    calculator.calculate(1);
+
+    // Assert
+    verify(repository, times(1)).findById(1);
+    verify(gameModule, times(1)).getByQuarterlySeasonId(1);
+
+    ArgumentCaptor<QuarterlySeason> argument = ArgumentCaptor.forClass(QuarterlySeason.class);
+    verify(repository).save(argument.capture());
+    QuarterlySeason qSeason = argument.getValue();
+
+    assertNotNull("quarterly season not null", qSeason);
+    assertEquals("quarterly season id 1", 1, (int) qSeason.getId());
+
+    assertEquals("quarter has no games played", 0, qSeason.getNumGamesPlayed());
+    assertEquals("qTocCollected is 0", 0, qSeason.getQTocCollected());
+
+    assertNull(qSeason.getPlayers());
+    assertNull(qSeason.getPayouts());
+  }
+
 //  @Test
 //  public void test1Games() {
 //

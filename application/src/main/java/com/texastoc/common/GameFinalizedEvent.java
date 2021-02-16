@@ -13,7 +13,8 @@ import lombok.ToString;
 @ToString
 public class GameFinalizedEvent {
 
-  private int seasonId;
   private int gameId;
+  private int seasonId;
+  private int qSeasonId;
   protected boolean finalized;
 }

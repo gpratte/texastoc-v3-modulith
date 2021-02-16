@@ -1,11 +1,19 @@
 package com.texastoc.module.quarterly.event;
 
 import com.texastoc.common.GameFinalizedEvent;
+import com.texastoc.module.quarterly.calculator.QuarterlySeasonCalculator;
 
 public class GameFinalizedHandler {
 
+  private QuarterlySeasonCalculator quarterlySeasonCalculator;
+
+  public GameFinalizedHandler(
+      QuarterlySeasonCalculator quarterlySeasonCalculator) {
+    this.quarterlySeasonCalculator = quarterlySeasonCalculator;
+  }
+
   public void handleGameFinalized(GameFinalizedEvent event) {
-    System.out.println("!!! season got game finalized event " + event);
+    quarterlySeasonCalculator.calculate(event.getQSeasonId());
   }
 
 }
