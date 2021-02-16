@@ -162,5 +162,5 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 32-historical-seasons
-Resurrect historical seasons and move to Spring Data JDBC.
+## Current Branch: 33-quarterly-season
+Moved quarterly seasons to Spring Data JDBC. Unit tests for CRUDding quarterly seasons.

@@ -1,5 +1,9 @@
 package com.texastoc.config;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -8,11 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
-
-import javax.sql.DataSource;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /**
  * Only run when the mysql spring profile is not present
@@ -35,9 +34,9 @@ public class H2DatabaseConfig {
   CommandLineRunner init(JdbcTemplate jdbcTemplate) {
     return args -> {
       InputStream resource = new ClassPathResource(
-        "create_toc_schema.sql").getInputStream();
+          "create_toc_schema.sql").getInputStream();
       try (BufferedReader reader = new BufferedReader(
-        new InputStreamReader(resource))) {
+          new InputStreamReader(resource))) {
         String line;
         StringBuilder sb = new StringBuilder();
         while ((line = reader.readLine()) != null) {
@@ -58,9 +57,9 @@ public class H2DatabaseConfig {
       }
 
       resource = new ClassPathResource(
-        "seed_toc.sql").getInputStream();
+          "seed_toc.sql").getInputStream();
       try (BufferedReader reader = new BufferedReader(
-        new InputStreamReader(resource))) {
+          new InputStreamReader(resource))) {
         String line;
         StringBuilder sb = new StringBuilder();
         while ((line = reader.readLine()) != null) {

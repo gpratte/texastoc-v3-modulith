@@ -74,9 +74,8 @@ public class GameSummary implements Runnable {
     context.put("season", season);
 
     QuarterlySeason currentQSeason = quarterlySeasons.stream()
-        .filter(qs -> {
-          return !game.getDate().isAfter(qs.getEnd()) && !game.getDate().isBefore(qs.getStart());
-        })
+        .filter(
+            qs -> !game.getDate().isAfter(qs.getEnd()) && !game.getDate().isBefore(qs.getStart()))
         .findFirst().get();
     context.put("qSeason", currentQSeason);
 

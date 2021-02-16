@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 
 @Data
 @Builder
@@ -14,18 +16,39 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class QuarterlySeason {
 
+  // Read-only id set when created
+  @Id
   private int id;
+
+  // Read/write fields from API
   private int seasonId;
   private LocalDate start;
   private LocalDate end;
-  private boolean finalized;
-  private Quarter quarter;
-  private int numGames;
-  private int numGamesPlayed;
-  private int qTocCollected;
+
+  // Read-only fields set by the server (set from TocConfig)
+  // TODO should end in "Cost"?
   private int qTocPerGame;
   private int numPayouts;
+
+  // Read-only fields set by the server
+  private Quarter quarter;
+
+  // End with "Collected" for physical money collected
+  // Read-only fields set by the server
+  private int qTocCollected;
+
+  // End with "Calculated" for the where the money goes.
+  // Read-only fields set by the server
   private LocalDateTime lastCalculated;
+
+  // Other runtime variables
+  // Read-only fields set by the server
+  private int numGames;
+  private int numGamesPlayed;
+  private boolean finalized;
+
+  @MappedCollection
   private List<QuarterlySeasonPlayer> players;
+  @MappedCollection
   private List<QuarterlySeasonPayout> payouts;
 }

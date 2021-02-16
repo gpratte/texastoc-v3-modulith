@@ -10,6 +10,9 @@ import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
 import com.texastoc.module.season.model.Season;
 import com.texastoc.module.settings.model.SystemSettings;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.http.client.HttpClient;
@@ -22,10 +25,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
-
-import java.time.LocalDate;
-import java.time.Month;
-import java.util.List;
 
 public abstract class BaseIntegrationTest implements TestConstants {
 
@@ -102,7 +101,8 @@ public abstract class BaseIntegrationTest implements TestConstants {
     return restTemplate.postForObject(endpoint() + "/games", entity, Game.class);
   }
 
-  protected void updateGame(int gameId, Game gameToUpdate, String token) throws JsonProcessingException {
+  protected void updateGame(int gameId, Game gameToUpdate, String token)
+      throws JsonProcessingException {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.set("Authorization", "Bearer " + token);
@@ -113,13 +113,14 @@ public abstract class BaseIntegrationTest implements TestConstants {
     HttpEntity<String> entity = new HttpEntity<>(updateGameRequestAsJson, headers);
 
     ResponseEntity<Void> response = restTemplate.exchange(
-      endpoint() + "/games/" + gameId,
-      HttpMethod.PATCH,
-      entity,
-      Void.class);
+        endpoint() + "/games/" + gameId,
+        HttpMethod.PATCH,
+        entity,
+        Void.class);
   }
 
-  protected GamePlayer addPlayerToGame(GamePlayer gamePlayer, String token) throws JsonProcessingException {
+  protected GamePlayer addPlayerToGame(GamePlayer gamePlayer, String token)
+      throws JsonProcessingException {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.set("Authorization", "Bearer " + token);
@@ -129,10 +130,13 @@ public abstract class BaseIntegrationTest implements TestConstants {
     String createGamePlayerRequestAsJson = mapper.writeValueAsString(gamePlayer);
     HttpEntity<String> entity = new HttpEntity<>(createGamePlayerRequestAsJson, headers);
 
-    return restTemplate.postForObject(endpoint() + "/games/" + gamePlayer.getGameId() + "/players", entity, GamePlayer.class);
+    return restTemplate
+        .postForObject(endpoint() + "/games/" + gamePlayer.getGameId() + "/players", entity,
+            GamePlayer.class);
   }
 
-  protected GamePlayer addFirstTimePlayerToGame(GamePlayer gamePlayer, String token) throws JsonProcessingException {
+  protected GamePlayer addFirstTimePlayerToGame(GamePlayer gamePlayer, String token)
+      throws JsonProcessingException {
     HttpHeaders headers = new HttpHeaders();
     headers.set("Content-Type", "application/vnd.texastoc.first-time+json");
     headers.set("Authorization", "Bearer " + token);
@@ -142,10 +146,13 @@ public abstract class BaseIntegrationTest implements TestConstants {
     String firstTimeGamePlayerRequestAsJson = mapper.writeValueAsString(gamePlayer);
     HttpEntity<String> entity = new HttpEntity<>(firstTimeGamePlayerRequestAsJson, headers);
 
-    return restTemplate.postForObject(endpoint() + "/games/" + gamePlayer.getGameId() + "/players", entity, GamePlayer.class);
+    return restTemplate
+        .postForObject(endpoint() + "/games/" + gamePlayer.getGameId() + "/players", entity,
+            GamePlayer.class);
   }
 
-  protected void updatePlayerInGame(GamePlayer gamePlayer, String token) throws JsonProcessingException {
+  protected void updatePlayerInGame(GamePlayer gamePlayer, String token)
+      throws JsonProcessingException {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.set("Authorization", "Bearer " + token);
@@ -156,22 +163,23 @@ public abstract class BaseIntegrationTest implements TestConstants {
     HttpEntity<String> entity = new HttpEntity<>(gamePlayerAsJson, headers);
 
     ResponseEntity<Void> response = restTemplate.exchange(
-      endpoint() + "/games/" + gamePlayer.getGameId() + "/players/" + gamePlayer.getId(),
-      HttpMethod.PATCH,
-      entity,
-      Void.class);
+        endpoint() + "/games/" + gamePlayer.getGameId() + "/players/" + gamePlayer.getId(),
+        HttpMethod.PATCH,
+        entity,
+        Void.class);
   }
 
-  protected void deletePlayerFromGame(int gameId, int gamePlayerId, String token) throws JsonProcessingException {
+  protected void deletePlayerFromGame(int gameId, int gamePlayerId, String token)
+      throws JsonProcessingException {
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
     HttpEntity<String> entity = new HttpEntity<>("", headers);
 
     ResponseEntity<Void> response = restTemplate.exchange(
-      endpoint() + "/games/" + gameId + "/players/" + gamePlayerId,
-      HttpMethod.DELETE,
-      entity,
-      Void.class);
+        endpoint() + "/games/" + gameId + "/players/" + gamePlayerId,
+        HttpMethod.DELETE,
+        entity,
+        Void.class);
   }
 
   protected void finalizeGame(int gameId, String token) throws JsonProcessingException {
@@ -203,7 +211,8 @@ public abstract class BaseIntegrationTest implements TestConstants {
     String seatingRequestAsJson = mapper.writeValueAsString(seating);
     HttpEntity<String> entity = new HttpEntity<>(seatingRequestAsJson, headers);
 
-    return restTemplate.postForObject(endpoint() + "/games/" + gameId + "/seats", entity, Seating.class);
+    return restTemplate
+        .postForObject(endpoint() + "/games/" + gameId + "/seats", entity, Seating.class);
   }
 
   protected Player createPlayer(Player player, String token) throws JsonProcessingException {
@@ -238,9 +247,9 @@ public abstract class BaseIntegrationTest implements TestConstants {
     HttpEntity<String> entity = new HttpEntity<>("", headers);
 
     restTemplate.exchange(endpoint() + "/players/" + playerId,
-      HttpMethod.DELETE,
-      entity,
-      Void.class);
+        HttpMethod.DELETE,
+        entity,
+        Void.class);
   }
 
   protected void addRole(int playerId, Role role, String token) throws JsonProcessingException {
@@ -254,9 +263,9 @@ public abstract class BaseIntegrationTest implements TestConstants {
     HttpEntity<String> entity = new HttpEntity<>(addRoleRequestAsJson, headers);
 
     restTemplate.exchange(endpoint() + "/players/" + playerId + "/roles",
-      HttpMethod.POST,
-      entity,
-      Void.class);
+        HttpMethod.POST,
+        entity,
+        Void.class);
   }
 
   protected void removeRole(int playerId, int roleId, String token) {
@@ -265,9 +274,9 @@ public abstract class BaseIntegrationTest implements TestConstants {
     HttpEntity<String> entity = new HttpEntity<>("", headers);
 
     restTemplate.exchange(endpoint() + "/players/" + playerId + "/roles/" + roleId,
-      HttpMethod.DELETE,
-      entity,
-      Void.class);
+        HttpMethod.DELETE,
+        entity,
+        Void.class);
   }
 
 
@@ -277,10 +286,10 @@ public abstract class BaseIntegrationTest implements TestConstants {
     HttpEntity<String> entity = new HttpEntity<>(headers);
 
     ResponseEntity<Player> response = restTemplate.exchange(
-      endpoint() + "/players/" + id,
-      HttpMethod.GET,
-      entity,
-      Player.class);
+        endpoint() + "/players/" + id,
+        HttpMethod.GET,
+        entity,
+        Player.class);
     return response.getBody();
   }
 
@@ -290,11 +299,11 @@ public abstract class BaseIntegrationTest implements TestConstants {
     HttpEntity<String> entity = new HttpEntity<>(headers);
 
     ResponseEntity<List<Player>> response = restTemplate.exchange(
-      endpoint() + "/players",
-      HttpMethod.GET,
-      entity,
-      new ParameterizedTypeReference<List<Player>>() {
-      });
+        endpoint() + "/players",
+        HttpMethod.GET,
+        entity,
+        new ParameterizedTypeReference<List<Player>>() {
+        });
     return response.getBody();
   }
 
@@ -303,10 +312,10 @@ public abstract class BaseIntegrationTest implements TestConstants {
     HttpEntity<String> entity = new HttpEntity<>(headers);
 
     ResponseEntity<SystemSettings> response = restTemplate.exchange(
-      endpoint() + "/settings",
-      HttpMethod.GET,
-      entity,
-      SystemSettings.class);
+        endpoint() + "/settings",
+        HttpMethod.GET,
+        entity,
+        SystemSettings.class);
     return response.getBody();
   }
 
@@ -316,10 +325,10 @@ public abstract class BaseIntegrationTest implements TestConstants {
     HttpEntity<String> entity = new HttpEntity<>("", headers);
 
     ResponseEntity<Game> response = restTemplate.exchange(
-      endpoint() + "/games/" + id,
-      HttpMethod.GET,
-      entity,
-      Game.class);
+        endpoint() + "/games/" + id,
+        HttpMethod.GET,
+        entity,
+        Game.class);
     return response.getBody();
   }
 
@@ -330,10 +339,10 @@ public abstract class BaseIntegrationTest implements TestConstants {
     HttpEntity<String> entity = new HttpEntity<>("", headers);
 
     ResponseEntity<Game> response = restTemplate.exchange(
-      endpoint() + "/games",
-      HttpMethod.GET,
-      entity,
-      Game.class);
+        endpoint() + "/games",
+        HttpMethod.GET,
+        entity,
+        Game.class);
     return response.getBody();
   }
 
@@ -356,10 +365,10 @@ public abstract class BaseIntegrationTest implements TestConstants {
     HttpEntity<String> entity = new HttpEntity<>("", headers);
 
     ResponseEntity<Season> response = restTemplate.exchange(
-      endpoint() + "/seasons/current",
-      HttpMethod.GET,
-      entity,
-      Season.class);
+        endpoint() + "/seasons/current",
+        HttpMethod.GET,
+        entity,
+        Season.class);
     return response.getBody();
   }
 
@@ -384,6 +393,7 @@ public abstract class BaseIntegrationTest implements TestConstants {
   @Getter
   @Setter
   private static class LoginParameters {
+
     String email;
     String password;
   }
@@ -391,12 +401,14 @@ public abstract class BaseIntegrationTest implements TestConstants {
   @Getter
   @Setter
   private static class Token {
+
     String token;
   }
 
   @Getter
   @Setter
-  private static class SeasonStart {
+  public static class SeasonStart {
+
     private int startYear;
   }
 

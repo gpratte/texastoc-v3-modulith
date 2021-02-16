@@ -6,9 +6,15 @@ import java.util.List;
 
 public interface QuarterlySeasonModule {
 
-  void createQuarterlySeasons(int seasonId, LocalDate start, LocalDate end);
+  /**
+   * Create the four quarterly seasons
+   *
+   * @param seasonId  the season Id
+   * @param startYear the year the season starts
+   */
+  void create(int seasonId, int startYear);
 
-  List<QuarterlySeason> getQuarterlySeasonBySeason(int seasonId);
+  List<QuarterlySeason> getBySeasonId(int seasonId);
 
-  QuarterlySeason getQuarterlySeasonByDate(LocalDate date);
+  QuarterlySeason getByDate(LocalDate date);
 }

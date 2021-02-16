@@ -1,11 +1,10 @@
 package com.texastoc.module.quarterly.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.quarterly.QuarterlySeasonModule;
 import com.texastoc.module.quarterly.model.Quarter;
 import com.texastoc.module.quarterly.model.QuarterlySeason;
-import com.texastoc.module.quarterly.repository.QuarterlySeasonPayoutRepository;
-import com.texastoc.module.quarterly.repository.QuarterlySeasonPlayerRepository;
 import com.texastoc.module.quarterly.repository.QuarterlySeasonRepository;
 import com.texastoc.module.settings.SettingsModule;
 import com.texastoc.module.settings.SettingsModuleFactory;
@@ -14,7 +13,6 @@ import com.texastoc.module.settings.model.TocConfig;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,66 +25,50 @@ public class QuarterlySeasonService implements QuarterlySeasonModule {
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   private final QuarterlySeasonRepository qSeasonRepository;
-  private final QuarterlySeasonPlayerRepository qSeasonPlayerRepository;
-  private final QuarterlySeasonPayoutRepository qSeasonPayoutRepository;
 
   private SettingsModule settingsModule;
 
   @Autowired
-  public QuarterlySeasonService(QuarterlySeasonRepository qSeasonRepository,
-      QuarterlySeasonPlayerRepository qSeasonPlayerRepository,
-      QuarterlySeasonPayoutRepository qSeasonPayoutRepository) {
+  public QuarterlySeasonService(QuarterlySeasonRepository qSeasonRepository) {
     this.qSeasonRepository = qSeasonRepository;
-    this.qSeasonPlayerRepository = qSeasonPlayerRepository;
-    this.qSeasonPayoutRepository = qSeasonPayoutRepository;
   }
 
   @Override
-  public List<QuarterlySeason> getQuarterlySeasonBySeason(int seasonId) {
-    return null;
-  }
-
-  @Override
-  public QuarterlySeason getQuarterlySeasonByDate(LocalDate date) {
-    return qSeasonRepository.getByDate(date);
-  }
-
-  @Override
-  public void createQuarterlySeasons(int seasonId, LocalDate seasonStart, LocalDate seasonEnd) {
+  public void create(int seasonId, int seasonStartYear) {
     Settings settings = getSettingsModule().get();
-    TocConfig tocConfig = settings.getTocConfigs().get(seasonStart.getYear());
+    TocConfig tocConfig = settings.getTocConfigs().get(seasonStartYear);
 
-    List<QuarterlySeason> qSeasons = new ArrayList<>(4);
     for (int i = 1; i <= 4; ++i) {
       LocalDate qStart = null;
       LocalDate qEnd = null;
       switch (i) {
         case 1:
           // Season start
-          qStart = seasonStart;
+          qStart = LocalDate.of(seasonStartYear, Month.MAY.getValue(), 1);
           // Last day in July
-          qEnd = LocalDate.of(seasonStart.getYear(), Month.AUGUST.getValue(), 1);
+          qEnd = LocalDate.of(seasonStartYear, Month.AUGUST.getValue(), 1);
           qEnd = qEnd.minusDays(1);
           break;
         case 2:
           // First day in August
-          qStart = LocalDate.of(seasonStart.getYear(), Month.AUGUST.getValue(), 1);
+          qStart = LocalDate.of(seasonStartYear, Month.AUGUST.getValue(), 1);
           // Last day in October
-          qEnd = LocalDate.of(seasonStart.getYear(), Month.NOVEMBER.getValue(), 1);
+          qEnd = LocalDate.of(seasonStartYear, Month.NOVEMBER.getValue(), 1);
           qEnd = qEnd.minusDays(1);
           break;
         case 3:
           // First day in November
-          qStart = LocalDate.of(seasonStart.getYear(), Month.NOVEMBER.getValue(), 1);
+          qStart = LocalDate.of(seasonStartYear, Month.NOVEMBER.getValue(), 1);
           // Last day in January
-          qEnd = LocalDate.of(seasonStart.getYear() + 1, Month.FEBRUARY.getValue(), 1);
+          qEnd = LocalDate.of(seasonStartYear + 1, Month.FEBRUARY.getValue(), 1);
           qEnd = qEnd.minusDays(1);
           break;
         case 4:
           // First day in February
-          qStart = LocalDate.of(seasonStart.getYear() + 1, Month.FEBRUARY.getValue(), 1);
+          qStart = LocalDate.of(seasonStartYear + 1, Month.FEBRUARY.getValue(), 1);
           // End of season
-          qEnd = seasonEnd;
+          qEnd = LocalDate.of(seasonStartYear + 1, Month.MAY.getValue(), 1);
+          qEnd = qEnd.minusDays(1);
           break;
       }
 
@@ -99,20 +81,30 @@ public class QuarterlySeasonService implements QuarterlySeasonModule {
       }
 
       QuarterlySeason qSeason = QuarterlySeason.builder()
+          .seasonId(seasonId)
           .quarter(Quarter.fromInt(i))
           .start(qStart)
           .end(qEnd)
-          .finalized(false)
           .numGames(qNumThursdays)
-          .numGamesPlayed(0)
-          .qTocCollected(0)
           .qTocPerGame(tocConfig.getQuarterlyTocCost())
           .numPayouts(tocConfig.getQuarterlyNumPayouts())
           .build();
-      qSeasons.add(qSeason);
+      qSeasonRepository.save(qSeason);
     }
+  }
 
-    // TODO persist quarterly seasons
+  @Override
+  public List<QuarterlySeason> getBySeasonId(int seasonId) {
+    return qSeasonRepository.findBySeasonId(seasonId);
+  }
+
+  @Override
+  public QuarterlySeason getByDate(LocalDate date) {
+    List<QuarterlySeason> qSeasons = qSeasonRepository.findByDate(date);
+    if (qSeasons.size() > 0) {
+      return qSeasons.get(0);
+    }
+    throw new NotFoundException("Could not find a quarterly for date " + date);
   }
 
   private LocalDate findNextThursday(LocalDate day) {

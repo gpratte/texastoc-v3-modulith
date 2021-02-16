@@ -81,6 +81,7 @@ public class PopulationScheduler {
       }
       Season season = seasonService.create(year);
       createGames(season);
+      System.out.println();
       log.info("Done populating");
     } catch (Exception e) {
       log.error("Problem populating", e);
@@ -104,6 +105,7 @@ public class PopulationScheduler {
         player = players.get(random.nextInt(numPlayers));
       }
 
+      System.out.print(".");
       Game game = gameService.create(Game.builder()
           .hostId(player.getId())
           .date(gameDate)

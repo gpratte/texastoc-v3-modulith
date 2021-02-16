@@ -47,7 +47,7 @@ public class SeasonService {
 
   @Autowired
   public SeasonService(SeasonRepository seasonRepository,
-    SeasonHistoryRepository seasonHistoryRepository) {
+      SeasonHistoryRepository seasonHistoryRepository) {
     this.seasonRepository = seasonRepository;
     this.seasonHistoryRepository = seasonHistoryRepository;
   }
@@ -89,23 +89,22 @@ public class SeasonService {
     }
 
     Season newSeason = Season.builder()
-      .start(start)
-      .end(end)
-      .kittyPerGame(tocConfig.getKittyDebit())
-      .tocPerGame(tocConfig.getAnnualTocCost())
-      .quarterlyTocPerGame(tocConfig.getQuarterlyTocCost())
-      .quarterlyNumPayouts(tocConfig.getQuarterlyNumPayouts())
-      .buyInCost(tocConfig.getRegularBuyInCost())
-      .rebuyAddOnCost(tocConfig.getRegularRebuyCost())
-      .rebuyAddOnTocDebitCost(tocConfig.getRegularRebuyTocDebit())
-      .numGames(numThursdays)
-      .build();
+        .start(start)
+        .end(end)
+        .kittyPerGame(tocConfig.getKittyDebit())
+        .tocPerGame(tocConfig.getAnnualTocCost())
+        .quarterlyTocPerGame(tocConfig.getQuarterlyTocCost())
+        .quarterlyNumPayouts(tocConfig.getQuarterlyNumPayouts())
+        .buyInCost(tocConfig.getRegularBuyInCost())
+        .rebuyAddOnCost(tocConfig.getRegularRebuyCost())
+        .rebuyAddOnTocDebitCost(tocConfig.getRegularRebuyTocDebit())
+        .numGames(numThursdays)
+        .build();
 
     Season season = seasonRepository.save(newSeason);
 
     // TODO message instead
-    getQuarterlySeasonModule()
-      .createQuarterlySeasons(season.getId(), season.getStart(), season.getEnd());
+    getQuarterlySeasonModule().create(season.getId(), season.getStart().getYear());
 
     return season;
   }
@@ -149,7 +148,7 @@ public class SeasonService {
 
   public List<Season> getAll() {
     return StreamSupport.stream(seasonRepository.findAll().spliterator(), false)
-      .collect(Collectors.toList());
+        .collect(Collectors.toList());
   }
 
   //  @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
@@ -172,17 +171,17 @@ public class SeasonService {
     // Set the historical season
     List<HistoricalSeasonPlayer> hsPlayers = new LinkedList<>();
     HistoricalSeason historicalSeason = HistoricalSeason.builder()
-      .seasonId(seasonId)
-      .startYear(Integer.toString(season.getStart().getYear()))
-      .endYear(Integer.toString(season.getEnd().getYear()))
-      .players(hsPlayers)
-      .build();
+        .seasonId(seasonId)
+        .startYear(Integer.toString(season.getStart().getYear()))
+        .endYear(Integer.toString(season.getEnd().getYear()))
+        .players(hsPlayers)
+        .build();
     season.getPlayers()
-      .forEach(seasonPlayer -> hsPlayers.add(HistoricalSeasonPlayer.builder()
-        .name(seasonPlayer.getName())
-        .points(seasonPlayer.getPoints())
-        .entries(seasonPlayer.getEntries())
-        .build()));
+        .forEach(seasonPlayer -> hsPlayers.add(HistoricalSeasonPlayer.builder()
+            .name(seasonPlayer.getName())
+            .points(seasonPlayer.getPoints())
+            .entries(seasonPlayer.getEntries())
+            .build()));
     seasonHistoryRepository.save(historicalSeason);
   }
 
