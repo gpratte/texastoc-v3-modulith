@@ -81,6 +81,7 @@ public class QuarterlySeasonService implements QuarterlySeasonModule {
       }
 
       QuarterlySeason qSeason = QuarterlySeason.builder()
+          .seasonId(seasonId)
           .quarter(Quarter.fromInt(i))
           .start(qStart)
           .end(qEnd)
