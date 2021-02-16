@@ -94,7 +94,7 @@ public class QuarterlySeasonService implements QuarterlySeasonModule {
 
   @Override
   public List<QuarterlySeason> getBySeasonId(int seasonId) {
-    return null;
+    return qSeasonRepository.findBySeasonId(seasonId);
   }
 
   @Override

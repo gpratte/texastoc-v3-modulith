@@ -14,4 +14,6 @@ public interface QuarterlySeasonRepository extends CrudRepository<QuarterlySeaso
   @Query("select * from quarterly_season where :date >= startDate and :date <= endDate order by id desc")
   List<QuarterlySeason> findByDate(@Param("date") LocalDate date);
 
+  List<QuarterlySeason> findBySeasonId(@Param("seasonId") int seasonId);
+
 }

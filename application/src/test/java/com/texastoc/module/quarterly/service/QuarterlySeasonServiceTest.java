@@ -4,11 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.texastoc.TestConstants;
+import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.quarterly.model.Quarter;
 import com.texastoc.module.quarterly.model.QuarterlySeason;
 import com.texastoc.module.quarterly.repository.QuarterlySeasonRepository;
@@ -18,9 +20,11 @@ import com.texastoc.module.settings.model.TocConfig;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -65,6 +69,44 @@ public class QuarterlySeasonServiceTest implements TestConstants {
       quarters.add(qs.getQuarter());
       assertQuarterlySeason(qs);
     });
+  }
+
+  @Test
+  public void getBySeasonId() {
+    // Arrange
+    when(qSeasonRepository.findBySeasonId(1)).thenReturn(Collections.emptyList());
+    // Act
+    List<QuarterlySeason> qSeasons = qSeasonService.getBySeasonId(1);
+    // Assert
+    assertEquals(0, qSeasons.size());
+
+    // Arrange
+    when(qSeasonRepository.findBySeasonId(1))
+        .thenReturn(Collections.singletonList(QuarterlySeason.builder().id(1).build()));
+    // Act
+    qSeasons = qSeasonService.getBySeasonId(1);
+    // Assert
+    assertEquals(1, qSeasons.size());
+  }
+
+  @Test
+  public void getByDate() {
+    // Arrange
+    when(qSeasonRepository.findByDate(any())).thenReturn(Collections.emptyList());
+    // Act and assert
+    Assertions.assertThatThrownBy(() -> {
+      qSeasonService.getByDate(LocalDate.now());
+    }).isInstanceOf(NotFoundException.class)
+        .hasMessageStartingWith("Could not find a quarterly for date");
+
+    // Arrange
+    when(qSeasonRepository.findByDate(any()))
+        .thenReturn(Collections.singletonList(QuarterlySeason.builder().id(1).build()));
+    // Act
+    QuarterlySeason qSeason = qSeasonService.getByDate(LocalDate.now());
+
+    // Assert
+    assertEquals(1, qSeason.getId());
   }
 
   private void assertQuarterlySeason(QuarterlySeason qs) {
