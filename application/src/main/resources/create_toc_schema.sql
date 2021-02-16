@@ -68,48 +68,48 @@ CREATE TABLE season_player
 
 CREATE TABLE quarterly_season
 (
-    id             int NOT NULL AUTO_INCREMENT,
-    season_id       int NOT NULL,
-    start      date      DEFAULT NULL,
-    end        date      DEFAULT NULL,
-    finalized      boolean   DEFAULT NULL,
-    quarter        int NOT NULL,
-    num_games       int       DEFAULT 0,
+    id               int         NOT NULL AUTO_INCREMENT,
+    season_id        int         NOT NULL,
+    start            date      DEFAULT NULL,
+    end              date      DEFAULT NULL,
+    finalized        boolean   DEFAULT NULL,
+    quarter          varchar(16) NOT NULL,
+    num_games        int       DEFAULT 0,
     num_games_played int       DEFAULT 0,
     q_toc_collected  int       DEFAULT 0,
-    q_toc_per_game    int       DEFAULT 0,
-    num_payouts     int       DEFAULT 0,
-    last_calculated timestamp DEFAULT NULL,
+    q_toc_per_game   int       DEFAULT 0,
+    num_payouts      int       DEFAULT 0,
+    last_calculated  timestamp DEFAULT NULL,
     PRIMARY KEY (id)
 );
 
 CREATE TABLE quarterly_season_player
 (
-    id        int NOT NULL AUTO_INCREMENT,
-    player_id  int NOT NULL,
-    season_id  int NOT NULL,
-    q_season_id int NOT NULL,
-    name      varchar(64) DEFAULT NULL,
-    entries   int         DEFAULT 0,
-    points    int         DEFAULT 0,
-    place     int         DEFAULT NULL,
+    id                   int NOT NULL AUTO_INCREMENT,
+    player_id            int NOT NULL,
+    season_id            int NOT NULL,
+    q_season_id          int NOT NULL,
+    name                 varchar(64) DEFAULT NULL,
+    entries              int         DEFAULT 0,
+    points               int         DEFAULT 0,
+    place                int         DEFAULT NULL,
     quarterly_season     int NOT NULL,
     quarterly_season_key int NOT NULL,
     PRIMARY KEY (id),
-    UNIQUE KEY Quarterly_Season_Player_Unique (playerId, seasonId, qSeasonId)
+    UNIQUE KEY QSPlayer_Unique (player_id, season_id, q_season_id)
 );
 
 CREATE TABLE quarterly_season_payout
 (
-    id        int NOT NULL AUTO_INCREMENT,
-    season_id  int NOT NULL,
-    q_season_id int NOT NULL,
-    place     int NOT NULL,
-    amount    int DEFAULT NULL,
+    id                   int NOT NULL AUTO_INCREMENT,
+    season_id            int NOT NULL,
+    q_season_id          int NOT NULL,
+    place                int NOT NULL,
+    amount               int DEFAULT NULL,
     quarterly_season     int NOT NULL,
     quarterly_season_key int NOT NULL,
     PRIMARY KEY (id),
-    UNIQUE KEY QSPayout_Unique (seasonId, qSeasonId, place)
+    UNIQUE KEY QQSPayout_Unique (season_id, q_season_id, place)
 );
 
 CREATE TABLE player
