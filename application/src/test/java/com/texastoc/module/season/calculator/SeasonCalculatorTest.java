@@ -47,10 +47,10 @@ public class SeasonCalculatorTest implements TestConstants {
   public void testNoGames() {
     // Arrange
     when(seasonRepository.findById(1))
-      .thenReturn(Optional.of(Season.builder().id(1).build()));
+        .thenReturn(Optional.of(Season.builder().id(1).build()));
     when(gameModule.getBySeasonId(1)).thenReturn(Collections.emptyList());
     when(seasonPayoutSettingsRepository.findBySeasonId(1))
-      .thenReturn(Collections.singletonList(TestConstants.getSeasonPayoutSettings(1)));
+        .thenReturn(Collections.singletonList(TestConstants.getSeasonPayoutSettings(1)));
 
     // Act
     seasonCalculator.calculate(1);
@@ -68,18 +68,18 @@ public class SeasonCalculatorTest implements TestConstants {
     assertEquals("totalCollected should be 0", 0, season.getTotalCollected());
 
     assertEquals("annualTocFromRebuyAddOnCalculated should be 0", 0,
-      season.getAnnualTocFromRebuyAddOnCalculated());
+        season.getAnnualTocFromRebuyAddOnCalculated());
     assertEquals("rebuyAddOnLessAnnualTocCalculated should be 0", 0,
-      season.getRebuyAddOnLessAnnualTocCalculated());
+        season.getRebuyAddOnLessAnnualTocCalculated());
     assertEquals("totalCombinedAnnualTocCalculated should be 0", 0,
-      season.getTotalCombinedAnnualTocCalculated());
+        season.getTotalCombinedAnnualTocCalculated());
     assertEquals("kittyCalculated should be 0", 0, season.getKittyCalculated());
     assertEquals("prizePotCalculated should be 0", 0, season.getPrizePotCalculated());
 
     assertEquals("numGamesPlayed should be 0", 0, season.getNumGamesPlayed());
 
     Assert.assertTrue("last calculated should be within the last few seconds",
-      season.getLastCalculated().isAfter(LocalDateTime.now().minusSeconds(3)));
+        season.getLastCalculated().isAfter(LocalDateTime.now().minusSeconds(3)));
 
     assertEquals(0, season.getPlayers().size());
     assertEquals(0, season.getPayouts().size());
@@ -90,12 +90,12 @@ public class SeasonCalculatorTest implements TestConstants {
   public void test1Game() {
     // Arrange
     when(seasonRepository.findById(1))
-      .thenReturn(Optional.of(Season.builder()
-        .id(1)
-        .numGames(52)
-        .build()));
+        .thenReturn(Optional.of(Season.builder()
+            .id(1)
+            .numGames(52)
+            .build()));
     when(seasonPayoutSettingsRepository.findBySeasonId(1))
-      .thenReturn(Collections.singletonList(TestConstants.getSeasonPayoutSettings(1)));
+        .thenReturn(Collections.singletonList(TestConstants.getSeasonPayoutSettings(1)));
 
     // 10 players bought in
     int boughtIn = 10 * GAME_BUY_IN;
@@ -115,26 +115,26 @@ public class SeasonCalculatorTest implements TestConstants {
     int prizePot = totalCollected - totalToc - kitty;
 
     Game game = Game.builder()
-      .buyInCollected(boughtIn)
-      .annualTocCollected(toc)
-      .rebuyAddOnCollected(rebought)
-      .totalCollected(totalCollected)
-      .annualTocFromRebuyAddOnCalculated(tocFromRebuys)
-      .rebuyAddOnLessAnnualTocCalculated(rebought - tocFromRebuys)
-      .totalCombinedTocCalculated(totalToc)
-      .kittyCalculated(kitty)
-      .prizePotCalculated(prizePot)
-      .build();
+        .buyInCollected(boughtIn)
+        .annualTocCollected(toc)
+        .rebuyAddOnCollected(rebought)
+        .totalCollected(totalCollected)
+        .annualTocFromRebuyAddOnCalculated(tocFromRebuys)
+        .rebuyAddOnLessAnnualTocCalculated(rebought - tocFromRebuys)
+        .totalCombinedTocCalculated(totalToc)
+        .kittyCalculated(kitty)
+        .prizePotCalculated(prizePot)
+        .build();
 
     List<GamePlayer> gameSeasonPlayers = new ArrayList<>(10);
     for (int i = 0; i < 10; ++i) {
       GamePlayer gamePlayer = GamePlayer.builder()
-        .id(i)
-        .playerId(i)
-        .gameId(1)
-        .tocPoints(i)
-        .annualTocParticipant(i < 6)
-        .build();
+          .id(i)
+          .playerId(i)
+          .gameId(1)
+          .tocPoints(i < 6 ? i : 0)
+          .annualTocParticipant(i < 6)
+          .build();
       gameSeasonPlayers.add(gamePlayer);
     }
     game.setPlayers(gameSeasonPlayers);
@@ -164,7 +164,7 @@ public class SeasonCalculatorTest implements TestConstants {
     assertEquals(1, season.getNumGamesPlayed());
 
     Assert.assertTrue("last calculated should be within the last few seconds",
-      season.getLastCalculated().isAfter(LocalDateTime.now().minusSeconds(3)));
+        season.getLastCalculated().isAfter(LocalDateTime.now().minusSeconds(3)));
 
     assertEquals(6, season.getPlayers().size());
     // Season players are sorted by points
@@ -198,12 +198,12 @@ public class SeasonCalculatorTest implements TestConstants {
   public void test2Games() {
     // Arrange
     when(seasonRepository.findById(1))
-      .thenReturn(Optional.of(Season.builder()
-        .id(1)
-        .numGames(52)
-        .build()));
+        .thenReturn(Optional.of(Season.builder()
+            .id(1)
+            .numGames(52)
+            .build()));
     when(seasonPayoutSettingsRepository.findBySeasonId(1))
-      .thenReturn(Collections.singletonList(TestConstants.getSeasonPayoutSettings(1)));
+        .thenReturn(Collections.singletonList(TestConstants.getSeasonPayoutSettings(1)));
 
     // Game 1
     // 10 players bought in
@@ -224,26 +224,26 @@ public class SeasonCalculatorTest implements TestConstants {
     int prizePot1 = totalCollected1 - totalToc1 - kitty1;
 
     Game game1 = Game.builder()
-      .buyInCollected(boughtIn1)
-      .annualTocCollected(toc1)
-      .rebuyAddOnCollected(rebought1)
-      .totalCollected(totalCollected1)
-      .annualTocFromRebuyAddOnCalculated(tocFromRebuys1)
-      .rebuyAddOnLessAnnualTocCalculated(rebought1 - tocFromRebuys1)
-      .totalCombinedTocCalculated(totalToc1)
-      .kittyCalculated(kitty1)
-      .prizePotCalculated(prizePot1)
-      .build();
+        .buyInCollected(boughtIn1)
+        .annualTocCollected(toc1)
+        .rebuyAddOnCollected(rebought1)
+        .totalCollected(totalCollected1)
+        .annualTocFromRebuyAddOnCalculated(tocFromRebuys1)
+        .rebuyAddOnLessAnnualTocCalculated(rebought1 - tocFromRebuys1)
+        .totalCombinedTocCalculated(totalToc1)
+        .kittyCalculated(kitty1)
+        .prizePotCalculated(prizePot1)
+        .build();
 
     List<GamePlayer> gameSeasonPlayers = new ArrayList<>(10);
     for (int i = 0; i < 10; ++i) {
       GamePlayer gamePlayer = GamePlayer.builder()
-        .id(i)
-        .playerId(i)
-        .gameId(1)
-        .tocPoints(i)
-        .annualTocParticipant(i < 6)
-        .build();
+          .id(i)
+          .playerId(i)
+          .gameId(1)
+          .tocPoints(i)
+          .annualTocParticipant(i < 6)
+          .build();
       gameSeasonPlayers.add(gamePlayer);
     }
     game1.setPlayers(gameSeasonPlayers);
@@ -267,26 +267,26 @@ public class SeasonCalculatorTest implements TestConstants {
     int prizePot2 = totalCollected2 - totalToc2 - kitty2;
 
     Game game2 = Game.builder()
-      .buyInCollected(boughtIn2)
-      .annualTocCollected(toc2)
-      .rebuyAddOnCollected(rebought2)
-      .totalCollected(totalCollected2)
-      .annualTocFromRebuyAddOnCalculated(tocFromRebuys2)
-      .rebuyAddOnLessAnnualTocCalculated(rebought2 - tocFromRebuys2)
-      .totalCombinedTocCalculated(totalToc2)
-      .kittyCalculated(kitty2)
-      .prizePotCalculated(prizePot2)
-      .build();
+        .buyInCollected(boughtIn2)
+        .annualTocCollected(toc2)
+        .rebuyAddOnCollected(rebought2)
+        .totalCollected(totalCollected2)
+        .annualTocFromRebuyAddOnCalculated(tocFromRebuys2)
+        .rebuyAddOnLessAnnualTocCalculated(rebought2 - tocFromRebuys2)
+        .totalCombinedTocCalculated(totalToc2)
+        .kittyCalculated(kitty2)
+        .prizePotCalculated(prizePot2)
+        .build();
 
     gameSeasonPlayers = new ArrayList<>(10);
     for (int i = 0; i < 16; ++i) {
       GamePlayer gamePlayer = GamePlayer.builder()
-        .id(i)
-        .playerId(i)
-        .gameId(1)
-        .tocPoints(i)
-        .annualTocParticipant(i < 10)
-        .build();
+          .id(i)
+          .playerId(i)
+          .gameId(1)
+          .tocPoints(i)
+          .annualTocParticipant(i < 10)
+          .build();
       gameSeasonPlayers.add(gamePlayer);
     }
 
@@ -310,7 +310,7 @@ public class SeasonCalculatorTest implements TestConstants {
     assertEquals(totalCollected1 + totalCollected2, season.getTotalCollected());
     assertEquals(tocFromRebuys1 + tocFromRebuys2, season.getAnnualTocFromRebuyAddOnCalculated());
     assertEquals((rebought1 - tocFromRebuys1) + (rebought2 - tocFromRebuys2),
-      season.getRebuyAddOnLessAnnualTocCalculated());
+        season.getRebuyAddOnLessAnnualTocCalculated());
     assertEquals(totalToc1 + totalToc2, season.getTotalCombinedAnnualTocCalculated());
     assertEquals(kitty1 + kitty2, season.getKittyCalculated());
     assertEquals(prizePot1 + prizePot2, season.getPrizePotCalculated());
@@ -318,7 +318,7 @@ public class SeasonCalculatorTest implements TestConstants {
     assertEquals(2, season.getNumGamesPlayed());
 
     Assert.assertTrue("last calculated should be within the last few seconds",
-      season.getLastCalculated().isAfter(LocalDateTime.now().minusSeconds(3)));
+        season.getLastCalculated().isAfter(LocalDateTime.now().minusSeconds(3)));
 
     assertEquals(10, season.getPlayers().size());
     // Season players are sorted by points

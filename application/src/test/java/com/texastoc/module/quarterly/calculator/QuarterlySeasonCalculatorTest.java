@@ -10,13 +10,22 @@ import static org.mockito.Mockito.when;
 
 import com.texastoc.TestConstants;
 import com.texastoc.module.game.GameModule;
+import com.texastoc.module.game.model.Game;
+import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.quarterly.model.QuarterlySeason;
+import com.texastoc.module.quarterly.model.QuarterlySeasonPlayer;
 import com.texastoc.module.quarterly.repository.QuarterlySeasonRepository;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
 public class QuarterlySeasonCalculatorTest implements TestConstants {
@@ -65,116 +74,178 @@ public class QuarterlySeasonCalculatorTest implements TestConstants {
     assertNull(qSeason.getPayouts());
   }
 
-//  @Test
-//  public void test1Games() {
-//
-//    QuarterlySeason currentSeason = QuarterlySeason.builder()
-//      .id(1)
-//      .build();
-//    Mockito.when(qSeasonRepository.getById(1)).thenReturn(currentSeason);
-//
-//    List<GamePlayer> gameQSeasonPlayers = new ArrayList<>(10);
-//    List<Integer> expectedPoints = new ArrayList<>();
-//    for (int i = 0; i < 10; ++i) {
-//      int points = 0;
-//      if (i % 3 == 0 && i != 0) {
-//        points = i;
-//        expectedPoints.add(points);
-//      }
-//
-//      GamePlayer gamePlayer = GamePlayer.builder()
-//        .id(i)
-//        .playerId(i)
-//        .gameId(1)
-//        .buyInCollected(GAME_BUY_IN)
-//        .rebuyAddOnCollected(GAME_REBUY)
-//        .annualTocCollected(TOC_PER_GAME)
-//        .quarterlyTocCollected(QUARTERLY_TOC_PER_GAME)
-//        .points(points)
-//        .build();
-//      gameQSeasonPlayers.add(gamePlayer);
-//    }
-//
-//    List<GamePlayer> gameNonSeasonPlayers = new ArrayList<>(5);
-//    for (int i = 0; i < 5; ++i) {
-//      GamePlayer gamePlayer = GamePlayer.builder()
-//        .id(i)
-//        .playerId(i)
-//        .buyInCollected(GAME_BUY_IN)
-//        .rebuyAddOnCollected(GAME_REBUY)
-//        .gameId(1)
-//        .build();
-//      gameNonSeasonPlayers.add(gamePlayer);
-//    }
-//
-//    Mockito.when(gamePlayerRepository.selectQuarterlyTocPlayersByQuarterlySeasonId(1)).thenReturn(gameQSeasonPlayers);
-//
-//    List<GamePlayer> gameCombinedPlayers = new ArrayList<>(15);
-//    gameCombinedPlayers.addAll(gameQSeasonPlayers);
-//    gameCombinedPlayers.addAll(gameNonSeasonPlayers);
-//
-////    Mockito.when(configRepository.get()).thenReturn(TestConstants.getTocConfig());
-//    Game currentGame = Game.builder()
-//      .build();
-//    Game calculatedGame = gameCalculator.calculate(currentGame, gameCombinedPlayers);
-//    List<Game> calculatedGames = new LinkedList<>();
-//    calculatedGames.add(calculatedGame);
-//    Mockito.when(gameRepository.getByQuarterlySeasonId(1)).thenReturn(calculatedGames);
-//
-//    int qTocCollected = 0;
-//    for (Game game : calculatedGames) {
-//      qTocCollected += game.getQuarterlyTocCollected();
-//    }
-//
-//    QuarterlySeason qSeason = qSeasonCalculator.calculate(1);
-//
-//    Mockito.verify(qSeasonRepository, Mockito.times(1)).getById(1);
-//    Mockito.verify(gamePlayerRepository, Mockito.times(1)).selectQuarterlyTocPlayersByQuarterlySeasonId(1);
-//
-//    Assert.assertNotNull("quarterly season not null", qSeason);
-//    Assert.assertEquals("quarterly season id 1", 1, (int) qSeason.getId());
-//
-//    Assert.assertEquals("quarter has 1 game played", 1, qSeason.getNumGamesPlayed());
-//    Assert.assertEquals("qTocCollected is " + qTocCollected, qTocCollected, qSeason.getQTocCollected());
-//
-//    Assert.assertEquals("players 10", 10, qSeason.getPlayers().size());
-//    checkPoints(expectedPoints, qSeason.getPlayers());
-//
-//    List<QuarterlySeasonPayout> payouts = qSeason.getPayouts();
-//    Assert.assertEquals("payouts " + QUARTERLY_NUM_PAYOUTS, QUARTERLY_NUM_PAYOUTS, payouts.size());
-//
-//    int firstPlace = (int) Math.round(qTocCollected * 0.5d);
-//    int secondPlace = (int) Math.round(qTocCollected * 0.3d);
-//    int thirdPlace = qTocCollected - firstPlace - secondPlace;
-//    int amounts[] = {firstPlace, secondPlace, thirdPlace};
-//
-//    for (int i = 0; i < 3; i++) {
-//      int place = i + 1;
-//      boolean found = false;
-//      for (QuarterlySeasonPayout payout : payouts) {
-//        if (payout.getPlace() == place) {
-//          found = true;
-//          Assert.assertEquals("payout " + place + " should be " + amounts[i], amounts[i], payout.getAmount());
-//        }
-//      }
-//      Assert.assertTrue("should have found a payout for place " + place, found);
-//    }
-//  }
-//
-//  private void checkPoints(Collection<Integer> expectedPoints, List<QuarterlySeasonPlayer> players) {
-//    for (int points : expectedPoints) {
-//      boolean found = false;
-//      for (QuarterlySeasonPlayer player : players) {
-//        if (points != 0 && player.getPoints() == points) {
-//          if (found) {
-//            Assert.fail("already found player with points " + points);
-//          } else {
-//            found = true;
-//          }
-//        }
-//      }
-//      Assert.assertTrue("should have found a player with points " + points, found);
-//    }
-//  }
+  @Test
+  public void test1Game() {
+    // Arrange
+    when(repository.findById(1))
+        .thenReturn(Optional.of(QuarterlySeason.builder()
+            .id(1)
+            .seasonId(2)
+            .numGames(13)
+            .build()));
+
+    // 4 quarterly toc
+    int qToc = 4 * QUARTERLY_TOC_PER_GAME;
+    Game game = Game.builder()
+        .quarterlyTocCollected(qToc)
+        .build();
+
+    List<GamePlayer> gamePlayers = new ArrayList<>(10);
+    for (int i = 0; i < 10; ++i) {
+      GamePlayer gamePlayer = GamePlayer.builder()
+          .id(i)
+          .playerId(i)
+          .gameId(1)
+          .qTocPoints(i < 4 ? i : 0)
+          .quarterlyTocParticipant(i < 4)
+          .build();
+      gamePlayers.add(gamePlayer);
+    }
+    game.setPlayers(gamePlayers);
+
+    when(gameModule.getByQuarterlySeasonId(1)).thenReturn(Collections.singletonList(game));
+
+    // Act
+    calculator.calculate(1);
+
+    // Assert
+    verify(repository, times(1)).findById(1);
+    verify(gameModule, times(1)).getByQuarterlySeasonId(1);
+
+    ArgumentCaptor<QuarterlySeason> argument = ArgumentCaptor.forClass(QuarterlySeason.class);
+    verify(repository).save(argument.capture());
+    QuarterlySeason qSeason = argument.getValue();
+
+    assertNotNull("quarterly season not null", qSeason);
+    assertEquals("quarterly season id 1", 1, (int) qSeason.getId());
+
+    assertEquals(1, qSeason.getNumGamesPlayed());
+    assertEquals(qToc, qSeason.getQTocCollected());
+
+    assertEquals(4, qSeason.getPlayers().size());
+    // Quarterly Season players are sorted by points
+    QuarterlySeasonPlayer qSeasonPlayer = qSeason.getPlayers().get(0);
+    assertEquals(1, qSeasonPlayer.getPlace().intValue());
+    assertEquals(3, qSeasonPlayer.getPoints());
+    qSeasonPlayer = qSeason.getPlayers().get(1);
+    assertEquals(2, qSeasonPlayer.getPlace().intValue());
+    assertEquals(2, qSeasonPlayer.getPoints());
+    qSeasonPlayer = qSeason.getPlayers().get(2);
+    assertEquals(3, qSeasonPlayer.getPlace().intValue());
+    assertEquals(1, qSeasonPlayer.getPoints());
+    qSeasonPlayer = qSeason.getPlayers().get(3);
+    assertNull(qSeasonPlayer.getPlace());
+    assertEquals(0, qSeasonPlayer.getPoints());
+
+    // TODO beef up testing payouts
+    assertEquals(3, qSeason.getPayouts().size());
+  }
+
+  @Test
+  public void test2Games() {
+    // Arrange
+    when(repository.findById(1))
+        .thenReturn(Optional.of(QuarterlySeason.builder()
+            .id(1)
+            .seasonId(2)
+            .numGames(13)
+            .build()));
+
+    // Game 1
+    // 4 annual toc
+    int qToc1 = 4 * QUARTERLY_TOC_PER_GAME;
+    Game game1 = Game.builder()
+        .quarterlyTocCollected(qToc1)
+        .build();
+
+    List<GamePlayer> gamePlayers = new ArrayList<>(10);
+    for (int i = 0; i < 10; ++i) {
+      GamePlayer gamePlayer = GamePlayer.builder()
+          .id(i)
+          .playerId(i)
+          .gameId(1)
+          .qTocPoints(i < 4 ? i : 0)
+          .quarterlyTocParticipant(i < 4)
+          .build();
+      gamePlayers.add(gamePlayer);
+    }
+    game1.setPlayers(gamePlayers);
+
+    // Game 2
+    // 7 quarterly toc
+    int qToc2 = 7 * QUARTERLY_TOC_PER_GAME;
+
+    Game game2 = Game.builder()
+        .quarterlyTocCollected(qToc2)
+        .build();
+
+    gamePlayers = new ArrayList<>(16);
+    for (int i = 0; i < 16; ++i) {
+      GamePlayer gamePlayer = GamePlayer.builder()
+          .id(i)
+          .playerId(i)
+          .gameId(1)
+          .qTocPoints(i < 7 ? i : 0)
+          .quarterlyTocParticipant(i < 7)
+          .build();
+      gamePlayers.add(gamePlayer);
+    }
+
+    game2.setPlayers(gamePlayers);
+
+    when(gameModule.getByQuarterlySeasonId(1)).thenReturn(Arrays.asList(game1, game2));
+
+    // Act
+    calculator.calculate(1);
+
+    // Assert
+    ArgumentCaptor<QuarterlySeason> qSeasonArg = ArgumentCaptor.forClass(QuarterlySeason.class);
+    Mockito.verify(repository, Mockito.times(1)).save(qSeasonArg.capture());
+    QuarterlySeason qSeason = qSeasonArg.getValue();
+
+    assertEquals(1, qSeason.getId());
+    assertEquals(2, qSeason.getNumGamesPlayed());
+    assertEquals(qToc1 + qToc2, qSeason.getQTocCollected());
+
+    assertEquals(2, qSeason.getNumGamesPlayed());
+
+    Assert.assertTrue("last calculated should be within the last few seconds",
+        qSeason.getLastCalculated().isAfter(LocalDateTime.now().minusSeconds(3)));
+
+    assertEquals(7, qSeason.getPlayers().size());
+    // Quarterly Season players are sorted by points
+    QuarterlySeasonPlayer qSeasonPlayer = qSeason.getPlayers().get(0);
+    assertEquals(1, qSeasonPlayer.getPlace().intValue());
+    assertEquals(6, qSeasonPlayer.getPoints());
+
+    qSeasonPlayer = qSeason.getPlayers().get(1);
+    assertEquals(1, qSeasonPlayer.getPlace().intValue());
+    assertEquals(6, qSeasonPlayer.getPoints());
+
+    qSeasonPlayer = qSeason.getPlayers().get(2);
+    assertEquals(3, qSeasonPlayer.getPlace().intValue());
+    assertEquals(5, qSeasonPlayer.getPoints());
+    assertEquals(1, qSeasonPlayer.getEntries());
+
+    qSeasonPlayer = qSeason.getPlayers().get(3);
+    assertEquals(4, qSeasonPlayer.getPlace().intValue());
+    assertEquals(4, qSeasonPlayer.getPoints());
+
+    qSeasonPlayer = qSeason.getPlayers().get(4);
+    assertEquals(4, qSeasonPlayer.getPlace().intValue());
+    assertEquals(4, qSeasonPlayer.getPoints());
+
+    qSeasonPlayer = qSeason.getPlayers().get(5);
+    assertEquals(6, qSeasonPlayer.getPlace().intValue());
+    assertEquals(2, qSeasonPlayer.getPoints());
+    assertEquals(2, qSeasonPlayer.getEntries());
+
+    qSeasonPlayer = qSeason.getPlayers().get(6);
+    assertNull(qSeasonPlayer.getPlace());
+    assertEquals(0, qSeasonPlayer.getPoints());
+
+    // TODO beef up testing payouts
+    assertEquals(3, qSeason.getPayouts().size());
+  }
 
 }
