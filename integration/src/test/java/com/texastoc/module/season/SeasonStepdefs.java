@@ -13,11 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.springframework.web.client.HttpClientErrorException;
 
-// Tests are run from SpringBootBaseIntegrationTest so must Ignore here
-@Ignore
 public class SeasonStepdefs extends BaseIntegrationTest {
 
   private LocalDate start;

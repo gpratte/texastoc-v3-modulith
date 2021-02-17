@@ -1,4 +1,4 @@
-package com.texastoc.module.season;
+package com.texastoc.module.quarterly;
 
 import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.season.model.Season;
