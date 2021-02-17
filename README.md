@@ -162,5 +162,5 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 33-quarterly-season
-Moved quarterly seasons to Spring Data JDBC. Unit tests for CRUDding quarterly seasons.
+## Current Branch: 34-quarterly-season-calculations
+Unit tests for the quarterly season calculator.

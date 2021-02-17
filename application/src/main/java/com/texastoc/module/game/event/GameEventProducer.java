@@ -10,7 +10,7 @@ public class GameEventProducer {
     this.gameEventing = gameEventing;
   }
 
-  public void notifyGameFinalized(int seasonId, int gameId, boolean finalized) {
-    gameEventing.send(new GameFinalizedEvent(seasonId, gameId, finalized));
+  public void notifyGameFinalized(int gameId, int seasonId, int qSeasonId, boolean finalized) {
+    gameEventing.send(new GameFinalizedEvent(gameId, seasonId, qSeasonId, finalized));
   }
 }
