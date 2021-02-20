@@ -346,18 +346,18 @@ public abstract class BaseIntegrationTest implements TestConstants {
     return response.getBody();
   }
 
-//  protected Season getSeason(int id, String token) throws JsonProcessingException {
-//    HttpHeaders headers = new HttpHeaders();
-//    headers.set("Authorization", "Bearer " + token);
-//    HttpEntity<String> entity = new HttpEntity<>("", headers);
-//
-//    ResponseEntity<Season> response = restTemplate.exchange(
-//      endpoint() + "/seasons/" + id,
-//      HttpMethod.GET,
-//      entity,
-//      Season.class);
-//    return response.getBody();
-//  }
+  protected Season getSeason(int id, String token) throws JsonProcessingException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + token);
+    HttpEntity<String> entity = new HttpEntity<>("", headers);
+
+    ResponseEntity<Season> response = restTemplate.exchange(
+        endpoint() + "/seasons/" + id,
+        HttpMethod.GET,
+        entity,
+        Season.class);
+    return response.getBody();
+  }
 
   protected Season getCurrentSeason(String token) throws JsonProcessingException {
     HttpHeaders headers = new HttpHeaders();
@@ -370,6 +370,24 @@ public abstract class BaseIntegrationTest implements TestConstants {
         entity,
         Season.class);
     return response.getBody();
+  }
+
+  protected void endSeason(int seasonId, String token) throws JsonProcessingException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + token);
+    headers.set("Content-Type", "application/vnd.texastoc.finalize+json");
+
+    HttpEntity<String> entity = new HttpEntity<>(headers);
+    restTemplate.put(endpoint() + "/seasons/" + seasonId, entity);
+  }
+
+  protected void openSeason(int seasonId, String token) throws JsonProcessingException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + token);
+    headers.set("Content-Type", "application/vnd.texastoc.unfinalize+json");
+
+    HttpEntity<String> entity = new HttpEntity<>(headers);
+    restTemplate.put(endpoint() + "/seasons/" + seasonId, entity);
   }
 
   protected String login(String email, String password) throws JsonProcessingException {
