@@ -67,11 +67,11 @@ public abstract class BaseIntegrationTest implements TestConstants {
     return start;
   }
 
-  protected Season createSeason(String token) throws Exception {
-    return createSeason(getSeasonStart(), token);
+  protected void createSeason(String token) throws Exception {
+    createSeason(getSeasonStart().getYear(), token);
   }
 
-  protected Season createSeason(LocalDate start, String token) throws Exception {
+  protected Season createSeason(int startYear, String token) throws Exception {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.set("Authorization", "Bearer " + token);
@@ -80,7 +80,7 @@ public abstract class BaseIntegrationTest implements TestConstants {
     mapper.registerModule(new JavaTimeModule());
 
     SeasonStart seasonStart = new SeasonStart();
-    seasonStart.setStartYear(start.getYear());
+    seasonStart.setStartYear(startYear);
     String seasonAsJson = mapper.writeValueAsString(seasonStart);
     HttpEntity<String> entity = new HttpEntity<>(seasonAsJson, headers);
 

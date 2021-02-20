@@ -1,47 +1,43 @@
 package com.texastoc.module.season;
 
+import static org.junit.Assert.assertEquals;
+
 import com.texastoc.BaseIntegrationTest;
-import com.texastoc.TestUtils;
-import com.texastoc.module.game.model.Game;
 import com.texastoc.module.season.model.Season;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.springframework.web.client.HttpClientErrorException;
 
 public class SeasonStepdefs extends BaseIntegrationTest {
 
-  private LocalDate start;
+  private Integer startYear;
   private Season seasonCreated;
   private Season seasonRetrieved;
-  private List<Game> games = new ArrayList<>();
   private HttpClientErrorException exception;
 
   @Before
   public void before() {
-    start = null;
+    super.before();
+    startYear = null;
     seasonCreated = null;
     seasonRetrieved = null;
     exception = null;
-    games.clear();
   }
 
-  @Given("^season starts now$")
-  public void season_starts_now() throws Exception {
+  @Given("^season starts encompassing today$")
+  public void seasonStarts() throws Exception {
     // Arrange
-    start = getSeasonStart();
+    startYear = getSeasonStart().getYear();
   }
 
   @When("^the season is created$")
   public void the_season_is_created() throws Exception {
-//    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
-//    seasonCreated = createSeason(start, token);
+    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
+    seasonCreated = createSeason(startYear, token);
   }
 
   @When("^attempting to create the season$")
@@ -54,20 +50,20 @@ public class SeasonStepdefs extends BaseIntegrationTest {
 //    }
   }
 
-  @Then("^the start date should be now$")
-  public void the_start_date_should_be_now() throws Exception {
-    TestUtils.assertCreatedSeason(start, seasonCreated);
+  @Then("^the start date should be May first$")
+  public void verifyStartDate() throws Exception {
+    assertEquals(getSeasonStart(), seasonCreated.getStart());
   }
 
   @Given("^season start date is missing$")
   public void season_start_date_is_missing() throws Exception {
     // Arrange
-    start = null;
+    startYear = null;
   }
 
   @Then("^response is \"([^\"]*)\"$")
   public void response_is(String expected) throws Exception {
-    Assert.assertEquals(expected, exception.getStatusCode().toString());
+    assertEquals(expected, exception.getStatusCode().toString());
   }
 
   @And("^the season is retrieved$")
@@ -76,14 +72,18 @@ public class SeasonStepdefs extends BaseIntegrationTest {
 //    seasonRetrieved = getSeason(seasonCreated.getId(), token);
   }
 
-  @Then("^the season should have four quarters$")
-  public void the_season_should_have_four_quarters() throws Exception {
-    // TODO
-//    Assert.assertNotNull("season retrieved should not be null", seasonRetrieved);
-//    Assert.assertNotNull("season retrieved quarterly seasons should not be null", seasonRetrieved.getQuarterlySeasons());
-//    Assert.assertEquals(4, seasonRetrieved.getQuarterlySeasons().size());
-//    Assert.assertNotNull("games should not be null", seasonRetrieved.getGames());
-//    Assert.assertEquals("season should have 0 games", 0, seasonRetrieved.getGames().size());
-  }
+  @And("^the season costs should be set$")
+  public void verifySeasonCosts() throws Exception {
+    Assert.assertEquals(KITTY_PER_GAME, seasonCreated.getKittyPerGame());
+    Assert.assertEquals(TOC_PER_GAME, seasonCreated.getTocPerGame());
+    Assert.assertEquals(QUARTERLY_TOC_PER_GAME, seasonCreated.getQuarterlyTocPerGame());
+    Assert.assertEquals(QUARTERLY_NUM_PAYOUTS, seasonCreated.getQuarterlyNumPayouts());
+    Assert.assertEquals(GAME_BUY_IN, seasonCreated.getBuyInCost());
+    Assert.assertEquals(GAME_REBUY, seasonCreated.getRebuyAddOnCost());
+    Assert.assertEquals(GAME_REBUY_TOC_DEBIT, seasonCreated.getRebuyAddOnTocDebitCost());
 
+    Assert.assertTrue(seasonCreated.getNumGames() == 52 || seasonCreated.getNumGames() == 53);
+    Assert.assertFalse(seasonCreated.isFinalized());
+  }
 }
+
