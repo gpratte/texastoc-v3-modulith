@@ -1,5 +1,9 @@
 package com.texastoc.module.game;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
@@ -13,17 +17,12 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.springframework.web.client.HttpClientErrorException;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.springframework.web.client.HttpClientErrorException;
 
 public class GameSeatingStepdefs extends BaseIntegrationTest {
 
@@ -46,13 +45,13 @@ public class GameSeatingStepdefs extends BaseIntegrationTest {
   @Given("^a game has (\\d+) players$")
   public void aGameHasPlayers(int numPlayers) throws Exception {
     String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
-    createSeason(getSeasonStart(), token);
+    createSeason(getSeasonStart().getYear(), token);
 
     Game game = createGame(Game.builder()
-      .date(LocalDate.now())
-      .hostId(1)
-      .transportRequired(false)
-      .build(), token);
+        .date(LocalDate.now())
+        .hostId(1)
+        .transportRequired(false)
+        .build(), token);
 
     gameId = game.getId();
 
@@ -60,18 +59,19 @@ public class GameSeatingStepdefs extends BaseIntegrationTest {
 
     for (int i = 0; i < numPlayers; i++) {
       GamePlayer gamePlayer = GamePlayer.builder()
-        .firstName("Joe" + i)
-        .lastName("Schmoe")
-        .email("joe" + i + ".schmoe@texastoc.com")
-        .gameId(gameId)
-        .boughtIn(true)
-        .build();
+          .firstName("Joe" + i)
+          .lastName("Schmoe")
+          .email("joe" + i + ".schmoe@texastoc.com")
+          .gameId(gameId)
+          .boughtIn(true)
+          .build();
       gamePlayers.add(addFirstTimePlayerToGame(gamePlayer, token));
     }
   }
 
   @When("^seating is done with (\\d+) tables each with (\\d+) seats and (\\d+) table requests for table (\\d+)$")
-  public void seatingIsDoneWithTableAndSeats(int tables, int seats, int requests, int tableRequested) throws Exception {
+  public void seatingIsDoneWithTableAndSeats(int tables, int seats, int requests,
+      int tableRequested) throws Exception {
     String token = login(USER_EMAIL, USER_PASSWORD);
     Seating seatingRequest = new Seating();
     List<SeatsPerTable> seatsPerTables = new ArrayList<>(tables);
@@ -79,7 +79,7 @@ public class GameSeatingStepdefs extends BaseIntegrationTest {
     for (int i = 0; i < tables; i++) {
       SeatsPerTable seatsPerTable = new SeatsPerTable();
       seatsPerTables.add(seatsPerTable);
-      seatsPerTable.setTableNum(i+1);
+      seatsPerTable.setTableNum(i + 1);
       seatsPerTable.setNumSeats(seats);
     }
 
@@ -123,8 +123,8 @@ public class GameSeatingStepdefs extends BaseIntegrationTest {
 
     List<Seat> seats = gameTable.getSeats();
     int numPlayersSeated = (int) seats.stream()
-      .filter((seat) -> seat != null)
-      .count();
+        .filter((seat) -> seat != null)
+        .count();
     assertEquals(numPlayers + " are seated", numPlayers, numPlayersSeated);
   }
 
@@ -134,8 +134,8 @@ public class GameSeatingStepdefs extends BaseIntegrationTest {
     GameTable table = gameTables.get(tableNum - 1);
     List<Seat> seats = table.getSeats();
     int numPlayersSeated = (int) seats.stream()
-      .filter((seat) -> seat != null)
-      .count();
+        .filter((seat) -> seat != null)
+        .count();
 
     SeatsPerTable seatsPerTable = seating.getSeatsPerTables().get(tableNum - 1);
     int numEmptySeats = seatsPerTable.getNumSeats() - numPlayersSeated;

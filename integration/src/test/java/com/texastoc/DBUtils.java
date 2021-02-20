@@ -1,9 +1,6 @@
 package com.texastoc;
 
 import com.google.common.collect.ImmutableList;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.io.ClassPathResource;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +10,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.io.ClassPathResource;
 
 @SuppressWarnings("ALL")
 public class DBUtils {
@@ -21,7 +20,12 @@ public class DBUtils {
   final static String DB_USER = "sa";
   final static String DB_PASSWORD = "";
 
-  final static List<String> TABLES_TO_CLEAN_IN_ORDER = ImmutableList.of("season", "quarterlyseason", "seasonplayer", "quarterlyseasonplayer", "role", "player", "seats_per_table", "table_request", "seat", "game_table", "game_player", "game_payout", "game", "seating", "quarterlyseasonpayout", "seasonpayout", "seasonpayoutsettings", "toc_config", "settings", "version", "historicalseasonplayer", "historicalseason");
+  // Leave the player and role tables out of the list of tables to clean
+  final static List<String> TABLES_TO_CLEAN_IN_ORDER = ImmutableList
+      .of("season", "quarterlyseason", "seasonplayer", "quarterlyseasonplayer", "seats_per_table",
+          "table_request", "seat", "game_table", "game_player", "game_payout", "game", "seating",
+          "quarterlyseasonpayout", "seasonpayout", "seasonpayoutsettings", "toc_config", "settings",
+          "version", "historicalseasonplayer", "historicalseason");
 
   static {
     try {
@@ -33,7 +37,7 @@ public class DBUtils {
 
   // Delete all the rows of all the tables
   public static synchronized void cleanDb() {
-    try(Connection conn = DriverManager.getConnection(DB_CONNECT, DB_USER, DB_PASSWORD)) {
+    try (Connection conn = DriverManager.getConnection(DB_CONNECT, DB_USER, DB_PASSWORD)) {
       Statement st = conn.createStatement();
       for (String tableName : TABLES_TO_CLEAN_IN_ORDER) {
         st.executeUpdate("delete from " + tableName);
@@ -51,9 +55,9 @@ public class DBUtils {
   // Reset the seed data
   static void seedTables(Connection conn) throws IOException, SQLException {
     InputStream resource = new ClassPathResource(
-      "seed_toc.sql").getInputStream();
+        "seed_toc.sql").getInputStream();
     try (BufferedReader reader = new BufferedReader(
-      new InputStreamReader(resource))) {
+        new InputStreamReader(resource))) {
       String line;
       StringBuilder sb = new StringBuilder();
       Statement st = conn.createStatement();
@@ -68,7 +72,10 @@ public class DBUtils {
         sb.append(" " + line);
 
         if (line.endsWith(";")) {
-          st.executeUpdate(sb.toString());
+          // Do not insert into the player or role tables
+          if (sb.indexOf("player") != -1 || sb.indexOf("role") != -1) {
+            st.executeUpdate(sb.toString());
+          }
           sb = new StringBuilder();
         }
       }
