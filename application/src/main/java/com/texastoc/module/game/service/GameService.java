@@ -142,7 +142,7 @@ public class GameService {
     game.setSeating(null);
     // TODO set game.chopped
     gameRepository.save(game);
-    // TODO message season for it to recalculate season and quarter
+    gameEventProducer.notifyGameFinalized(id, game.getSeasonId(), game.getQSeasonId(), true);
     gameHelper.sendUpdatedGame();
     // TODO message clock to end
     gameHelper.sendGameSummary(id);

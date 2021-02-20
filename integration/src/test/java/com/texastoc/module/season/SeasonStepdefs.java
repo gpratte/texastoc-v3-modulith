@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.season.model.Season;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -12,22 +11,12 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
 import org.junit.Before;
-import org.springframework.web.client.HttpClientErrorException;
 
-public class SeasonStepdefs extends BaseIntegrationTest {
-
-  private Integer startYear;
-  private Season seasonCreated;
-  private Season seasonRetrieved;
-  private HttpClientErrorException exception;
+public class SeasonStepdefs extends BaseSeasonStepdefs {
 
   @Before
   public void before() {
     super.before();
-    startYear = null;
-    seasonCreated = null;
-    seasonRetrieved = null;
-    exception = null;
   }
 
   @Given("^season starts encompassing today$")
@@ -38,10 +27,7 @@ public class SeasonStepdefs extends BaseIntegrationTest {
 
   @Given("^a season encompassing today exists$")
   public void seasonExists() throws Exception {
-    // Arrange
-    startYear = getSeasonStart().getYear();
-    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
-    seasonCreated = createSeason(startYear, token);
+    aSeasonExists();
   }
 
   @When("^the season is created$")
