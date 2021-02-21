@@ -43,12 +43,6 @@ Feature: a finalized game triggers the season to recalculate
     }
   ],
   "payouts":[],
-  "estimatedPayouts":[
-    {
-      "place":1,
-      "amount":50,
-      "guaranteed":true
-    }
-  ]
+  "estimatedPayouts":[]
 }
     """

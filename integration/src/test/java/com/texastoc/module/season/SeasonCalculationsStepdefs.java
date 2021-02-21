@@ -106,6 +106,7 @@ public class SeasonCalculationsStepdefs extends BaseSeasonStepdefs {
 
     assertEquals(expectedSeason.getPlayers().size(), seasonRetrieved.getPlayers().size());
     for (int i = 0; i < expectedSeason.getPlayers().size(); i++) {
+      assertEquals(seasonRetrieved.getId(), seasonRetrieved.getPlayers().get(i).getSeasonId());
       assertEquals(expectedSeason.getPlayers().get(i).getName(),
           seasonRetrieved.getPlayers().get(i).getName());
       if (expectedSeason.getPlayers().get(i).getPlace() == null) {
@@ -121,5 +122,36 @@ public class SeasonCalculationsStepdefs extends BaseSeasonStepdefs {
     }
 
     assertEquals(expectedSeason.getPayouts().size(), seasonRetrieved.getPayouts().size());
+    for (int i = 0; i < expectedSeason.getPayouts().size(); i++) {
+      assertEquals(seasonRetrieved.getId(), seasonRetrieved.getPayouts().get(i).getSeasonId());
+      assertEquals(expectedSeason.getPayouts().get(i).getPlace(),
+          seasonRetrieved.getPayouts().get(i).getPlace());
+      assertEquals(expectedSeason.getPayouts().get(i).getAmount(),
+          seasonRetrieved.getPayouts().get(i).getAmount());
+      assertEquals(expectedSeason.getPayouts().get(i).isGuaranteed(),
+          seasonRetrieved.getPayouts().get(i).isGuaranteed());
+      assertEquals(expectedSeason.getPayouts().get(i).isEstimated(),
+          seasonRetrieved.getPayouts().get(i).isEstimated());
+      assertEquals(expectedSeason.getPayouts().get(i).isCash(),
+          seasonRetrieved.getPayouts().get(i).isCash());
+    }
+
+    assertEquals(expectedSeason.getEstimatedPayouts().size(),
+        seasonRetrieved.getEstimatedPayouts().size());
+    for (int i = 0; i < expectedSeason.getEstimatedPayouts().size(); i++) {
+      assertEquals(seasonRetrieved.getId(),
+          seasonRetrieved.getEstimatedPayouts().get(i).getSeasonId());
+      assertEquals(expectedSeason.getEstimatedPayouts().get(i).getPlace(),
+          seasonRetrieved.getEstimatedPayouts().get(i).getPlace());
+      assertEquals(expectedSeason.getEstimatedPayouts().get(i).getAmount(),
+          seasonRetrieved.getEstimatedPayouts().get(i).getAmount());
+      assertEquals(expectedSeason.getEstimatedPayouts().get(i).isGuaranteed(),
+          seasonRetrieved.getEstimatedPayouts().get(i).isGuaranteed());
+      assertEquals(expectedSeason.getEstimatedPayouts().get(i).isEstimated(),
+          seasonRetrieved.getEstimatedPayouts().get(i).isEstimated());
+      assertEquals(expectedSeason.getEstimatedPayouts().get(i).isCash(),
+          seasonRetrieved.getEstimatedPayouts().get(i).isCash());
+    }
+
   }
 }
