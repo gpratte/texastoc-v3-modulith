@@ -29,259 +29,259 @@ public interface TestConstants {
 
   static TocConfig getTocConfig() {
     return TocConfig.builder()
-      .kittyDebit(KITTY_PER_GAME)
-      .annualTocCost(TOC_PER_GAME)
-      .quarterlyTocCost(QUARTERLY_TOC_PER_GAME)
-      .quarterlyNumPayouts(QUARTERLY_NUM_PAYOUTS)
-      .regularBuyInCost(GAME_BUY_IN)
-      .regularRebuyCost(GAME_REBUY)
-      .regularRebuyTocDebit(GAME_REBUY_TOC_DEBIT)
-      .build();
+        .kittyDebit(KITTY_PER_GAME)
+        .annualTocCost(TOC_PER_GAME)
+        .quarterlyTocCost(QUARTERLY_TOC_PER_GAME)
+        .quarterlyNumPayouts(QUARTERLY_NUM_PAYOUTS)
+        .regularBuyInCost(GAME_BUY_IN)
+        .regularRebuyCost(GAME_REBUY)
+        .regularRebuyTocDebit(GAME_REBUY_TOC_DEBIT)
+        .build();
   }
 
   static List<Payout> getPayouts(int num) {
     Map<Integer, List<Payout>> payoutsMap = new HashMap<>();
     List<Payout> payouts = new ArrayList<>(2);
     payouts.add(Payout.builder()
-      .place(1)
-      .percent(0.65)
-      .build());
+        .place(1)
+        .percent(0.65)
+        .build());
     payouts.add(Payout.builder()
-      .place(2)
-      .percent(0.35)
-      .build());
+        .place(2)
+        .percent(0.35)
+        .build());
     payoutsMap.put(2, payouts);
 
     payouts = new ArrayList<>(3);
     payouts.add(Payout.builder()
-      .place(1)
-      .percent(0.50)
-      .build());
+        .place(1)
+        .percent(0.50)
+        .build());
     payouts.add(Payout.builder()
-      .place(2)
-      .percent(0.30)
-      .build());
+        .place(2)
+        .percent(0.30)
+        .build());
     payouts.add(Payout.builder()
-      .place(3)
-      .percent(0.20)
-      .build());
+        .place(3)
+        .percent(0.20)
+        .build());
     payoutsMap.put(3, payouts);
 
     payouts = new ArrayList<>(4);
     payouts.add(Payout.builder()
-      .place(1)
-      .percent(0.45)
-      .build());
+        .place(1)
+        .percent(0.45)
+        .build());
     payouts.add(Payout.builder()
-      .place(2)
-      .percent(0.25)
-      .build());
+        .place(2)
+        .percent(0.25)
+        .build());
     payouts.add(Payout.builder()
-      .place(3)
-      .percent(0.18)
-      .build());
+        .place(3)
+        .percent(0.18)
+        .build());
     payouts.add(Payout.builder()
-      .place(4)
-      .percent(0.12)
-      .build());
+        .place(4)
+        .percent(0.12)
+        .build());
     payoutsMap.put(4, payouts);
 
     payouts = new ArrayList<>(5);
     payouts.add(Payout.builder()
-      .place(1)
-      .percent(0.40)
-      .build());
+        .place(1)
+        .percent(0.40)
+        .build());
     payouts.add(Payout.builder()
-      .place(2)
-      .percent(0.23)
-      .build());
+        .place(2)
+        .percent(0.23)
+        .build());
     payouts.add(Payout.builder()
-      .place(3)
-      .percent(0.16)
-      .build());
+        .place(3)
+        .percent(0.16)
+        .build());
     payouts.add(Payout.builder()
-      .place(4)
-      .percent(0.12)
-      .build());
+        .place(4)
+        .percent(0.12)
+        .build());
     payouts.add(Payout.builder()
-      .place(5)
-      .percent(0.09)
-      .build());
+        .place(5)
+        .percent(0.09)
+        .build());
     payoutsMap.put(5, payouts);
 
     payouts = new ArrayList<>(6);
     payouts.add(Payout.builder()
-      .place(1)
-      .percent(0.38)
-      .build());
+        .place(1)
+        .percent(0.38)
+        .build());
     payouts.add(Payout.builder()
-      .place(2)
-      .percent(0.22)
-      .build());
+        .place(2)
+        .percent(0.22)
+        .build());
     payouts.add(Payout.builder()
-      .place(3)
-      .percent(0.15)
-      .build());
+        .place(3)
+        .percent(0.15)
+        .build());
     payouts.add(Payout.builder()
-      .place(4)
-      .percent(0.11)
-      .build());
+        .place(4)
+        .percent(0.11)
+        .build());
     payouts.add(Payout.builder()
-      .place(5)
-      .percent(0.08)
-      .build());
+        .place(5)
+        .percent(0.08)
+        .build());
     payouts.add(Payout.builder()
-      .place(6)
-      .percent(0.06)
-      .build());
+        .place(6)
+        .percent(0.06)
+        .build());
     payoutsMap.put(6, payouts);
 
     payouts = new ArrayList<>(7);
     payouts.add(Payout.builder()
-      .place(1)
-      .percent(0.35)
-      .build());
+        .place(1)
+        .percent(0.35)
+        .build());
     payouts.add(Payout.builder()
-      .place(2)
-      .percent(0.21)
-      .build());
+        .place(2)
+        .percent(0.21)
+        .build());
     payouts.add(Payout.builder()
-      .place(3)
-      .percent(0.15)
-      .build());
+        .place(3)
+        .percent(0.15)
+        .build());
     payouts.add(Payout.builder()
-      .place(4)
-      .percent(0.11)
-      .build());
+        .place(4)
+        .percent(0.11)
+        .build());
     payouts.add(Payout.builder()
-      .place(5)
-      .percent(0.08)
-      .build());
+        .place(5)
+        .percent(0.08)
+        .build());
     payouts.add(Payout.builder()
-      .place(6)
-      .percent(0.06)
-      .build());
+        .place(6)
+        .percent(0.06)
+        .build());
     payouts.add(Payout.builder()
-      .place(7)
-      .percent(0.04)
-      .build());
+        .place(7)
+        .percent(0.04)
+        .build());
     payoutsMap.put(7, payouts);
 
     payouts = new ArrayList<>(8);
     payouts.add(Payout.builder()
-      .place(1)
-      .percent(0.335)
-      .build());
+        .place(1)
+        .percent(0.335)
+        .build());
     payouts.add(Payout.builder()
-      .place(2)
-      .percent(0.20)
-      .build());
+        .place(2)
+        .percent(0.20)
+        .build());
     payouts.add(Payout.builder()
-      .place(3)
-      .percent(0.145)
-      .build());
+        .place(3)
+        .percent(0.145)
+        .build());
     payouts.add(Payout.builder()
-      .place(4)
-      .percent(0.11)
-      .build());
+        .place(4)
+        .percent(0.11)
+        .build());
     payouts.add(Payout.builder()
-      .place(5)
-      .percent(0.08)
-      .build());
+        .place(5)
+        .percent(0.08)
+        .build());
     payouts.add(Payout.builder()
-      .place(6)
-      .percent(0.06)
-      .build());
+        .place(6)
+        .percent(0.06)
+        .build());
     payouts.add(Payout.builder()
-      .place(7)
-      .percent(0.04)
-      .build());
+        .place(7)
+        .percent(0.04)
+        .build());
     payouts.add(Payout.builder()
-      .place(8)
-      .percent(0.03)
-      .build());
+        .place(8)
+        .percent(0.03)
+        .build());
     payoutsMap.put(8, payouts);
 
     payouts = new ArrayList<>(9);
     payouts.add(Payout.builder()
-      .place(1)
-      .percent(0.32)
-      .build());
+        .place(1)
+        .percent(0.32)
+        .build());
     payouts.add(Payout.builder()
-      .place(2)
-      .percent(0.195)
-      .build());
+        .place(2)
+        .percent(0.195)
+        .build());
     payouts.add(Payout.builder()
-      .place(3)
-      .percent(0.14)
-      .build());
+        .place(3)
+        .percent(0.14)
+        .build());
     payouts.add(Payout.builder()
-      .place(4)
-      .percent(0.11)
-      .build());
+        .place(4)
+        .percent(0.11)
+        .build());
     payouts.add(Payout.builder()
-      .place(5)
-      .percent(0.08)
-      .build());
+        .place(5)
+        .percent(0.08)
+        .build());
     payouts.add(Payout.builder()
-      .place(6)
-      .percent(0.06)
-      .build());
+        .place(6)
+        .percent(0.06)
+        .build());
     payouts.add(Payout.builder()
-      .place(7)
-      .percent(0.04)
-      .build());
+        .place(7)
+        .percent(0.04)
+        .build());
     payouts.add(Payout.builder()
-      .place(8)
-      .percent(0.03)
-      .build());
+        .place(8)
+        .percent(0.03)
+        .build());
     payouts.add(Payout.builder()
-      .place(9)
-      .percent(0.025)
-      .build());
+        .place(9)
+        .percent(0.025)
+        .build());
     payoutsMap.put(9, payouts);
 
     payouts = new ArrayList<>(10);
     payouts.add(Payout.builder()
-      .place(1)
-      .percent(0.30)
-      .build());
+        .place(1)
+        .percent(0.30)
+        .build());
     payouts.add(Payout.builder()
-      .place(2)
-      .percent(0.19)
-      .build());
+        .place(2)
+        .percent(0.19)
+        .build());
     payouts.add(Payout.builder()
-      .place(3)
-      .percent(0.1325)
-      .build());
+        .place(3)
+        .percent(0.1325)
+        .build());
     payouts.add(Payout.builder()
-      .place(4)
-      .percent(0.105)
-      .build());
+        .place(4)
+        .percent(0.105)
+        .build());
     payouts.add(Payout.builder()
-      .place(5)
-      .percent(0.075)
-      .build());
+        .place(5)
+        .percent(0.075)
+        .build());
     payouts.add(Payout.builder()
-      .place(6)
-      .percent(0.055)
-      .build());
+        .place(6)
+        .percent(0.055)
+        .build());
     payouts.add(Payout.builder()
-      .place(7)
-      .percent(0.0375)
-      .build());
+        .place(7)
+        .percent(0.0375)
+        .build());
     payouts.add(Payout.builder()
-      .place(8)
-      .percent(0.03)
-      .build());
+        .place(8)
+        .percent(0.03)
+        .build());
     payouts.add(Payout.builder()
-      .place(9)
-      .percent(0.0225)
-      .build());
+        .place(9)
+        .percent(0.0225)
+        .build());
     payouts.add(Payout.builder()
-      .place(10)
-      .percent(0.015)
-      .build());
+        .place(10)
+        .percent(0.015)
+        .build());
     payoutsMap.put(10, payouts);
 
     return payoutsMap.get(num);
@@ -297,9 +297,9 @@ public interface TestConstants {
     return settings;
   }
 
-  static SeasonPayoutSettings getSeasonPayoutSettings(int seasonId) {
+  static SeasonPayoutSettings getSeasonPayoutSettings(int startYear) {
     SeasonPayoutSettings seasonPayoutSettings = new SeasonPayoutSettings();
-    seasonPayoutSettings.setSeasonId(seasonId);
+    seasonPayoutSettings.setStartYear(startYear);
 
     List<SeasonPayoutRange> ranges = new LinkedList<>();
     seasonPayoutSettings.setRanges(ranges);

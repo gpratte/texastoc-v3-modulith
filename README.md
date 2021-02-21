@@ -162,5 +162,5 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 35-season-integration-tests
-Now have cucumber integration tests for the core season features.
+## Current Branch: 36-season-calculations-integration-tests
+Now have cucumber integration tests for the season calculations.

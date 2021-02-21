@@ -14,7 +14,7 @@ VALUES (1, 'ADMIN', 1),
        (4, 'ADMIN', 3),
        (5, 'USER', 3);
 INSERT INTO season_payout_settings
-VALUES (1, 1,
+VALUES (1, 2020,
         '[{"lowRange" : 5000,"highRange" : 7000,
            "guaranteed": [{"place" : 1,"amount" : 1400,"percent" : 20}],
            "finalTable": [{"place" : 2,"amount" : 1350,"percent" : 20},
@@ -22,7 +22,7 @@ VALUES (1, 1,
                           {"place" : 4,"amount" : 1100,"percent" : 14},
                           {"place" : 5,"amount" : 0,"percent" : 30}]}]');
 INSERT INTO season_payout_settings
-VALUES (2, 2,
+VALUES (2, 2021,
         '[{"lowRange" : 5000,"highRange" : 7000,
            "guaranteed": [{"place" : 1,"amount" : 1400,"percent" : 20}],
            "finalTable": [{"place" : 2,"amount" : 1350,"percent" : 20},

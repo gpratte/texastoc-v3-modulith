@@ -6,6 +6,7 @@ import com.texastoc.module.game.GameModuleFactory;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.season.model.Season;
+import com.texastoc.module.season.model.SeasonEstimatedPayout;
 import com.texastoc.module.season.model.SeasonPayout;
 import com.texastoc.module.season.model.SeasonPayoutPlace;
 import com.texastoc.module.season.model.SeasonPayoutRange;
@@ -32,7 +33,7 @@ public class SeasonCalculator {
   private GameModule gameModule;
 
   public SeasonCalculator(SeasonRepository seasonRepository,
-    SeasonPayoutSettingsRepository seasonPayoutSettingsRepository) {
+      SeasonPayoutSettingsRepository seasonPayoutSettingsRepository) {
     this.seasonRepository = seasonRepository;
     this.seasonPayoutSettingsRepository = seasonPayoutSettingsRepository;
   }
@@ -66,13 +67,13 @@ public class SeasonCalculator {
       annualTocFromRebuyAddOnCalculated += game.getAnnualTocFromRebuyAddOnCalculated();
       rebuyAddOnLessAnnualTocCalculated += game.getRebuyAddOnLessAnnualTocCalculated();
       totalCombinedAnnualTocCalculated +=
-        game.getAnnualTocCollected() + game.getAnnualTocFromRebuyAddOnCalculated();
+          game.getAnnualTocCollected() + game.getAnnualTocFromRebuyAddOnCalculated();
       kittyCalculated += game.getKittyCalculated();
       prizePotCalculated += game.getPrizePotCalculated();
 
       gameAnnualTocPlayers.addAll(game.getPlayers().stream()
-        .filter(GamePlayer::isAnnualTocParticipant)
-        .collect(Collectors.toList())
+          .filter(GamePlayer::isAnnualTocParticipant)
+          .collect(Collectors.toList())
       );
     }
 
@@ -95,10 +96,10 @@ public class SeasonCalculator {
 
     // Calculate current payouts and estimated payouts
     List<SeasonPayoutSettings> seasonPayoutSettingss = seasonPayoutSettingsRepository
-      .findBySeasonId(season.getId());
+        .findByStartYear(season.getStart().getYear());
     if (seasonPayoutSettingss.size() < 1) {
       throw new NotFoundException(
-        "Could not find the SeasonPayoutSettings for season " + season.getId());
+          "Could not find the SeasonPayoutSettings for season " + season.getId());
     }
     SeasonPayoutSettings seasonPayoutSettings = seasonPayoutSettingss.get(0);
     int total = season.getTotalCombinedAnnualTocCalculated();
@@ -110,7 +111,7 @@ public class SeasonCalculator {
       double seasonTocAmountPerGame = total / (double) season.getNumGamesPlayed();
       int estimatedTotal = (int) (seasonTocAmountPerGame * season.getNumGames());
       season.setEstimatedPayouts(
-        calculatePayouts(estimatedTotal, season.getId(), true, seasonPayoutSettings));
+          calculateEstimatedPayouts(estimatedTotal, season.getId(), true, seasonPayoutSettings));
     }
 
     // Persist season
@@ -124,10 +125,10 @@ public class SeasonCalculator {
       SeasonPlayer seasonPlayer = seasonPlayerMap.get(gamePlayer.getPlayerId());
       if (seasonPlayer == null) {
         seasonPlayer = SeasonPlayer.builder()
-          .playerId(gamePlayer.getPlayerId())
-          .seasonId(id)
-          .name(gamePlayer.getName())
-          .build();
+            .playerId(gamePlayer.getPlayerId())
+            .seasonId(id)
+            .name(gamePlayer.getName())
+            .build();
         seasonPlayerMap.put(gamePlayer.getPlayerId(), seasonPlayer);
       }
 
@@ -164,7 +165,7 @@ public class SeasonCalculator {
   }
 
   private List<SeasonPayout> calculatePayouts(int seasonTocAmount, int seasonId, boolean estimated,
-    SeasonPayoutSettings seasonPayoutSettings) {
+      SeasonPayoutSettings seasonPayoutSettings) {
     List<SeasonPayout> seasonPayouts = new LinkedList<>();
 
     List<SeasonPayoutRange> ranges = seasonPayoutSettings.getRanges();
@@ -209,6 +210,28 @@ public class SeasonCalculator {
     }
 
     return seasonPayouts;
+  }
+
+  private List<SeasonEstimatedPayout> calculateEstimatedPayouts(int seasonTocAmount, int seasonId,
+      boolean estimated, SeasonPayoutSettings seasonPayoutSettings) {
+    List<SeasonPayout> seasonPayouts = calculatePayouts(seasonTocAmount, seasonId, estimated,
+        seasonPayoutSettings);
+
+    if (seasonPayouts.size() == 0) {
+      return Collections.emptyList();
+    }
+
+    List<SeasonEstimatedPayout> estimatedPayouts = new ArrayList<>(seasonPayouts.size());
+    seasonPayouts.forEach(sp ->
+        estimatedPayouts.add(SeasonEstimatedPayout.builder()
+            .seasonId(sp.getSeasonId())
+            .place(sp.getPlace())
+            .amount(sp.getAmount())
+            .guaranteed(sp.isGuaranteed())
+            .estimated(sp.isEstimated())
+            .cash(sp.isCash())
+            .build()));
+    return estimatedPayouts;
   }
 
   private SeasonPayout calculatePayout(SeasonPayoutPlace place, int amountToDivy) {
