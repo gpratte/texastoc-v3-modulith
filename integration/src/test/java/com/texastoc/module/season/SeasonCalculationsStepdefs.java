@@ -1,6 +1,7 @@
 package com.texastoc.module.season;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -102,5 +103,23 @@ public class SeasonCalculationsStepdefs extends BaseSeasonStepdefs {
     assertEquals(expectedSeason.getNumGames(), seasonRetrieved.getNumGames());
     assertEquals(expectedSeason.getNumGamesPlayed(), seasonRetrieved.getNumGamesPlayed());
     assertEquals(expectedSeason.isFinalized(), seasonRetrieved.isFinalized());
+
+    assertEquals(expectedSeason.getPlayers().size(), seasonRetrieved.getPlayers().size());
+    for (int i = 0; i < expectedSeason.getPlayers().size(); i++) {
+      assertEquals(expectedSeason.getPlayers().get(i).getName(),
+          seasonRetrieved.getPlayers().get(i).getName());
+      if (expectedSeason.getPlayers().get(i).getPlace() == null) {
+        assertNull(seasonRetrieved.getPlayers().get(i).getPlace());
+      } else {
+        assertEquals(expectedSeason.getPlayers().get(i).getPlace(),
+            seasonRetrieved.getPlayers().get(i).getPlace());
+      }
+      assertEquals(expectedSeason.getPlayers().get(i).getPoints(),
+          seasonRetrieved.getPlayers().get(i).getPoints());
+      assertEquals(expectedSeason.getPlayers().get(i).getEntries(),
+          seasonRetrieved.getPlayers().get(i).getEntries());
+    }
+
+    assertEquals(expectedSeason.getPayouts().size(), seasonRetrieved.getPayouts().size());
   }
 }

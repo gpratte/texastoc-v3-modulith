@@ -13,6 +13,7 @@ import com.texastoc.module.season.model.Season;
 import com.texastoc.module.season.model.SeasonPlayer;
 import com.texastoc.module.season.repository.SeasonPayoutSettingsRepository;
 import com.texastoc.module.season.repository.SeasonRepository;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,10 +48,13 @@ public class SeasonCalculatorTest implements TestConstants {
   public void testNoGames() {
     // Arrange
     when(seasonRepository.findById(1))
-        .thenReturn(Optional.of(Season.builder().id(1).build()));
+        .thenReturn(Optional.of(Season.builder()
+            .id(1)
+            .start(LocalDate.of(2020, 5, 1))
+            .build()));
     when(gameModule.getBySeasonId(1)).thenReturn(Collections.emptyList());
-    when(seasonPayoutSettingsRepository.findBySeasonId(1))
-        .thenReturn(Collections.singletonList(TestConstants.getSeasonPayoutSettings(1)));
+    when(seasonPayoutSettingsRepository.findByStartYear(2020))
+        .thenReturn(Collections.singletonList(TestConstants.getSeasonPayoutSettings(2020)));
 
     // Act
     seasonCalculator.calculate(1);
@@ -92,10 +96,11 @@ public class SeasonCalculatorTest implements TestConstants {
     when(seasonRepository.findById(1))
         .thenReturn(Optional.of(Season.builder()
             .id(1)
+            .start(LocalDate.of(2020, 5, 1))
             .numGames(52)
             .build()));
-    when(seasonPayoutSettingsRepository.findBySeasonId(1))
-        .thenReturn(Collections.singletonList(TestConstants.getSeasonPayoutSettings(1)));
+    when(seasonPayoutSettingsRepository.findByStartYear(2020))
+        .thenReturn(Collections.singletonList(TestConstants.getSeasonPayoutSettings(2020)));
 
     // 10 players bought in
     int boughtIn = 10 * GAME_BUY_IN;
@@ -200,10 +205,11 @@ public class SeasonCalculatorTest implements TestConstants {
     when(seasonRepository.findById(1))
         .thenReturn(Optional.of(Season.builder()
             .id(1)
+            .start(LocalDate.of(2020, 5, 1))
             .numGames(52)
             .build()));
-    when(seasonPayoutSettingsRepository.findBySeasonId(1))
-        .thenReturn(Collections.singletonList(TestConstants.getSeasonPayoutSettings(1)));
+    when(seasonPayoutSettingsRepository.findByStartYear(2020))
+        .thenReturn(Collections.singletonList(TestConstants.getSeasonPayoutSettings(2020)));
 
     // Game 1
     // 10 players bought in

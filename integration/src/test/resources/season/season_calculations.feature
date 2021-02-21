@@ -28,7 +28,7 @@ Feature: a finalized game triggers the season to recalculate
   "totalCollected":120,
   "annualTocFromRebuyAddOnCalculated":20,
   "rebuyAddOnLessAnnualTocCalculated":20,
-  "totalCombinedTocCalculated":60,
+  "totalCombinedAnnualTocCalculated":40,
   "kittyCalculated":10,
   "prizePotCalculated":50,
   "numGames":52,
@@ -38,11 +38,11 @@ Feature: a finalized game triggers the season to recalculate
     {
       "name":"abe abeson",
       "place":1,
-      "points":0,
+      "points":30,
       "entries":1
     }
   ],
-  "payouts":null,
+  "payouts":[],
   "estimatedPayouts":[
     {
       "place":1,

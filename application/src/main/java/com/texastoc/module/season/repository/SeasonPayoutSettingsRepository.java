@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SeasonPayoutSettingsRepository extends
-  CrudRepository<SeasonPayoutSettings, Integer> {
+    CrudRepository<SeasonPayoutSettings, Integer> {
 
-  List<SeasonPayoutSettings> findBySeasonId(int id);
+  List<SeasonPayoutSettings> findByStartYear(int startYear);
 }

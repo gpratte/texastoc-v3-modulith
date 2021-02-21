@@ -19,7 +19,7 @@ public class SeasonPayoutSettings {
 
   @Id
   private int id;
-  private int seasonId;
+  private int startYear;
 
   // JSON
   private String settings;
@@ -32,8 +32,8 @@ public class SeasonPayoutSettings {
     if (ranges == null) {
       try {
         ranges = new ObjectMapper()
-          .readValue(settings, new TypeReference<List<SeasonPayoutRange>>() {
-          });
+            .readValue(settings, new TypeReference<List<SeasonPayoutRange>>() {
+            });
       } catch (JsonProcessingException e) {
         throw new RuntimeException("problem deserializing settings", e);
       }

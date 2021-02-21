@@ -310,9 +310,9 @@ CREATE TABLE season_payout
 
 CREATE TABLE season_payout_settings
 (
-    id        int           NOT NULL AUTO_INCREMENT,
-    season_id int           NOT NULL,
-    settings  varchar(8192) NOT NULL,
+    id         int           NOT NULL AUTO_INCREMENT,
+    start_year int           NOT NULL,
+    settings   varchar(8192) NOT NULL,
     PRIMARY KEY (id)
 );
 
