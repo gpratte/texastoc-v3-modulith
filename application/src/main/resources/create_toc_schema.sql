@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS player;
 DROP TABLE IF EXISTS season;
 DROP TABLE IF EXISTS season_player;
 DROP TABLE IF EXISTS season_payout;
+DROP TABLE IF EXISTS season_estimated_payout;
 DROP TABLE IF EXISTS quarterly_season;
 DROP TABLE IF EXISTS quarterly_season_player;
 DROP TABLE IF EXISTS quarterly_season_payout;
@@ -306,6 +307,21 @@ CREATE TABLE season_payout
     season_key int NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY Season_Payout_Unique (season_id, place, estimated)
+);
+
+CREATE TABLE season_estimated_payout
+(
+    id         int NOT NULL AUTO_INCREMENT,
+    season_id  int NOT NULL,
+    place      int NOT NULL,
+    amount     int     DEFAULT NULL,
+    guaranteed boolean DEFAULT false,
+    estimated  boolean DEFAULT false,
+    cash       boolean DEFAULT false,
+    season     int NOT NULL,
+    season_key int NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY Season_Estimated_Payout_Unique (season_id, place, estimated)
 );
 
 CREATE TABLE season_payout_settings

@@ -3,11 +3,13 @@ package com.texastoc.module.season;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.season.model.Season;
+import com.texastoc.module.season.model.SeasonPlayer;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -44,7 +46,6 @@ public class SeasonCalculationsStepdefs extends BaseSeasonStepdefs {
 
     String token = login(USER_EMAIL, USER_PASSWORD);
     gameCreated = createGame(gameToCreate, token);
-    System.out.println("!!! game created " + gameCreated.getId());
 
     List<GamePlayer> gamePlayers = OBJECT_MAPPER.readValue(
         json, new TypeReference<List<GamePlayer>>() {
@@ -65,10 +66,50 @@ public class SeasonCalculationsStepdefs extends BaseSeasonStepdefs {
     }
   }
 
+  @And("^a running game has existing players$")
+  public void gameInProgressAddExistingPlayer(String json) throws Exception {
+    // Create a game
+    Game gameToCreate = Game.builder()
+        .date(LocalDate.now())
+        .hostId(1)
+        .transportRequired(false)
+        .build();
+
+    String token = login(USER_EMAIL, USER_PASSWORD);
+    gameCreated = createGame(gameToCreate, token);
+
+    List<SeasonPlayer> seasonPlayers = super.getSeason(seasonCreated.getId(), token).getPlayers();
+
+    List<GamePlayer> gamePlayers = OBJECT_MAPPER.readValue(
+        json, new TypeReference<List<GamePlayer>>() {
+        });
+    for (GamePlayer gp : gamePlayers) {
+      SeasonPlayer seasonPlayer = seasonPlayers.stream()
+          .filter(sp -> sp.getName().startsWith(gp.getFirstName()))
+          .findFirst().get();
+      GamePlayer gamePlayer = GamePlayer.builder()
+          .gameId(gameCreated.getId())
+          .playerId(seasonPlayer.getPlayerId())
+          .boughtIn(gp.isBoughtIn())
+          .annualTocParticipant(gp.isAnnualTocParticipant())
+          .quarterlyTocParticipant(gp.isQuarterlyTocParticipant())
+          .rebought(gp.isRebought())
+          .place(gp.getPlace())
+          .chop(gp.getChop())
+          .build();
+      addPlayerToGame(gamePlayer, token);
+    }
+  }
+
+  @And("^the running game is finalized$")
+  public void finalizedGame() throws JsonProcessingException {
+    String token = login(USER_EMAIL, USER_PASSWORD);
+    super.finalizeGame(gameCreated.getId(), token);
+  }
+
   @When("^the finalized game triggers the season to recalculate$")
   public void finalizeGame() throws Exception {
     String token = login(USER_EMAIL, USER_PASSWORD);
-    System.out.println("!!! finalizing game " + gameCreated.getId());
     finalizeGame(gameCreated.getId(), token);
   }
 
