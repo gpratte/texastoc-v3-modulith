@@ -23,13 +23,11 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@Ignore
 public class QuarterlySeasonCalculatorTest implements TestConstants {
 
   private QuarterlySeasonCalculator calculator;
@@ -72,8 +70,8 @@ public class QuarterlySeasonCalculatorTest implements TestConstants {
     assertEquals("quarter has no games played", 0, qSeason.getNumGamesPlayed());
     assertEquals("qTocCollected is 0", 0, qSeason.getQTocCollected());
 
-    assertNull(qSeason.getPlayers());
-    assertNull(qSeason.getPayouts());
+    assertEquals(0, qSeason.getPlayers().size());
+    assertEquals(0, qSeason.getPayouts().size());
   }
 
   @Test

@@ -8,6 +8,7 @@ import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.model.Seating;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
+import com.texastoc.module.quarterly.model.QuarterlySeason;
 import com.texastoc.module.season.model.Season;
 import com.texastoc.module.settings.model.SystemSettings;
 import java.time.LocalDate;
@@ -388,6 +389,20 @@ public abstract class BaseIntegrationTest implements TestConstants {
 
     HttpEntity<String> entity = new HttpEntity<>(headers);
     restTemplate.put(endpoint() + "/seasons/" + seasonId, entity);
+  }
+
+  protected List<QuarterlySeason> getQuarterlySeasons(int seasonId, String token) {
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + token);
+    HttpEntity<String> entity = new HttpEntity<>(headers);
+
+    ResponseEntity<List<QuarterlySeason>> response = restTemplate.exchange(
+        endpoint() + "/players",
+        HttpMethod.GET,
+        entity,
+        new ParameterizedTypeReference<List<QuarterlySeason>>() {
+        });
+    return response.getBody();
   }
 
   protected String login(String email, String password) throws JsonProcessingException {

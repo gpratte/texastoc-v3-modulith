@@ -9,7 +9,6 @@ import com.texastoc.module.season.service.SeasonService;
 import java.io.IOException;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,7 +25,6 @@ public class SeasonRestController {
   private final SeasonService seasonService;
   private final HistoricalSeasonService historicalSeasonService;
 
-  @Autowired
   public SeasonRestController(SeasonService seasonService,
       HistoricalSeasonService historicalSeasonService) {
     this.seasonService = seasonService;
