@@ -397,7 +397,7 @@ public abstract class BaseIntegrationTest implements TestConstants {
     HttpEntity<String> entity = new HttpEntity<>(headers);
 
     ResponseEntity<List<QuarterlySeason>> response = restTemplate.exchange(
-        endpoint() + "/players",
+        endpoint() + "/seasons/" + seasonId + "/quarterlies",
         HttpMethod.GET,
         entity,
         new ParameterizedTypeReference<List<QuarterlySeason>>() {
