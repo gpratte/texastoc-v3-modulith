@@ -1,52 +1,84 @@
 package com.texastoc.module.quarterly;
 
-import com.texastoc.BaseIntegrationTest;
-import com.texastoc.module.season.model.Season;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
+import com.texastoc.module.quarterly.model.QuarterlySeason;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.time.LocalDate;
-import org.junit.Ignore;
+import java.time.Month;
+import java.util.List;
+import org.junit.Before;
 
-// Tests are run from SpringBootBaseIntegrationTest so must Ignore here
-@Ignore
-public class QuarterlySeasonStepdefs extends BaseIntegrationTest {
+public class QuarterlySeasonStepdefs extends BaseQuarterlySeasonStepdefs {
 
-  private LocalDate start;
-  private Season seasonCreated;
-
-  @Given("^first quarterly season starts now$")
-  public void season_starts_now() throws Exception {
-    // Arrange
-    start = getSeasonStart();
+  @Before
+  public void before() {
+    super.before();
   }
 
-  @When("^the quarterly seasons are created$")
-  public void the_season_is_created() throws Exception {
-//    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
-//    seasonCreated = createSeason(start, token);
+  @Given("^the season start year encompassing today$")
+  public void seasonStarts() throws Exception {
+    startYear = getSeasonStart().getYear();
+  }
+
+  @When("^the current season is created$")
+  public void createTheSeason() throws Exception {
+    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
+    seasonCreated = createSeason(startYear, token);
   }
 
   @Then("^four quarterly seasons should be created$")
-  public void the_start_date_should_be_now() throws Exception {
-    // TODO
-//    Assert.assertTrue(seasonCreated.getQuarterlySeasons().size() == 4);
-//
-//    for (int i = 0; i < 4; ++i) {
-//      QuarterlySeason qSeason = seasonCreated.getQuarterlySeasons().get(i);
-//      Assert.assertTrue(qSeason.getId() > 0);
-//      Assert.assertEquals((int) i + 1, (int) qSeason.getQuarter().getValue());
-//
-//      Assert.assertEquals(QUARTERLY_TOC_PER_GAME, (int) qSeason.getQTocPerGame());
-//      Assert.assertEquals(QUARTERLY_NUM_PAYOUTS, (int) qSeason.getNumPayouts());
-//
-//      Assert.assertTrue(qSeason.getQTocCollected() == 0);
-//
-//      Assert.assertTrue(qSeason.getNumGamesPlayed() == 0);
-//      Assert.assertTrue(qSeason.getNumGames() == 12 || qSeason.getNumGames() == 13 || qSeason.getNumGames() == 14);
-//
-//      Assert.assertTrue(qSeason.getPlayers() == null || qSeason.getPlayers().size() == 0);
-//      Assert.assertTrue(qSeason.getPayouts() == null || qSeason.getPayouts().size() == 0);
-//    }
+  public void verifyQuarters() throws Exception {
+    String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
+    List<QuarterlySeason> quarters = getQuarterlySeasons(seasonCreated.getId(), token);
+    assertEquals(4, quarters.size());
+    quarters.forEach(qs -> {
+      assertEquals(seasonCreated.getId(), qs.getSeasonId());
+      int startYear = seasonCreated.getStart().getYear();
+      switch (qs.getQuarter().getValue()) {
+        case 1:
+          // First day in May
+          assertEquals(LocalDate.of(startYear, Month.MAY.getValue(), 1), qs.getStart());
+          assertEquals(LocalDate.of(startYear, Month.AUGUST.getValue(), 1).minusDays(1),
+              qs.getEnd());
+          break;
+        case 2:
+          // First day in August
+          assertEquals(LocalDate.of(startYear, Month.AUGUST.getValue(), 1), qs.getStart());
+          assertEquals(LocalDate.of(startYear, Month.NOVEMBER.getValue(), 1).minusDays(1),
+              qs.getEnd());
+          break;
+        case 3:
+          // First day in November
+          assertEquals(LocalDate.of(startYear, Month.NOVEMBER.getValue(), 1), qs.getStart());
+          assertEquals(LocalDate.of(startYear + 1, Month.FEBRUARY.getValue(), 1).minusDays(1),
+              qs.getEnd());
+          break;
+        case 4:
+          // First day in February
+          assertEquals(LocalDate.of(startYear + 1, Month.FEBRUARY.getValue(), 1), qs.getStart());
+          assertEquals(LocalDate.of(startYear + 1, Month.MAY.getValue(), 1).minusDays(1),
+              qs.getEnd());
+          break;
+        default:
+          fail("Unknown quarter");
+      }
+
+      verifyQuarterlySeasonCosts(qs);
+    });
   }
+
+  private void verifyQuarterlySeasonCosts(QuarterlySeason qSeason) {
+    assertEquals(QUARTERLY_TOC_PER_GAME, qSeason.getQTocPerGame());
+    assertEquals(QUARTERLY_NUM_PAYOUTS, qSeason.getNumPayouts());
+    assertEquals(0, qSeason.getQTocCollected());
+    assertEquals(13, qSeason.getNumGames());
+    assertEquals(0, qSeason.getNumGamesPlayed());
+    assertFalse(qSeason.isFinalized());
+  }
+
 }
