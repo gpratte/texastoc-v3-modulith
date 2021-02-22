@@ -162,5 +162,6 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 36-season-calculations-integration-tests
-Now have cucumber integration tests for the season calculations.
+## Current Branch: 37-quarterly-season-tests
+An integration test for the quarterly season module. Includes a new rest controller
+for getting the quarterly seasons for a given season.
