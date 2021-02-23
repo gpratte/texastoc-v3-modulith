@@ -9,9 +9,7 @@ Feature: a finalized game triggers the season to recalculate
     "firstName":"abe",
     "lastName":"abeson",
     "boughtIn":true,
-    "annualTocParticipant":true,
     "quarterlyTocParticipant":true,
-    "rebought":true,
     "place":1,
     "chop":null
   }
@@ -51,19 +49,17 @@ Feature: a finalized game triggers the season to recalculate
 }
     """
 
-  Scenario: calculate a season with two games
+  Scenario: calculate a quarterly season with two games
   Two games with enough players to generate estimated payouts
-    Given a season started encompassing today
-    And a running game has players
+    Given a quarterly season started encompassing today
+    And a running quarterly game has players
     """
 [
   {
     "firstName":"abe",
     "lastName":"abeson",
     "boughtIn":true,
-    "annualTocParticipant":true,
     "quarterlyTocParticipant":true,
-    "rebought":true,
     "place":1,
     "chop":null
   },
@@ -71,9 +67,7 @@ Feature: a finalized game triggers the season to recalculate
     "firstName":"bob",
     "lastName":"bobson",
     "boughtIn":true,
-    "annualTocParticipant":true,
     "quarterlyTocParticipant":true,
-    "rebought":true,
     "place":2,
     "chop":null
   },
@@ -81,65 +75,37 @@ Feature: a finalized game triggers the season to recalculate
     "firstName":"coy",
     "lastName":"coyson",
     "boughtIn":true,
-    "annualTocParticipant":true,
     "quarterlyTocParticipant":true,
-    "rebought":true,
     "place":3,
     "chop":null
   }
 ]
     """
-    And the running game is finalized
-    And a running game has existing players
+    And the running quarterly game is finalized
+    And a running quarterly game has existing players
     """
 [
   {
-    "firstName":"abe",
-    "lastName":"abeson",
-    "boughtIn":true,
-    "annualTocParticipant":true,
-    "quarterlyTocParticipant":true,
-    "rebought":true,
-    "place":1,
-    "chop":null
+    "name":"abe abeson",
+    "place":1
   },
   {
-    "firstName":"bob",
-    "lastName":"bobson",
-    "boughtIn":true,
-    "annualTocParticipant":true,
-    "quarterlyTocParticipant":true,
-    "rebought":true,
-    "place":2,
-    "chop":null
+    "name":"bob bobson",
+    "place":2
   },
   {
-    "firstName":"coy",
-    "lastName":"coyson",
-    "boughtIn":true,
-    "annualTocParticipant":true,
-    "quarterlyTocParticipant":true,
-    "rebought":true,
-    "place":3,
-    "chop":null
+    "name":"coy coyson",
+    "place":3
   }
 ]
     """
-    When the finalized game triggers the season to recalculate
-    Then the calculated season is retrieved with 2 games played
-    Then the season calculations should be
+    When the finalized game triggers the quarterly season to recalculate
+    Then the calculated quarterly season is retrieved with 2 games played
+    Then the quarterly season calculations should be
     """
 {
-  "buyInCollected":240,
-  "rebuyAddOnCollected":240,
-  "annualTocCollected":120,
-  "totalCollected":720,
-  "annualTocFromRebuyAddOnCalculated":120,
-  "rebuyAddOnLessAnnualTocCalculated":120,
-  "totalCombinedAnnualTocCalculated":240,
-  "kittyCalculated":20,
-  "prizePotCalculated":340,
-  "numGames":52,
+  "qtocCollected":120,
+  "numGames":13,
   "numGamesPlayed":2,
   "finalized":false,
   "players":[
@@ -162,42 +128,18 @@ Feature: a finalized game triggers the season to recalculate
       "entries":2
     }
   ],
-  "payouts":[],
-  "estimatedPayouts":[
+  "payouts":[
     {
       "place":1,
-      "amount":1649,
-      "guaranteed":true,
-      "estimated":true,
-      "cash":false
+      "amount":60
     },
     {
       "place":2,
-      "amount":1598,
-      "guaranteed":false,
-      "estimated":true,
-      "cash":false
+      "amount":36
     },
     {
       "place":3,
-      "amount":1348,
-      "guaranteed":false,
-      "estimated":true,
-      "cash":false
-    },
-    {
-      "place":4,
-      "amount":1273,
-      "guaranteed":false,
-      "estimated":true,
-      "cash":false
-    },
-    {
-      "place":5,
-      "amount":372,
-      "guaranteed":false,
-      "estimated":true,
-      "cash":true
+      "amount":24
     }
   ]
 }

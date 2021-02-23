@@ -31,6 +31,11 @@ public class BaseQuarterlySeasonStepdefs extends BaseIntegrationTest {
     seasonCreated = createSeason(startYear, token);
   }
 
+  protected QuarterlySeason getCurrentQuarterlySeason(int seasonId, String token) {
+    List<QuarterlySeason> qSeasons = super.getQuarterlySeasons(seasonCreated.getId(), token);
+    return getCurrentQuarterlySeason(qSeasons);
+  }
+
   protected QuarterlySeason getCurrentQuarterlySeason(List<QuarterlySeason> qSeasons) {
     LocalDate now = LocalDate.now();
     for (QuarterlySeason qSeason : qSeasons) {

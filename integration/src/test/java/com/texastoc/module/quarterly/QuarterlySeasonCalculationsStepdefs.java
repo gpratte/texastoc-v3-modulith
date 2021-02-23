@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.quarterly.model.QuarterlySeason;
-import com.texastoc.module.season.model.SeasonPlayer;
+import com.texastoc.module.quarterly.model.QuarterlySeasonPlayer;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -78,24 +78,22 @@ public class QuarterlySeasonCalculationsStepdefs extends BaseQuarterlySeasonStep
     String token = login(USER_EMAIL, USER_PASSWORD);
     gameCreated = createGame(gameToCreate, token);
 
-    List<SeasonPlayer> seasonPlayers = super.getSeason(seasonCreated.getId(), token).getPlayers();
+    List<QuarterlySeasonPlayer> qSeasonPlayers = super
+        .getCurrentQuarterlySeason(seasonCreated.getId(), token).getPlayers();
 
-    List<GamePlayer> gamePlayers = OBJECT_MAPPER.readValue(
-        json, new TypeReference<List<GamePlayer>>() {
+    List<QuarterlySeasonPlayer> qsGamePlayers = OBJECT_MAPPER.readValue(
+        json, new TypeReference<List<QuarterlySeasonPlayer>>() {
         });
-    for (GamePlayer gp : gamePlayers) {
-      SeasonPlayer seasonPlayer = seasonPlayers.stream()
-          .filter(sp -> sp.getName().startsWith(gp.getFirstName()))
+    for (QuarterlySeasonPlayer gp : qsGamePlayers) {
+      QuarterlySeasonPlayer qSeasonPlayer = qSeasonPlayers.stream()
+          .filter(qsp -> qsp.getName().equals(gp.getName()))
           .findFirst().get();
       GamePlayer gamePlayer = GamePlayer.builder()
           .gameId(gameCreated.getId())
-          .playerId(seasonPlayer.getPlayerId())
-          .boughtIn(gp.isBoughtIn())
-          .annualTocParticipant(gp.isAnnualTocParticipant())
-          .quarterlyTocParticipant(gp.isQuarterlyTocParticipant())
-          .rebought(gp.isRebought())
+          .playerId(qSeasonPlayer.getPlayerId())
+          .boughtIn(true)
+          .quarterlyTocParticipant(true)
           .place(gp.getPlace())
-          .chop(gp.getChop())
           .build();
       addPlayerToGame(gamePlayer, token);
     }
