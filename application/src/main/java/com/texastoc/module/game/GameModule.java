@@ -188,4 +188,6 @@ public interface GameModule {
    * @throws NotFoundException
    */
   void notifySeating(int gameId);
+
+  void updateCanRebuy(int gameId, boolean value);
 }
