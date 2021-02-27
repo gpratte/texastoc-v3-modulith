@@ -3,16 +3,14 @@ package com.texastoc.module.season;
 import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.season.model.Season;
-import org.junit.Before;
 
-public class BaseSeasonStepdefs extends BaseIntegrationTest {
+public abstract class BaseSeasonStepdefs extends BaseIntegrationTest {
 
   protected Integer startYear;
   protected Season seasonCreated;
   protected Season seasonRetrieved;
   protected Game gameCreated;
 
-  @Before
   public void before() {
     super.before();
     startYear = null;

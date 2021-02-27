@@ -54,13 +54,13 @@ public class GamePlayerService {
     String firstName = gamePlayer.getFirstName();
     String lastName = gamePlayer.getLastName();
     Player player = Player.builder()
-      .firstName(firstName)
-      .lastName(lastName)
-      .email(gamePlayer.getEmail())
-      .roles(ImmutableSet.of(Role.builder()
-        .type(Role.Type.USER)
-        .build()))
-      .build();
+        .firstName(firstName)
+        .lastName(lastName)
+        .email(gamePlayer.getEmail())
+        .roles(ImmutableSet.of(Role.builder()
+            .type(Role.Type.USER)
+            .build()))
+        .build();
     int playerId = getPlayerModule().create(player).getId();
     gamePlayer.setPlayerId(playerId);
 
@@ -77,8 +77,8 @@ public class GamePlayerService {
     gameHelper.checkFinalized(game);
 
     GamePlayer existingGamePlayer = game.getPlayers().stream()
-      .filter(gp -> gp.getId() == gamePlayer.getId())
-      .findFirst().get();
+        .filter(gp -> gp.getId() == gamePlayer.getId())
+        .findFirst().get();
 
     existingGamePlayer.setPlace(gamePlayer.getPlace());
     existingGamePlayer.setRoundUpdates(gamePlayer.isRoundUpdates());
@@ -106,8 +106,8 @@ public class GamePlayerService {
     gameHelper.checkFinalized(game);
 
     Optional<GamePlayer> optionalGamePlayer = game.getPlayers().stream()
-      .filter(gp -> gp.getId() == gamePlayerId)
-      .findFirst();
+        .filter(gp -> gp.getId() == gamePlayerId)
+        .findFirst();
     if (!optionalGamePlayer.isPresent()) {
       throw new NotFoundException("Game player with id " + gamePlayerId + " not found");
     }
@@ -124,8 +124,8 @@ public class GamePlayerService {
     gameHelper.checkFinalized(game);
 
     Optional<GamePlayer> optionalGamePlayer = game.getPlayers().stream()
-      .filter(gp -> gp.getId() == gamePlayerId)
-      .findFirst();
+        .filter(gp -> gp.getId() == gamePlayerId)
+        .findFirst();
     if (!optionalGamePlayer.isPresent()) {
       throw new NotFoundException("Game player with id " + gamePlayerId + " not found");
     }
@@ -145,8 +145,8 @@ public class GamePlayerService {
     if (game.getPlayers() != null) {
       // Remove the game player from the list of game players
       game.setPlayers(game.getPlayers().stream()
-        .filter(gp -> gp.getId() != gamePlayerId)
-        .collect(Collectors.toList()));
+          .filter(gp -> gp.getId() != gamePlayerId)
+          .collect(Collectors.toList()));
       gameRepository.save(game);
       gameHelper.recalculate(game.getId());
       gameHelper.sendUpdatedGame();
@@ -166,7 +166,6 @@ public class GamePlayerService {
       game.setPlayers(new ArrayList<>(1));
     }
     game.getPlayers().add(gamePlayer);
-    // TODO verify the game player id gets set by spring data jdbc
     gameRepository.save(game);
     return gamePlayer;
   }

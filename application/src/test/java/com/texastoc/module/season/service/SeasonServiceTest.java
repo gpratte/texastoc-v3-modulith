@@ -97,9 +97,9 @@ public class SeasonServiceTest implements TestConstants {
 
     assertEquals(start, seasonArg.getValue().getStart());
 
-    assertEquals(KITTY_PER_GAME, season.getKittyPerGame());
-    assertEquals(TOC_PER_GAME, season.getTocPerGame());
-    assertEquals(QUARTERLY_TOC_PER_GAME, season.getQuarterlyTocPerGame());
+    assertEquals(KITTY_PER_GAME, season.getKittyPerGameCost());
+    assertEquals(TOC_PER_GAME, season.getTocPerGameCost());
+    assertEquals(QUARTERLY_TOC_PER_GAME, season.getQuarterlyTocPerGameCost());
     assertEquals(QUARTERLY_NUM_PAYOUTS, season.getQuarterlyNumPayouts());
 
     assertEquals(GAME_BUY_IN, season.getBuyInCost());

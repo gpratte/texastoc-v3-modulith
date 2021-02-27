@@ -25,13 +25,13 @@ public class QuarterlySeason {
   private LocalDate start;
   private LocalDate end;
 
-  // Read-only fields set by the server (set from TocConfig)
-  // TODO should end in "Cost"?
-  private int qTocPerGame;
-  private int numPayouts;
-
   // Read-only fields set by the server
   private Quarter quarter;
+  private int numPayouts;
+
+  // Setup variables. End with "Cost"
+  // Read-only fields set by the server
+  private int qTocPerGameCost;
 
   // End with "Collected" for physical money collected
   // Read-only fields set by the server

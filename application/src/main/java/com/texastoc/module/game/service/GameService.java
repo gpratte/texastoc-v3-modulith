@@ -59,12 +59,12 @@ public class GameService {
 
     // Game setup variables
     game.setSeasonId(currentSeason.getId());
-    game.setKittyCost(currentSeason.getKittyPerGame());
+    game.setKittyCost(currentSeason.getKittyPerGameCost());
     game.setBuyInCost(currentSeason.getBuyInCost());
     game.setRebuyAddOnCost(currentSeason.getRebuyAddOnCost());
     game.setRebuyAddOnTocDebitCost(currentSeason.getRebuyAddOnTocDebitCost());
-    game.setAnnualTocCost(currentSeason.getTocPerGame());
-    game.setQuarterlyTocCost(currentSeason.getQuarterlyTocPerGame());
+    game.setAnnualTocCost(currentSeason.getTocPerGameCost());
+    game.setQuarterlyTocCost(currentSeason.getQuarterlyTocPerGameCost());
     game.setSeasonGameNum(currentSeason.getNumGamesPlayed() + 1);
 
     game.setBuyInCost(currentSeason.getBuyInCost());
@@ -149,7 +149,6 @@ public class GameService {
     game = get(id);
     game.setFinalized(true);
     game.setSeating(null);
-    // TODO set game.chopped
     gameRepository.save(game);
     gameEventProducer.notifyGameFinalized(id, game.getSeasonId(), game.getQSeasonId(), true);
     gameHelper.sendUpdatedGame();
@@ -160,7 +159,6 @@ public class GameService {
   //  @CacheEvict(value = {"currentGame", "currentSeason",
 //      "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   public void unfinalize(int id) {
-    // TODO admin only
     Game gameToOpen = get(id);
 
     if (!gameToOpen.isFinalized()) {

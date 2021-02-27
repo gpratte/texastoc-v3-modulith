@@ -141,7 +141,7 @@ public class QuarterlySeasonServiceTest implements TestConstants {
     assertEquals(0, qs.getNumGamesPlayed());
     assertEquals(0, qs.getQTocCollected());
     assertFalse(qs.isFinalized());
-    assertEquals(QUARTERLY_TOC_PER_GAME, qs.getQTocPerGame());
+    assertEquals(QUARTERLY_TOC_PER_GAME, qs.getQTocPerGameCost());
     assertEquals(QUARTERLY_NUM_PAYOUTS, qs.getNumPayouts());
     assertNull(qs.getPlayers());
     assertNull(qs.getPayouts());

@@ -6,16 +6,14 @@ import com.texastoc.module.quarterly.model.QuarterlySeason;
 import com.texastoc.module.season.model.Season;
 import java.time.LocalDate;
 import java.util.List;
-import org.junit.Before;
 
-public class BaseQuarterlySeasonStepdefs extends BaseIntegrationTest {
+public abstract class BaseQuarterlySeasonStepdefs extends BaseIntegrationTest {
 
   protected Integer startYear;
   protected Season seasonCreated;
   protected QuarterlySeason qSeasonRetrieved;
   protected Game gameCreated;
 
-  @Before
   public void before() {
     super.before();
     startYear = null;

@@ -5,13 +5,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import com.texastoc.module.quarterly.model.QuarterlySeason;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
-import org.junit.Before;
 
 public class QuarterlySeasonStepdefs extends BaseQuarterlySeasonStepdefs {
 
@@ -73,7 +73,7 @@ public class QuarterlySeasonStepdefs extends BaseQuarterlySeasonStepdefs {
   }
 
   private void verifyQuarterlySeasonCosts(QuarterlySeason qSeason) {
-    assertEquals(QUARTERLY_TOC_PER_GAME, qSeason.getQTocPerGame());
+    assertEquals(QUARTERLY_TOC_PER_GAME, qSeason.getQTocPerGameCost());
     assertEquals(QUARTERLY_NUM_PAYOUTS, qSeason.getNumPayouts());
     assertEquals(0, qSeason.getQTocCollected());
     assertEquals(13, qSeason.getNumGames());

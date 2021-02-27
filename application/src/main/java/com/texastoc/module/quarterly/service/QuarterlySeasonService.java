@@ -86,7 +86,7 @@ public class QuarterlySeasonService implements QuarterlySeasonModule {
           .start(qStart)
           .end(qEnd)
           .numGames(qNumThursdays)
-          .qTocPerGame(tocConfig.getQuarterlyTocCost())
+          .qTocPerGameCost(tocConfig.getQuarterlyTocCost())
           .numPayouts(tocConfig.getQuarterlyNumPayouts())
           .build();
       qSeasonRepository.save(qSeason);

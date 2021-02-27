@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import org.springframework.web.client.HttpClientErrorException;
 
 public class GameSeatingStepdefs extends BaseIntegrationTest {
@@ -61,7 +62,7 @@ public class GameSeatingStepdefs extends BaseIntegrationTest {
       GamePlayer gamePlayer = GamePlayer.builder()
           .firstName("Joe" + i)
           .lastName("Schmoe")
-          .email("joe" + i + ".schmoe@texastoc.com")
+          .email("joe" + UUID.randomUUID() + ".schmoe@texastoc.com")
           .gameId(gameId)
           .boughtIn(true)
           .build();

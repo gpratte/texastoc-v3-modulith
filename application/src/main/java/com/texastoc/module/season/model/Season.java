@@ -26,16 +26,15 @@ public class Season {
   private LocalDate start;
   private LocalDate end;
 
-  // Read-only fields set by the server (set from TocConfig)
-  // TODO should end in "Cost"
-  private int kittyPerGame;
-  private int tocPerGame;
-  private int quarterlyTocPerGame;
+  // Read-only fields set by the server
   private int quarterlyNumPayouts;
 
   // Setup variables. End with "Cost"
   // Read-only fields set by the server
+  private int kittyPerGameCost;
   private int buyInCost;
+  private int tocPerGameCost;
+  private int quarterlyTocPerGameCost;
   private int rebuyAddOnCost;
   private int rebuyAddOnTocDebitCost;
 

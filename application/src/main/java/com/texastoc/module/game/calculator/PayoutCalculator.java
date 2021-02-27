@@ -8,12 +8,11 @@ import com.texastoc.module.game.repository.GameRepository;
 import com.texastoc.module.settings.SettingsModule;
 import com.texastoc.module.settings.SettingsModuleFactory;
 import com.texastoc.module.settings.model.Payout;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 @Component
 public class PayoutCalculator {
@@ -53,10 +52,10 @@ public class PayoutCalculator {
     // If only one player then that player gets it all
     if (numToPay == 1) {
       gamePayouts.add(GamePayout.builder()
-        .gameId(game.getId())
-        .place(1)
-        .amount(game.getPrizePotCalculated())
-        .build());
+          .gameId(game.getId())
+          .place(1)
+          .amount(game.getPrizePotCalculated())
+          .build());
 
       persistPayouts(gamePayouts, game.getId());
       return gamePayouts;
@@ -83,19 +82,7 @@ public class PayoutCalculator {
     // Apply the chop
     chopPayouts(game.getPlayers(), gamePayouts);
 
-    // TODO check if the game payouts are not the same as the current payouts
-    // flag if the payouts changed
-//    boolean payoutsChanged = false;
-//    Set<GamePayout> currentPayouts = gameRepository.findById(game.getId()).get().getPayouts();
-//    if (gamePayouts.size() != currentPayouts.size()) {
-//      payoutsChanged = true;
-//    } else {
-//       figure this out
-//    }
-//
-//    if (payoutsChanged) {
-//      persistPayouts(gamePayouts, game.getId());
-//    }
+    // TODO only persist if the game payouts are not the same as the current payouts
     persistPayouts(gamePayouts, game.getId());
 
     return gamePayouts;

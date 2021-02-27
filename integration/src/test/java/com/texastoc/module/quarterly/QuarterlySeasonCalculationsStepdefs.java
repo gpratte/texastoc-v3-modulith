@@ -10,6 +10,7 @@ import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.quarterly.model.QuarterlySeason;
 import com.texastoc.module.quarterly.model.QuarterlySeasonPlayer;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
-import org.junit.Before;
 
 public class QuarterlySeasonCalculationsStepdefs extends BaseQuarterlySeasonStepdefs {
 

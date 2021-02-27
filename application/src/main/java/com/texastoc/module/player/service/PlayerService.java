@@ -11,12 +11,6 @@ import com.texastoc.module.player.exception.CannotRemoveRoleException;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
 import com.texastoc.module.player.repository.PlayerRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,6 +21,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -41,7 +40,8 @@ public class PlayerService implements PlayerModule {
   // Only one server so cache the forgot password codes here
   private Map<String, String> forgotPasswordCodes = new HashMap<>();
 
-  public PlayerService(PlayerRepository playerRepository, BCryptPasswordEncoder bCryptPasswordEncoder, AuthorizationHelper authorizationHelper) {
+  public PlayerService(PlayerRepository playerRepository,
+      BCryptPasswordEncoder bCryptPasswordEncoder, AuthorizationHelper authorizationHelper) {
     this.playerRepository = playerRepository;
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     this.authorizationHelper = authorizationHelper;
@@ -51,15 +51,15 @@ public class PlayerService implements PlayerModule {
   @Transactional
   public Player create(Player player) {
     Player playerToCreate = Player.builder()
-      .firstName(player.getFirstName())
-      .lastName(player.getLastName())
-      .email(player.getEmail())
-      .phone(player.getPhone())
-      .password(null)
-      .roles(ImmutableSet.of(Role.builder()
-        .type(Role.Type.USER)
-        .build()))
-      .build();
+        .firstName(player.getFirstName())
+        .lastName(player.getLastName())
+        .email(player.getEmail())
+        .phone(player.getPhone())
+        .password(null)
+        .roles(ImmutableSet.of(Role.builder()
+            .type(Role.Type.USER)
+            .build()))
+        .build();
 
     int id = playerRepository.save(playerToCreate).getId();
 
@@ -80,7 +80,8 @@ public class PlayerService implements PlayerModule {
   @Override
   @Transactional(readOnly = true)
   public List<Player> getAll() {
-    List<Player> players = StreamSupport.stream(playerRepository.findAll().spliterator(), false).collect(Collectors.toList());
+    List<Player> players = StreamSupport.stream(playerRepository.findAll().spliterator(), false)
+        .collect(Collectors.toList());
     Collections.sort(players);
     return players;
   }
@@ -112,6 +113,7 @@ public class PlayerService implements PlayerModule {
   @Transactional
   public void delete(int id) {
     verifyLoggedInUserIsAdmin();
+    // ;;
     // TODO call game service to see if player has any games
 //    if (player has any games) {
 //      throw new CannotDeletePlayerException("Player with ID " + id + " cannot be deleted");
@@ -121,7 +123,9 @@ public class PlayerService implements PlayerModule {
 
   @Override
   public void forgotPassword(String email) {
-    String generatedString = RandomStringUtils.random(5, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
+    String generatedString = RandomStringUtils
+        .random(5, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+            'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
     forgotPasswordCodes.put(email, generatedString);
     log.info("reset code: {}", generatedString);
     getNotificaionModule().sendEmail(Arrays.asList(email), "Reset Code", generatedString);
@@ -200,7 +204,8 @@ public class PlayerService implements PlayerModule {
   // verify the user is an admin
   private void verifyLoggedInUserIsAdmin() {
     if (!authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)) {
-      throw new PermissionDeniedException("A player that is not an admin cannot update another player");
+      throw new PermissionDeniedException(
+          "A player that is not an admin cannot update another player");
     }
   }
 
@@ -214,7 +219,8 @@ public class PlayerService implements PlayerModule {
       }
       Player loggedInPlayer = players.get(0);
       if (loggedInPlayer.getId() != player.getId()) {
-        throw new PermissionDeniedException("A player that is not an admin cannot update another player");
+        throw new PermissionDeniedException(
+            "A player that is not an admin cannot update another player");
       }
     }
   }
