@@ -162,5 +162,8 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 38-quarterly-seasons-calculations-integration-tests
-Quarterly season cucumber integration tests with 1 game and with 2 games.
+## Current Branch: 39-clock-module
+Resurrected the clock. No tests because
+* integration tests need to connect to the websocket which will be a heavy lift
+* very easy to test from the user interface
+* we are in the middle of the COVID pandemic and the clock is not being used 
