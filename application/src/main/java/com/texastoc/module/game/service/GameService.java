@@ -95,6 +95,15 @@ public class GameService {
     gameHelper.sendUpdatedGame();
   }
 
+
+  //@CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
+  @Transactional
+  public void updateCanRebuy(int id, boolean value) {
+    Game game = get(id);
+    game.setCanRebuy(value);
+    gameRepository.save(game);
+  }
+
   @Transactional(readOnly = true)
   public Game get(int id) {
     return gameHelper.get(id);

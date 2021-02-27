@@ -21,7 +21,7 @@ public class ArchitectureTest {
     JavaClasses importedClasses = new ClassFileImporter().importPackages("com.texastoc.module");
     noClasses().that()
         .resideInAnyPackage("..game..", "..notification..", "..season..", "..quarterly..",
-            "..settings..")
+            "..settings..", "..clock..")
         .should().dependOnClassesThat()
         .resideInAnyPackage("..player.exception..", "..player.repository..", "..player.service..")
         .check(importedClasses);
@@ -39,7 +39,7 @@ public class ArchitectureTest {
     JavaClasses importedClasses = new ClassFileImporter().importPackages("com.texastoc.module");
     noClasses().that()
         .resideInAnyPackage("..player..", "..game..", "..notification..", "..season..",
-            "..quarterly..")
+            "..quarterly..", "..clock..")
         .should().dependOnClassesThat()
         .resideInAnyPackage("..settings.repository..", "..settings.service..")
         .check(importedClasses);
@@ -62,10 +62,13 @@ public class ArchitectureTest {
     JavaClasses importedClasses = new ClassFileImporter().importPackages("com.texastoc.module");
     noClasses().that()
         .resideInAnyPackage("..player..", "..settings..", "..notification..", "..season..",
-            "..quarterly..")
+            "..quarterly..", "..clock..")
         .should().dependOnClassesThat()
-        .resideInAnyPackage("..game.config..", "..game.connector..", "..game.exception..",
-            "..game.repository..", "..game.service..")
+        .resideInAnyPackage("..game.config..",
+            // TODO figure out websocket "..game.connector..",
+            "..game.exception..",
+            "..game.repository..",
+            "..game.service..")
         .check(importedClasses);
   }
 
@@ -83,7 +86,7 @@ public class ArchitectureTest {
     JavaClasses importedClasses = new ClassFileImporter().importPackages("com.texastoc.module");
     noClasses().that()
         .resideInAnyPackage("..player..", "..settings..", "..notification..", "..game..",
-            "..quarterly..")
+            "..quarterly..", "..clock..")
         .should().dependOnClassesThat()
         .resideInAnyPackage("..season.calculator..", "..season.exception..",
             "..season.repository..", "..season.service..")
@@ -104,7 +107,7 @@ public class ArchitectureTest {
     JavaClasses importedClasses = new ClassFileImporter().importPackages("com.texastoc.module");
     noClasses().that()
         .resideInAnyPackage("..player..", "..settings..", "..notification..", "..game..",
-            "..season..")
+            "..season..", "..clock..")
         .should().dependOnClassesThat()
         .resideInAnyPackage("..quarterly.calculator..", "..quarterly.exception..",
             "..quarterly.repository..", "..quarterly.service..")
@@ -115,11 +118,22 @@ public class ArchitectureTest {
   public void notificationModuleInterfaceAndModel() {
     JavaClasses importedClasses = new ClassFileImporter().importPackages("com.texastoc.module");
     noClasses().that()
-        .resideInAnyPackage("..player..", "..settings..", "..game..", "..season..", "..quarterly..")
+        .resideInAnyPackage("..player..", "..settings..", "..game..", "..season..", "..quarterly..",
+            "..clock..")
         .should().dependOnClassesThat()
         .resideInAnyPackage("..notification.config..", "..notification.connector..",
             "..notification.exception..", "..notification.repository..", "..notification.service..")
         .check(importedClasses);
   }
 
+  @Test
+  public void clockModuleInterfaceAndModel() {
+    JavaClasses importedClasses = new ClassFileImporter().importPackages("com.texastoc.module");
+    noClasses().that()
+        .resideInAnyPackage("..player..", "..settings..", "..game..", "..season..", "..quarterly..",
+            "..notification..")
+        .should().dependOnClassesThat()
+        .resideInAnyPackage("..clock.config..", "..clock.service..")
+        .check(importedClasses);
+  }
 }
