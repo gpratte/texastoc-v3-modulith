@@ -38,6 +38,7 @@ public class GamePlayer implements Comparable<GamePlayer> {
   private String firstName;
   private String lastName;
   private String email;
+  private String phone;
   private Integer tocPoints;
   private Integer tocChopPoints;
   private Integer qTocPoints;

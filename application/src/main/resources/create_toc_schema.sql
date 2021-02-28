@@ -211,6 +211,7 @@ CREATE TABLE game_player
     first_name                varchar(64) DEFAULT NULL,
     last_name                 varchar(64) DEFAULT NULL,
     email                     varchar(64) DEFAULT NULL,
+    phone                     varchar(64) DEFAULT NULL,
     toc_points                int         DEFAULT NULL,
     toc_chop_points           int         DEFAULT NULL,
     q_toc_points              int         DEFAULT NULL,

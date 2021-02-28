@@ -10,6 +10,7 @@ import com.texastoc.module.game.model.Seating;
 import com.texastoc.module.game.model.SeatsPerTable;
 import com.texastoc.module.game.model.TableRequest;
 import com.texastoc.module.game.repository.GameRepository;
+import com.texastoc.module.notification.connector.SMSConnector;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,11 +24,13 @@ import org.springframework.stereotype.Service;
 public class SeatingService {
 
   private final GameRepository gameRepository;
+  private final SMSConnector smsConnector;
 
   private final Random random = new Random(System.currentTimeMillis());
 
-  public SeatingService(GameRepository gameRepository) {
+  public SeatingService(GameRepository gameRepository, SMSConnector smsConnector) {
     this.gameRepository = gameRepository;
+    this.smsConnector = smsConnector;
   }
 
   public Seating seatGamePlayers(Seating seating) {
@@ -260,28 +263,29 @@ public class SeatingService {
     return false;
   }
 
-  //;;
-  // TODO move to notifications
   public void notifySeating(int gameId) {
-//    Seating seating = seatingRepository.get(gameId);
-//    if (seating == null || seating.getTables() == null || seating.getTables().size() == 0) {
-//      return;
-//    }
-//    for (Table table : seating.getTables()) {
-//      if (table.getSeats() == null || table.getSeats().size() == 0) {
-//        continue;
-//      }
-//      for (Seat seat : table.getSeats()) {
-//        if (seat == null) {
-//          continue;
-//        }
-//        GamePlayer gamePlayer = gamePlayerRepository.selectById(seat.getGamePlayerId());
-//        Player player = getPlayerModule().get(gamePlayer.getPlayerId());
-//        if (player.getPhone() != null) {
-//          smsConnector.text(player.getPhone(), player.getName() + " table " +
-//            table.getNumber() + " seat " + seat.getSeatNumber());
-//        }
-//      }
-//    }
+    Game game = gameRepository.findById(gameId).get();
+    Seating seating = game.getSeating();
+    if (seating == null || seating.getGameTables() == null || seating.getGameTables().size() == 0) {
+      return;
+    }
+    for (GameTable table : seating.getGameTables()) {
+      if (table.getSeats() == null || table.getSeats().size() == 0) {
+        continue;
+      }
+      for (Seat seat : table.getSeats()) {
+        if (seat == null) {
+          continue;
+        }
+        GamePlayer gamePlayer = game.getPlayers().stream()
+            .filter(gp -> gp.getId() == seat.getGamePlayerId())
+            .findFirst().get();
+
+        if (gamePlayer.getPhone() != null) {
+          smsConnector.text(gamePlayer.getPhone(), gamePlayer.getName() + " table " +
+              table.getTableNum() + " seat " + seat.getSeatNum());
+        }
+      }
+    }
   }
 }

@@ -3,7 +3,9 @@ package com.texastoc.module.game.service;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 import com.texastoc.TestConstants;
@@ -16,21 +18,27 @@ import com.texastoc.module.game.model.Seating;
 import com.texastoc.module.game.model.SeatsPerTable;
 import com.texastoc.module.game.model.TableRequest;
 import com.texastoc.module.game.repository.GameRepository;
+import com.texastoc.module.notification.connector.SMSConnector;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class SeatingServiceTest implements TestConstants {
 
   private SeatingService seatingService;
   private GameRepository gameRepository;
+  private SMSConnector smsConnector;
 
   @Before
   public void init() {
     gameRepository = mock(GameRepository.class);
-    seatingService = new SeatingService(gameRepository);
+    smsConnector = mock(SMSConnector.class);
+    seatingService = new SeatingService(gameRepository, smsConnector);
   }
 
   @Test
@@ -295,5 +303,74 @@ public class SeatingServiceTest implements TestConstants {
       seatingService.seatGamePlayers(seating);
     }).isInstanceOf(SeatingException.class)
         .hasMessageContaining("Requested invalid table number 7");
+  }
+
+  @Test
+  public void noNotifySeating() {
+    // Arrange
+    Game game = Game.builder()
+        .id(111)
+        .build();
+    when(gameRepository.findById(111)).thenReturn(Optional.of(game));
+
+    // Act
+    seatingService.notifySeating(111);
+
+    // Assert
+    Mockito.verify(smsConnector, times(0)).text(any(), any());
+  }
+
+  @Test
+  public void notifySeating() {
+    // Arrange
+    List<Seat> seats = new ArrayList<>();
+    Seat seat = Seat.builder()
+        .gamePlayerId(6)
+        .build();
+    seats.add(seat);
+
+    seats.add(null);
+
+    seat = Seat.builder()
+        .gamePlayerId(7)
+        .seatNum(2)
+        .build();
+    seats.add(seat);
+
+    GameTable gameTable = GameTable.builder()
+        .tableNum(1)
+        .build();
+    gameTable.setSeats(seats);
+
+    Seating seating = new Seating();
+    seating.setGameId(111);
+    seating.setGameTables(Collections.singletonList(gameTable));
+
+    // 2 players with buy-ins
+    List<GamePlayer> gamePlayers = new LinkedList<>();
+    gamePlayers.add(GamePlayer.builder()
+        .id(6)
+        .boughtIn(true)
+        .build());
+    gamePlayers.add(GamePlayer.builder()
+        .id(7)
+        .boughtIn(true)
+        .phone("33344455555")
+        .firstName("abe")
+        .lastName("abeson")
+        .build());
+
+    Game game = Game.builder()
+        .id(111)
+        .players(gamePlayers)
+        .seating(seating)
+        .build();
+    when(gameRepository.findById(111)).thenReturn(Optional.of(game));
+
+    // Act
+    seatingService.notifySeating(111);
+
+    // Assert
+    Mockito.verify(smsConnector, times(1)).text("33344455555", "abe abeson table 1 seat 2");
   }
 }

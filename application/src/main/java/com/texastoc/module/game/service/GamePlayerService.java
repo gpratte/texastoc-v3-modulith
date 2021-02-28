@@ -155,9 +155,13 @@ public class GamePlayerService {
 
   private GamePlayer createGamePlayerWorker(GamePlayer gamePlayer, Game game) {
     if (gamePlayer.getFirstName() == null && gamePlayer.getLastName() == null) {
+      // If the first and last name are not set then this is an existing
+      // player so copy fields to the game player
       Player player = getPlayerModule().get(gamePlayer.getPlayerId());
       gamePlayer.setFirstName(player.getFirstName());
       gamePlayer.setLastName(player.getLastName());
+      gamePlayer.setPhone(player.getPhone());
+      gamePlayer.setEmail(player.getEmail());
     }
     gamePlayer.setQSeasonId(game.getQSeasonId());
     gamePlayer.setSeasonId(game.getSeasonId());
