@@ -1,22 +1,5 @@
 package com.texastoc.module.game.calculator;
 
-import com.texastoc.TestConstants;
-import com.texastoc.module.game.model.Game;
-import com.texastoc.module.game.model.GamePayout;
-import com.texastoc.module.game.model.GamePlayer;
-import com.texastoc.module.game.repository.GameRepository;
-import com.texastoc.module.settings.SettingsModule;
-import com.texastoc.module.settings.model.Payout;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-
 import static com.texastoc.TestConstants.getSettings;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -25,6 +8,22 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.texastoc.TestConstants;
+import com.texastoc.module.game.model.Game;
+import com.texastoc.module.game.model.GamePayout;
+import com.texastoc.module.game.model.GamePlayer;
+import com.texastoc.module.game.repository.GameRepository;
+import com.texastoc.module.settings.SettingsModule;
+import com.texastoc.module.settings.model.Payout;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class PayoutCalculatorTest implements TestConstants {
 
@@ -45,10 +44,10 @@ public class PayoutCalculatorTest implements TestConstants {
   @Test
   public void testNoPlayersNoPayouts() {
     Game gameToCalculate = Game.builder()
-      .id(1)
-      .numPlayers(0)
-      .prizePotCalculated(0)
-      .build();
+        .id(1)
+        .numPlayers(0)
+        .prizePotCalculated(0)
+        .build();
 
     List<GamePayout> gamePayouts = payoutCalculator.calculate(gameToCalculate);
 
@@ -59,10 +58,10 @@ public class PayoutCalculatorTest implements TestConstants {
   @Test
   public void test1PlayersNoPayouts() {
     Game gameToCalculate = Game.builder()
-      .id(1)
-      .numPlayers(1)
-      .prizePotCalculated(0)
-      .build();
+        .id(1)
+        .numPlayers(1)
+        .prizePotCalculated(0)
+        .build();
 
     List<GamePayout> gamePayouts = payoutCalculator.calculate(gameToCalculate);
 
@@ -73,10 +72,10 @@ public class PayoutCalculatorTest implements TestConstants {
   @Test
   public void test1Players1Payout() {
     Game gameToCalculate = Game.builder()
-      .id(1)
-      .numPlayers(1)
-      .prizePotCalculated(GAME_BUY_IN)
-      .build();
+        .id(1)
+        .numPlayers(1)
+        .prizePotCalculated(GAME_BUY_IN)
+        .build();
 
     when(gameRepository.findById(1)).thenReturn(Optional.of(new Game()));
 
@@ -98,10 +97,10 @@ public class PayoutCalculatorTest implements TestConstants {
   @Test
   public void test7Players1Payout() {
     Game gameToCalculate = Game.builder()
-      .id(1)
-      .numPlayers(7)
-      .prizePotCalculated(GAME_BUY_IN * 7)
-      .build();
+        .id(1)
+        .numPlayers(7)
+        .prizePotCalculated(GAME_BUY_IN * 7)
+        .build();
 
     when(gameRepository.findById(1)).thenReturn(Optional.of(new Game()));
 
@@ -115,7 +114,8 @@ public class PayoutCalculatorTest implements TestConstants {
 
     GamePayout gamePayout = gamePayouts.get(0);
     assertEquals("payout should be place 1", 1, gamePayout.getPlace());
-    assertEquals("payout amount should be " + (GAME_BUY_IN * 7), GAME_BUY_IN * 7, gamePayout.getAmount());
+    assertEquals("payout amount should be " + (GAME_BUY_IN * 7), GAME_BUY_IN * 7,
+        gamePayout.getAmount());
     assertNull("payout chop amount should be null", gamePayout.getChopAmount());
   }
 
@@ -125,10 +125,10 @@ public class PayoutCalculatorTest implements TestConstants {
     List<GamePlayer> gamePlayers = new ArrayList<>(numPlayers);
     for (int i = 0; i < numPlayers; i++) {
       GamePlayer gamePlayer = GamePlayer.builder()
-        .id(i + 1)
-        .place(i + 1)
-        .boughtIn(true)
-        .build();
+          .id(i + 1)
+          .place(i + 1)
+          .boughtIn(true)
+          .build();
       gamePlayers.add(gamePlayer);
     }
     gamePlayers.get(0).setChop(100_000);
@@ -136,11 +136,11 @@ public class PayoutCalculatorTest implements TestConstants {
 
     int prizePot = GAME_BUY_IN * numPlayers;
     Game gameToCalculate = Game.builder()
-      .id(1)
-      .numPlayers(numPlayers)
-      .players(gamePlayers)
-      .prizePotCalculated(prizePot)
-      .build();
+        .id(1)
+        .numPlayers(numPlayers)
+        .players(gamePlayers)
+        .prizePotCalculated(prizePot)
+        .build();
 
     when(gameRepository.findById(1)).thenReturn(Optional.of(gameToCalculate));
 
@@ -153,8 +153,10 @@ public class PayoutCalculatorTest implements TestConstants {
     assertEquals("list of game payouts should be size 2", 2, gamePayouts.size());
 
     List<Integer> amountsWithoutChop = new ArrayList<>(2);
-    int firstPlaceWithoutChop = (int) Math.round(TestConstants.getPayouts(2).get(0).getPercent() * prizePot);
-    int secondPlaceWithoutChop = (int) Math.round(TestConstants.getPayouts(2).get(1).getPercent() * prizePot);
+    int firstPlaceWithoutChop = (int) Math
+        .round(TestConstants.getPayouts(2).get(0).getPercent() * prizePot);
+    int secondPlaceWithoutChop = (int) Math
+        .round(TestConstants.getPayouts(2).get(1).getPercent() * prizePot);
     amountsWithoutChop.add(firstPlaceWithoutChop);
     amountsWithoutChop.add(secondPlaceWithoutChop);
 
@@ -184,8 +186,10 @@ public class PayoutCalculatorTest implements TestConstants {
       totalPaidOutWithChop += gamePayout.getChopAmount();
     }
 
-    assertEquals("sum of payouts without chop for " + numPlayers + " players should be " + prizePot, prizePot, totalPaidOutWithoutChop);
-    assertEquals("sum of payouts with chop for " + numPlayers + " players should be " + prizePot, prizePot, totalPaidOutWithChop);
+    assertEquals("sum of payouts without chop for " + numPlayers + " players should be " + prizePot,
+        prizePot, totalPaidOutWithoutChop);
+    assertEquals("sum of payouts with chop for " + numPlayers + " players should be " + prizePot,
+        prizePot, totalPaidOutWithChop);
   }
 
   @Test
@@ -194,10 +198,10 @@ public class PayoutCalculatorTest implements TestConstants {
     List<GamePlayer> gamePlayers = new ArrayList<>(numPlayers);
     for (int i = 0; i < numPlayers; i++) {
       GamePlayer gamePlayer = GamePlayer.builder()
-        .id(i + 1)
-        .place(i + 1)
-        .boughtIn(true)
-        .build();
+          .id(i + 1)
+          .place(i + 1)
+          .boughtIn(true)
+          .build();
       gamePlayers.add(gamePlayer);
     }
     gamePlayers.get(0).setChop(550_000);
@@ -206,11 +210,11 @@ public class PayoutCalculatorTest implements TestConstants {
 
     int prizePot = GAME_BUY_IN * numPlayers;
     Game gameToCalculate = Game.builder()
-      .id(1)
-      .numPlayers(numPlayers)
-      .players(gamePlayers)
-      .prizePotCalculated(prizePot)
-      .build();
+        .id(1)
+        .numPlayers(numPlayers)
+        .players(gamePlayers)
+        .prizePotCalculated(prizePot)
+        .build();
 
     when(gameRepository.findById(1)).thenReturn(Optional.of(gameToCalculate));
 
@@ -269,7 +273,9 @@ public class PayoutCalculatorTest implements TestConstants {
       }
     }
 
-    assertEquals("sum of payouts without chop for " + numPlayers + " players should be " + prizePot, prizePot, totalPaidOutWithoutChop);
-    assertEquals("sum of payouts with chop for " + numPlayers + " players should be " + prizePot, prizePot, totalPaidOutWithChop);
+    assertEquals("sum of payouts without chop for " + numPlayers + " players should be " + prizePot,
+        prizePot, totalPaidOutWithoutChop);
+    assertEquals("sum of payouts with chop for " + numPlayers + " players should be " + prizePot,
+        prizePot, totalPaidOutWithChop);
   }
 }

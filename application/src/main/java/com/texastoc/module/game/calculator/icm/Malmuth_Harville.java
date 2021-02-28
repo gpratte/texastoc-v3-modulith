@@ -9,9 +9,10 @@ import java.util.List;
  * See https://github.com/gpratte/icm-calculator
  */
 public class Malmuth_Harville {
+
   /**
-   * Figure out the order of the stacks that will be needed later for the summations.
-   * For example if there are three stacks
+   * Figure out the order of the stacks that will be needed later for the summations. For example if
+   * there are three stacks
    * <ul>
    *   <li>100</li>
    *   <li>75</li>
@@ -75,8 +76,7 @@ public class Malmuth_Harville {
   }
 
   /**
-   * Calculate the percentage from the rankings.
-   * Given
+   * Calculate the percentage from the rankings. Given
    * <ul>
    *   <li>100</li>
    *   <li>75</li>
@@ -104,7 +104,8 @@ public class Malmuth_Harville {
    * @param paths          the rankings
    * @return the percentage for that place
    */
-  static double calculateProbabilityForPlace(String stackId, int sumOfAllStacks, List<List<String>> paths) {
+  static double calculateProbabilityForPlace(String stackId, int sumOfAllStacks,
+      List<List<String>> paths) {
     if (paths.size() == 0) {
       return stackToInt(stackId) / (double) sumOfAllStacks;
     }

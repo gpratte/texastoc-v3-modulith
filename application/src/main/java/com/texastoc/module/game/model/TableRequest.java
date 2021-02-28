@@ -11,6 +11,7 @@ import org.springframework.data.annotation.Id;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TableRequest {
+
   @Id
   private int id;
   private int gamePlayerId;

@@ -1,29 +1,29 @@
 package com.texastoc.security;
 
+import static com.texastoc.security.SecurityConstants.HEADER_STRING;
+import static com.texastoc.security.SecurityConstants.TOKEN_PREFIX;
+
 import com.texastoc.module.player.service.UserDetailsServiceImpl;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
+import java.io.IOException;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
-import static com.texastoc.security.SecurityConstants.HEADER_STRING;
-import static com.texastoc.security.SecurityConstants.TOKEN_PREFIX;
-
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
   private final JwtTokenProvider jwtTokenProvider;
   private final UserDetailsServiceImpl userDetailsService;
 
-  JwtAuthorizationFilter(AuthenticationManager authManager, JwtTokenProvider jwtTokenProvider, UserDetailsServiceImpl userDetailsService) {
+  JwtAuthorizationFilter(AuthenticationManager authManager, JwtTokenProvider jwtTokenProvider,
+      UserDetailsServiceImpl userDetailsService) {
     super(authManager);
     this.jwtTokenProvider = jwtTokenProvider;
     this.userDetailsService = userDetailsService;
@@ -31,8 +31,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest req,
-                                  HttpServletResponse res,
-                                  FilterChain chain) throws IOException, ServletException {
+      HttpServletResponse res,
+      FilterChain chain) throws IOException, ServletException {
     String header = req.getHeader(HEADER_STRING);
 
     if (header == null || !header.startsWith(TOKEN_PREFIX)) {

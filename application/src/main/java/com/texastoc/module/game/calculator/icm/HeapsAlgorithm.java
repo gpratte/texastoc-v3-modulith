@@ -9,6 +9,7 @@ import java.util.List;
  * See https://github.com/gpratte/icm-calculator
  */
 public class HeapsAlgorithm {
+
   /**
    * Generate all the different permutations
    *
@@ -22,7 +23,8 @@ public class HeapsAlgorithm {
     return rankings;
   }
 
-  private static void generateRankingsRecursive(int n, List<String> elements, List<List<String>> rankings) {
+  private static void generateRankingsRecursive(int n, List<String> elements,
+      List<List<String>> rankings) {
     if (n == 1) {
       rankings.add(new ArrayList<>(elements));
     } else {

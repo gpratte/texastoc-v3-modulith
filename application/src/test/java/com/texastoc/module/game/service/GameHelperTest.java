@@ -44,7 +44,7 @@ public class GameHelperTest {
     seasonModule = mock(SeasonModule.class);
     webSocketConnector = mock(WebSocketConnector.class);
     gameHelper = new GameHelper(gameRepository, gameCalculator, payoutCalculator, pointsCalculator,
-      webSocketConnector);
+        webSocketConnector);
     ReflectionTestUtils.setField(gameHelper, "playerModule", playerModule);
     ReflectionTestUtils.setField(gameHelper, "seasonModule", seasonModule);
   }
@@ -54,9 +54,9 @@ public class GameHelperTest {
     // Arrange
     LocalDate now = LocalDate.now();
     Game game = Game.builder()
-      .id(111)
-      .date(now)
-      .build();
+        .id(111)
+        .date(now)
+        .build();
     when(gameRepository.findById(111)).thenReturn(Optional.of(game));
 
     // Act
@@ -77,7 +77,7 @@ public class GameHelperTest {
     assertThatThrownBy(() -> {
       gameHelper.get(111);
     }).isInstanceOf(NotFoundException.class)
-      .hasMessageContaining("Game with id 111 not found");
+        .hasMessageContaining("Game with id 111 not found");
   }
 
   @Test
@@ -87,9 +87,9 @@ public class GameHelperTest {
 
     LocalDate now = LocalDate.now();
     Game game = Game.builder()
-      .id(111)
-      .date(now)
-      .build();
+        .id(111)
+        .date(now)
+        .build();
     List<Game> games = new ArrayList<>();
     games.add(game);
     when(gameRepository.findUnfinalizedBySeasonId(2)).thenReturn(games);
@@ -111,9 +111,9 @@ public class GameHelperTest {
 
     LocalDate now = LocalDate.now();
     Game game = Game.builder()
-      .id(112)
-      .date(now)
-      .build();
+        .id(112)
+        .date(now)
+        .build();
     List<Game> games = new ArrayList<>();
     games.add(game);
     when(gameRepository.findMostRecentBySeasonId(2)).thenReturn(games);
@@ -133,8 +133,8 @@ public class GameHelperTest {
     // Arrange
     LocalDate now = LocalDate.now();
     Game game = Game.builder()
-      .finalized(false)
-      .build();
+        .finalized(false)
+        .build();
 
     // Act
     // No exception should be thrown
@@ -146,22 +146,22 @@ public class GameHelperTest {
     // Arrange
     LocalDate now = LocalDate.now();
     Game game = Game.builder()
-      .finalized(true)
-      .build();
+        .finalized(true)
+        .build();
 
     // Act & Assert
     assertThatThrownBy(() -> {
       gameHelper.checkFinalized(game);
     }).isInstanceOf(GameIsFinalizedException.class)
-      .hasMessageContaining("Game is finalized");
+        .hasMessageContaining("Game is finalized");
   }
 
   @Test
   public void testRecalculate() {
     // Arrange
     Game game = Game.builder()
-      .id(111)
-      .build();
+        .id(111)
+        .build();
     when(gameRepository.findById(111)).thenReturn(Optional.of(game));
 
     Game calculatedGame = new Game();
@@ -184,9 +184,9 @@ public class GameHelperTest {
 
     LocalDate now = LocalDate.now();
     Game game = Game.builder()
-      .id(111)
-      .date(now)
-      .build();
+        .id(111)
+        .date(now)
+        .build();
     List<Game> games = new ArrayList<>();
     games.add(game);
     when(gameRepository.findUnfinalizedBySeasonId(2)).thenReturn(games);

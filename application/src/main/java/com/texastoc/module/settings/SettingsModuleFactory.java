@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SettingsModuleFactory {
+
   private static SettingsModule SETTINGS_MODULE;
 
   public SettingsModuleFactory(SettingsService settingsService) {

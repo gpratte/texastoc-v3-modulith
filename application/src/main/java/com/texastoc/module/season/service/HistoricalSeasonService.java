@@ -37,15 +37,16 @@ public class HistoricalSeasonService {
     String json = getPastSeasonsAsJson();
     try {
       historicalSeasonsFromJson = OBJECT_MAPPER
-        .readValue(json, new TypeReference<List<HistoricalSeason>>() {
-        });
+          .readValue(json, new TypeReference<List<HistoricalSeason>>() {
+          });
     } catch (JsonProcessingException e) {
       log.warn("Could not deserialize historical seasons json");
       historicalSeasonsFromJson = new LinkedList<>();
     }
 
     List<HistoricalSeason> historicalSeasons = StreamSupport
-      .stream(seasonHistoryRepository.findAll().spliterator(), false).collect(Collectors.toList());
+        .stream(seasonHistoryRepository.findAll().spliterator(), false)
+        .collect(Collectors.toList());
 
     historicalSeasons.addAll(historicalSeasonsFromJson);
     return historicalSeasons;
@@ -62,7 +63,7 @@ public class HistoricalSeasonService {
       return null;
     }
     try (BufferedReader bf = new BufferedReader(
-      new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+        new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
       pastSeasonsAsJson = bf.lines().collect(Collectors.joining());
       return pastSeasonsAsJson;
     } catch (IOException e) {

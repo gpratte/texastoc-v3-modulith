@@ -4,14 +4,13 @@ import com.texastoc.module.game.calculator.icm.ICMCalculator;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.repository.GameRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 public class PointsCalculator {
@@ -23,7 +22,9 @@ public class PointsCalculator {
 
   private final Map<Integer, Map<Integer, Integer>> POINT_SYSTEM = new HashMap<>();
 
-  public PointsCalculator(@Value("${points.tenthPlaceIncr}") Double tenthPlaceIncr, @Value("${points.tenthPlacePoints}") Integer tenthPlacePoints, @Value("${points.multiplier}") Double multiplier, GameRepository gameRepository) {
+  public PointsCalculator(@Value("${points.tenthPlaceIncr}") Double tenthPlaceIncr,
+      @Value("${points.tenthPlacePoints}") Integer tenthPlacePoints,
+      @Value("${points.multiplier}") Double multiplier, GameRepository gameRepository) {
     this.tenthPlaceIncr = tenthPlaceIncr;
     this.tenthPlacePoints = tenthPlacePoints;
     this.multiplier = multiplier;
@@ -73,7 +74,8 @@ public class PointsCalculator {
   /**
    * If the place/points Set is in the cache for the number of players return it.
    * <p>
-   * Otherwise calculate the Set of place/points for the number of players, add it to the cache and return it.
+   * Otherwise calculate the Set of place/points for the number of players, add it to the cache and
+   * return it.
    */
   public Map<Integer, Integer> calculatePlacePoints(int numPlayers) {
     if (POINT_SYSTEM.get(numPlayers) != null) {
@@ -100,7 +102,7 @@ public class PointsCalculator {
       value *= multiplier;
       if (players >= i) {
         placePoints.put(i, Long.valueOf(Math.round(value))
-          .intValue());
+            .intValue());
       } else {
         placePoints.put(i, 0);
       }
@@ -110,7 +112,8 @@ public class PointsCalculator {
     return placePoints;
   }
 
-  private Map<Integer, Integer> chopPoints(List<GamePlayer> gamePlayers, Map<Integer, Integer> placePoints) {
+  private Map<Integer, Integer> chopPoints(List<GamePlayer> gamePlayers,
+      Map<Integer, Integer> placePoints) {
     List<Integer> chips = new LinkedList<>();
     outer:
     for (int i = 1; i <= 10; i++) {

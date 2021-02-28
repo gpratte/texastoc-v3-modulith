@@ -34,8 +34,8 @@ public class GameCalculatorTest implements TestConstants {
   @Test
   public void testNullGamePlayers() {
     Game gameToCalculate = Game.builder()
-      .id(1)
-      .build();
+        .id(1)
+        .build();
     TestUtils.populateGameCosts(gameToCalculate);
     gameCalculator.calculate(gameToCalculate);
 
@@ -48,9 +48,9 @@ public class GameCalculatorTest implements TestConstants {
   @Test
   public void testEmptyGamePlayers() {
     Game gameToCalculate = Game.builder()
-      .id(1)
-      .players(Collections.emptyList())
-      .build();
+        .id(1)
+        .players(Collections.emptyList())
+        .build();
     TestUtils.populateGameCosts(gameToCalculate);
     gameCalculator.calculate(gameToCalculate);
 
@@ -65,17 +65,17 @@ public class GameCalculatorTest implements TestConstants {
     List<GamePlayer> gamePlayers = new ArrayList<>();
     for (int i = 0; i < 10; ++i) {
       GamePlayer gamePlayer = GamePlayer.builder()
-        .id(i)
-        .playerId(i)
-        .gameId(1)
-        .build();
+          .id(i)
+          .playerId(i)
+          .gameId(1)
+          .build();
       gamePlayers.add(gamePlayer);
     }
 
     Game gameToCalculate = Game.builder()
-      .id(1)
-      .players(gamePlayers)
-      .build();
+        .id(1)
+        .players(gamePlayers)
+        .build();
     TestUtils.populateGameCosts(gameToCalculate);
     gameCalculator.calculate(gameToCalculate);
 
@@ -171,85 +171,85 @@ public class GameCalculatorTest implements TestConstants {
   public void testGamePlayerOneOfEach() {
     List<GamePlayer> gamePlayers = new ArrayList<>();
     GamePlayer gamePlayer = GamePlayer.builder()
-      .id(1)
-      .playerId(1)
-      .gameId(1)
-      .boughtIn(true)
-      .build();
+        .id(1)
+        .playerId(1)
+        .gameId(1)
+        .boughtIn(true)
+        .build();
     gamePlayers.add(gamePlayer);
 
     gamePlayer = GamePlayer.builder()
-      .id(2)
-      .playerId(2)
-      .gameId(1)
-      .boughtIn(true)
-      .annualTocParticipant(true)
-      .build();
+        .id(2)
+        .playerId(2)
+        .gameId(1)
+        .boughtIn(true)
+        .annualTocParticipant(true)
+        .build();
     gamePlayers.add(gamePlayer);
 
     gamePlayer = GamePlayer.builder()
-      .id(3)
-      .playerId(3)
-      .gameId(1)
-      .boughtIn(true)
-      .quarterlyTocParticipant(true)
-      .build();
+        .id(3)
+        .playerId(3)
+        .gameId(1)
+        .boughtIn(true)
+        .quarterlyTocParticipant(true)
+        .build();
     gamePlayers.add(gamePlayer);
 
     gamePlayer = GamePlayer.builder()
-      .id(4)
-      .playerId(4)
-      .gameId(1)
-      .boughtIn(true)
-      .annualTocParticipant(true)
-      .quarterlyTocParticipant(true)
-      .build();
+        .id(4)
+        .playerId(4)
+        .gameId(1)
+        .boughtIn(true)
+        .annualTocParticipant(true)
+        .quarterlyTocParticipant(true)
+        .build();
     gamePlayers.add(gamePlayer);
 
     gamePlayer = GamePlayer.builder()
-      .id(5)
-      .playerId(5)
-      .gameId(1)
-      .boughtIn(true)
-      .rebought(true)
-      .build();
+        .id(5)
+        .playerId(5)
+        .gameId(1)
+        .boughtIn(true)
+        .rebought(true)
+        .build();
     gamePlayers.add(gamePlayer);
 
     gamePlayer = GamePlayer.builder()
-      .id(6)
-      .playerId(6)
-      .gameId(1)
-      .boughtIn(true)
-      .annualTocParticipant(true)
-      .rebought(true)
-      .build();
+        .id(6)
+        .playerId(6)
+        .gameId(1)
+        .boughtIn(true)
+        .annualTocParticipant(true)
+        .rebought(true)
+        .build();
     gamePlayers.add(gamePlayer);
 
     gamePlayer = GamePlayer.builder()
-      .id(7)
-      .playerId(7)
-      .gameId(1)
-      .boughtIn(true)
-      .quarterlyTocParticipant(true)
-      .rebought(true)
-      .build();
+        .id(7)
+        .playerId(7)
+        .gameId(1)
+        .boughtIn(true)
+        .quarterlyTocParticipant(true)
+        .rebought(true)
+        .build();
     gamePlayers.add(gamePlayer);
 
     gamePlayer = GamePlayer.builder()
-      .id(8)
-      .playerId(8)
-      .gameId(1)
-      .boughtIn(true)
-      .annualTocParticipant(true)
-      .quarterlyTocParticipant(true)
-      .rebought(true)
-      .build();
+        .id(8)
+        .playerId(8)
+        .gameId(1)
+        .boughtIn(true)
+        .annualTocParticipant(true)
+        .quarterlyTocParticipant(true)
+        .rebought(true)
+        .build();
     gamePlayers.add(gamePlayer);
 
     Game gameToCalculate = Game.builder()
-      .id(1)
-      .players(gamePlayers)
-      .build();
+        .id(1)
+        .players(gamePlayers)
+        .build();
     TestUtils.populateGameCosts(gameToCalculate);
     gameCalculator.calculate(gameToCalculate);
 
@@ -261,19 +261,19 @@ public class GameCalculatorTest implements TestConstants {
 
     assertEquals("buy-in collected should be 48", 48, gameCalculated.getBuyInCollected());
     assertEquals("rebuy add on collected should be 20", 20,
-      gameCalculated.getRebuyAddOnCollected());
+        gameCalculated.getRebuyAddOnCollected());
     assertEquals("annual toc collected should be 32", 32, gameCalculated.getAnnualTocCollected());
     assertEquals("quarterly toc collected should be 28", 28,
-      gameCalculated.getQuarterlyTocCollected());
+        gameCalculated.getQuarterlyTocCollected());
     assertEquals("total collected should be 128", 128, gameCalculated.getTotalCollected());
 
     assertEquals("kitty calculated should be 9", 9, gameCalculated.getKittyCalculated());
     assertEquals("annual Toc from rebuy add on calculated should be 8", 8,
-      gameCalculated.getAnnualTocFromRebuyAddOnCalculated());
+        gameCalculated.getAnnualTocFromRebuyAddOnCalculated());
     assertEquals("rebuy add on less annual Toc calculated should be 12", 12,
-      gameCalculated.getRebuyAddOnLessAnnualTocCalculated());
+        gameCalculated.getRebuyAddOnLessAnnualTocCalculated());
     assertEquals("total combined toc calculated should be 68", 68,
-      gameCalculated.getTotalCombinedTocCalculated());
+        gameCalculated.getTotalCombinedTocCalculated());
     assertEquals("prize pot calculated should be 51", 51, gameCalculated.getPrizePotCalculated());
   }
 
@@ -282,15 +282,15 @@ public class GameCalculatorTest implements TestConstants {
     assertEquals("rebuy add on collected should be 0", 0, gameCalculated.getRebuyAddOnCollected());
     assertEquals("annual toc collected should be 0", 0, gameCalculated.getAnnualTocCollected());
     assertEquals("quarterly toc collected should be 0", 0,
-      gameCalculated.getQuarterlyTocCollected());
+        gameCalculated.getQuarterlyTocCollected());
     assertEquals("total collected should be 0", 0, gameCalculated.getTotalCollected());
 
     assertEquals("rebuy add on toc calculated should be 0", 0,
-      gameCalculated.getAnnualTocFromRebuyAddOnCalculated());
+        gameCalculated.getAnnualTocFromRebuyAddOnCalculated());
     assertEquals("rebuy add on less toc calculated should be 0", 0,
-      gameCalculated.getRebuyAddOnLessAnnualTocCalculated());
+        gameCalculated.getRebuyAddOnLessAnnualTocCalculated());
     assertEquals("total toc calculated should be 0", 0,
-      gameCalculated.getTotalCombinedTocCalculated());
+        gameCalculated.getTotalCombinedTocCalculated());
     assertEquals("kitty calculated should be 0", 0, gameCalculated.getKittyCalculated());
     assertEquals("prize pot should be 0", 0, gameCalculated.getPrizePotCalculated());
   }
