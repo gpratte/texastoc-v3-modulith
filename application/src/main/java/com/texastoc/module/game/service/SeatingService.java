@@ -10,7 +10,8 @@ import com.texastoc.module.game.model.Seating;
 import com.texastoc.module.game.model.SeatsPerTable;
 import com.texastoc.module.game.model.TableRequest;
 import com.texastoc.module.game.repository.GameRepository;
-import com.texastoc.module.notification.connector.SMSConnector;
+import com.texastoc.module.notification.NotificationModule;
+import com.texastoc.module.notification.NotificationModuleFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,13 +25,12 @@ import org.springframework.stereotype.Service;
 public class SeatingService {
 
   private final GameRepository gameRepository;
-  private final SMSConnector smsConnector;
+  private NotificationModule notificationModule;
 
   private final Random random = new Random(System.currentTimeMillis());
 
-  public SeatingService(GameRepository gameRepository, SMSConnector smsConnector) {
+  public SeatingService(GameRepository gameRepository) {
     this.gameRepository = gameRepository;
-    this.smsConnector = smsConnector;
   }
 
   public Seating seatGamePlayers(Seating seating) {
@@ -282,10 +282,17 @@ public class SeatingService {
             .findFirst().get();
 
         if (gamePlayer.getPhone() != null) {
-          smsConnector.text(gamePlayer.getPhone(), gamePlayer.getName() + " table " +
+          getNotificaionModule().sendText(gamePlayer.getPhone(), gamePlayer.getName() + " table " +
               table.getTableNum() + " seat " + seat.getSeatNum());
         }
       }
     }
+  }
+
+  private NotificationModule getNotificaionModule() {
+    if (notificationModule == null) {
+      notificationModule = NotificationModuleFactory.getNotificationModule();
+    }
+    return notificationModule;
   }
 }

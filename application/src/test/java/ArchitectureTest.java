@@ -122,7 +122,7 @@ public class ArchitectureTest {
             "..clock..")
         .should().dependOnClassesThat()
         .resideInAnyPackage("..notification.config..", "..notification.exception..",
-            "..notification.repository..", "..notification.service..")
+            "..notification.repository..", "..notification.connector..", "..notification.service..")
         .check(importedClasses);
   }
 

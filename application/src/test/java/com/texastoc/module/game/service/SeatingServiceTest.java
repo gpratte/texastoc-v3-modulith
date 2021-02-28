@@ -18,7 +18,7 @@ import com.texastoc.module.game.model.Seating;
 import com.texastoc.module.game.model.SeatsPerTable;
 import com.texastoc.module.game.model.TableRequest;
 import com.texastoc.module.game.repository.GameRepository;
-import com.texastoc.module.notification.connector.SMSConnector;
+import com.texastoc.module.notification.NotificationModule;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -27,18 +27,21 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class SeatingServiceTest implements TestConstants {
 
   private SeatingService seatingService;
   private GameRepository gameRepository;
-  private SMSConnector smsConnector;
+  private NotificationModule notificationModule;
 
   @Before
   public void init() {
     gameRepository = mock(GameRepository.class);
-    smsConnector = mock(SMSConnector.class);
-    seatingService = new SeatingService(gameRepository, smsConnector);
+    seatingService = new SeatingService(gameRepository);
+
+    notificationModule = mock(NotificationModule.class);
+    ReflectionTestUtils.setField(seatingService, "notificationModule", notificationModule);
   }
 
   @Test
@@ -317,7 +320,7 @@ public class SeatingServiceTest implements TestConstants {
     seatingService.notifySeating(111);
 
     // Assert
-    Mockito.verify(smsConnector, times(0)).text(any(), any());
+    Mockito.verify(notificationModule, times(0)).sendText(any(), any());
   }
 
   @Test
@@ -371,6 +374,7 @@ public class SeatingServiceTest implements TestConstants {
     seatingService.notifySeating(111);
 
     // Assert
-    Mockito.verify(smsConnector, times(1)).text("33344455555", "abe abeson table 1 seat 2");
+    Mockito.verify(notificationModule, times(1))
+        .sendText("33344455555", "abe abeson table 1 seat 2");
   }
 }
