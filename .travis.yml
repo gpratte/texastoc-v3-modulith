@@ -1,10 +1,13 @@
 language: java
 jdk: openjdk8
 sudo: false
-script: mvn clean install
 cache:
   directories:
     - $HOME/.m2
+script:
+  - mvn clean
+  - mvn -pl application test
+  - mvn install
 
 install:
   - mvn -N io.takari:maven:wrapper
