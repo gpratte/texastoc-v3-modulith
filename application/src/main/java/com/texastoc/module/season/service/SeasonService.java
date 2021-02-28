@@ -60,7 +60,7 @@ public class SeasonService {
     try {
       Season currentSeason = getCurrent();
       if (!currentSeason.isFinalized()) {
-        throw new SeasonInProgressException();
+        throw new SeasonInProgressException(startYear);
       }
     } catch (NotFoundException e) {
       // do nothing

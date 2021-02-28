@@ -50,7 +50,7 @@ public class GameService {
     List<Game> otherGames = gameRepository.findBySeasonId(currentSeason.getId());
     for (Game otherGame : otherGames) {
       if (!otherGame.isFinalized()) {
-        throw new GameInProgressException("There is a game in progress");
+        throw new GameInProgressException();
       }
     }
 
@@ -183,7 +183,7 @@ public class GameService {
         continue;
       }
       if (!game.isFinalized()) {
-        throw new GameInProgressException("There is a game in progress");
+        throw new GameInProgressException();
       }
     }
 

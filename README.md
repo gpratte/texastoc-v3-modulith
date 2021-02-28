@@ -162,5 +162,6 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 40-cleanup-todos
-Fixed the most important TODOs for having a fully functional server.
+## Current Branch: 42-error-messages
+Finalized the exception messages. Configured Spring Boot to include the exception
+messages in the response.

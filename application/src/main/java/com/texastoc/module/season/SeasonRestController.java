@@ -79,6 +79,8 @@ public class SeasonRestController {
   @ExceptionHandler(value = {SeasonInProgressException.class})
   protected void handleSeasonInProgressException(SeasonInProgressException ex,
       HttpServletResponse response) throws IOException {
+    String message = ex.getMessage();
+    System.out.println(message);
     response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
   }
 

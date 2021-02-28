@@ -153,7 +153,7 @@ public class GameHelperTest {
     assertThatThrownBy(() -> {
       gameHelper.checkFinalized(game);
     }).isInstanceOf(GameIsFinalizedException.class)
-        .hasMessageContaining("Game is finalized");
+        .hasMessage("Action cannot be completed because the game is finalized");
   }
 
   @Test

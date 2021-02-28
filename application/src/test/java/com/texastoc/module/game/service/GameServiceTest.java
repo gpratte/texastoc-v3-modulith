@@ -186,7 +186,7 @@ public class GameServiceTest implements TestConstants {
     assertThatThrownBy(() -> {
       gameService.create(new Game());
     }).isInstanceOf(GameInProgressException.class)
-        .hasMessageContaining("There is a game in progress");
+        .hasMessageContaining("Action cannot be completed because there is a game in progress");
   }
 
   @Test
@@ -433,7 +433,7 @@ public class GameServiceTest implements TestConstants {
     assertThatThrownBy(() -> {
       gameService.unfinalize(1);
     }).isInstanceOf(GameInProgressException.class)
-        .hasMessageContaining("There is a game in progress");
+        .hasMessageContaining("Action cannot be completed because there is a game in progress");
   }
 
 }
