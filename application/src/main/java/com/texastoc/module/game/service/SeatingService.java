@@ -10,8 +10,8 @@ import com.texastoc.module.game.model.Seating;
 import com.texastoc.module.game.model.SeatsPerTable;
 import com.texastoc.module.game.model.TableRequest;
 import com.texastoc.module.game.repository.GameRepository;
-import org.springframework.stereotype.Service;
-
+import com.texastoc.module.notification.NotificationModule;
+import com.texastoc.module.notification.NotificationModuleFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,11 +19,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
 
 @Service
 public class SeatingService {
 
   private final GameRepository gameRepository;
+  private NotificationModule notificationModule;
 
   private final Random random = new Random(System.currentTimeMillis());
 
@@ -75,14 +77,14 @@ public class SeatingService {
     // Create the seats for the tables (tables are numbered 1's based)
     for (int i = 1; i <= numTables; i++) {
       GameTable gameTable = GameTable.builder()
-        .tableNum(i)
-        .build();
+          .tableNum(i)
+          .build();
       gameTables.add(gameTable);
       // Get the seats per table for table
       final int tableNum = i;
       SeatsPerTable seatsPerTable = seating.getSeatsPerTables().stream()
-        .filter(spt -> spt.getTableNum() == tableNum)
-        .findFirst().get();
+          .filter(spt -> spt.getTableNum() == tableNum)
+          .findFirst().get();
       List<Seat> seats = new ArrayList<>(seatsPerTable.getNumSeats());
       // All seats are dead stacks
       for (int j = 0; j < seatsPerTable.getNumSeats(); j++) {
@@ -106,11 +108,11 @@ public class SeatingService {
         for (int i = 0; i < seats.size(); i++) {
           if (seats.get(i) == null) {
             seats.set(i, Seat.builder()
-              .seatNum(i + 1)
-              .tableNum(gameTable.getTableNum())
-              .gamePlayerId(gamePlayer.getId())
-              .gamePlayerName(gamePlayer.getName())
-              .build());
+                .seatNum(i + 1)
+                .tableNum(gameTable.getTableNum())
+                .gamePlayerId(gamePlayer.getId())
+                .gamePlayerName(gamePlayer.getName())
+                .build());
             break;
           }
         }
@@ -127,8 +129,8 @@ public class SeatingService {
       // Make sure the table request exists
       final int tableRequestedNum = tableRequest.getTableNum();
       Optional<GameTable> optional = gameTables.stream()
-        .filter(gameTable -> gameTable.getTableNum() == tableRequestedNum)
-        .findFirst();
+          .filter(gameTable -> gameTable.getTableNum() == tableRequestedNum)
+          .findFirst();
       if (!optional.isPresent()) {
         throw new SeatingException("Requested invalid table number " + tableRequestedNum);
       }
@@ -138,7 +140,8 @@ public class SeatingService {
       tableLoop:
       for (GameTable table : gameTables) {
         for (Seat seat : table.getSeats()) {
-          if (seat != null && seat.getGamePlayerId() != null && seat.getGamePlayerId() == tableRequest.getGamePlayerId()) {
+          if (seat != null && seat.getGamePlayerId() != null
+              && seat.getGamePlayerId() == tableRequest.getGamePlayerId()) {
             playerThatWantsToSwapSeat = seat;
             break tableLoop;
           }
@@ -156,7 +159,9 @@ public class SeatingService {
       if (playerThatWantsToSwapSeat.getTableNum() != tableToMoveTo.getTableNum()) {
         for (Seat seatAtTableToMoveTo : tableToMoveTo.getSeats()) {
           // Find a seat to swap - avoid seats that are dead stacks and avoid seats of players that have already been swapped
-          if (seatAtTableToMoveTo != null && seatAtTableToMoveTo.getGamePlayerId() != null && !seatBelongsToPlayerThatRequestedTheTable(seatAtTableToMoveTo.getGamePlayerId(), seating.getTableRequests())) {
+          if (seatAtTableToMoveTo != null && seatAtTableToMoveTo.getGamePlayerId() != null
+              && !seatBelongsToPlayerThatRequestedTheTable(seatAtTableToMoveTo.getGamePlayerId(),
+              seating.getTableRequests())) {
             // Swap
             int saveGamePlayerId = seatAtTableToMoveTo.getGamePlayerId();
             String saveGamePlayerName = seatAtTableToMoveTo.getGamePlayerName();
@@ -175,8 +180,8 @@ public class SeatingService {
     // Remove the null seats
     for (GameTable gameTable : seating.getGameTables()) {
       gameTable.setSeats(gameTable.getSeats().stream()
-        .filter(Objects::nonNull)
-        .collect(Collectors.toList()));
+          .filter(Objects::nonNull)
+          .collect(Collectors.toList()));
     }
 
     gameRepository.save(game);
@@ -191,8 +196,8 @@ public class SeatingService {
 
     int numSeats = seats.size();
     int numPlayers = (int) seats.stream()
-      .filter(seat -> seat != null)
-      .count();
+        .filter(seat -> seat != null)
+        .count();
 
     if (numPlayers == numSeats || numPlayers == (numSeats - 1)) {
       return seats;
@@ -227,7 +232,7 @@ public class SeatingService {
     // The number of dead stacks outnumber the players. Put multiple deads stacks between the
     // players. Currently all the players are seated in the first seats of the table.
     List<Seat> newSeats = new ArrayList<>(numSeats);
-    final double averageDeadsBetween = numDeadStacks / (double)numPlayers;
+    final double averageDeadsBetween = numDeadStacks / (double) numPlayers;
     double remainder = 0.0;
     int seatNumber = 1;
     for (int i = 0; i < seats.size(); i++) {
@@ -237,7 +242,7 @@ public class SeatingService {
         newSeats.add(seat);
 
         double numDeadsBetween = averageDeadsBetween + remainder;
-        int deads = (int)Math.floor(numDeadsBetween);
+        int deads = (int) Math.floor(numDeadsBetween);
         for (int j = 0; j < deads; j++) {
           ++seatNumber;
           newSeats.add(null);
@@ -248,7 +253,8 @@ public class SeatingService {
     return newSeats;
   }
 
-  private boolean seatBelongsToPlayerThatRequestedTheTable(int gamePlayerId, List<TableRequest> tableRequests) {
+  private boolean seatBelongsToPlayerThatRequestedTheTable(int gamePlayerId,
+      List<TableRequest> tableRequests) {
     for (TableRequest tableRequest : tableRequests) {
       if (tableRequest.getGamePlayerId() == gamePlayerId) {
         return true;
@@ -257,27 +263,36 @@ public class SeatingService {
     return false;
   }
 
-  // TODO move to notifications
   public void notifySeating(int gameId) {
-//    Seating seating = seatingRepository.get(gameId);
-//    if (seating == null || seating.getTables() == null || seating.getTables().size() == 0) {
-//      return;
-//    }
-//    for (Table table : seating.getTables()) {
-//      if (table.getSeats() == null || table.getSeats().size() == 0) {
-//        continue;
-//      }
-//      for (Seat seat : table.getSeats()) {
-//        if (seat == null) {
-//          continue;
-//        }
-//        GamePlayer gamePlayer = gamePlayerRepository.selectById(seat.getGamePlayerId());
-//        Player player = getPlayerModule().get(gamePlayer.getPlayerId());
-//        if (player.getPhone() != null) {
-//          smsConnector.text(player.getPhone(), player.getName() + " table " +
-//            table.getNumber() + " seat " + seat.getSeatNumber());
-//        }
-//      }
-//    }
+    Game game = gameRepository.findById(gameId).get();
+    Seating seating = game.getSeating();
+    if (seating == null || seating.getGameTables() == null || seating.getGameTables().size() == 0) {
+      return;
+    }
+    for (GameTable table : seating.getGameTables()) {
+      if (table.getSeats() == null || table.getSeats().size() == 0) {
+        continue;
+      }
+      for (Seat seat : table.getSeats()) {
+        if (seat == null) {
+          continue;
+        }
+        GamePlayer gamePlayer = game.getPlayers().stream()
+            .filter(gp -> gp.getId() == seat.getGamePlayerId())
+            .findFirst().get();
+
+        if (gamePlayer.getPhone() != null) {
+          getNotificaionModule().sendText(gamePlayer.getPhone(), gamePlayer.getName() + " table " +
+              table.getTableNum() + " seat " + seat.getSeatNum());
+        }
+      }
+    }
+  }
+
+  private NotificationModule getNotificaionModule() {
+    if (notificationModule == null) {
+      notificationModule = NotificationModuleFactory.getNotificationModule();
+    }
+    return notificationModule;
   }
 }

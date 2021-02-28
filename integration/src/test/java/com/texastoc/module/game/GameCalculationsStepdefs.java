@@ -1,5 +1,7 @@
 package com.texastoc.module.game;
 
+import static org.junit.Assert.assertEquals;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.texastoc.module.game.model.Game;
@@ -9,11 +11,8 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.junit.Assert;
-
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Assert;
 
 public class GameCalculationsStepdefs extends BaseGameStepdefs {
 
@@ -38,22 +37,22 @@ public class GameCalculationsStepdefs extends BaseGameStepdefs {
   @When("^adding players$")
   public void addPlayers(String json) throws Exception {
     List<GamePlayer> gamePlayers = OBJECT_MAPPER.readValue(
-      json, new TypeReference<List<GamePlayer>>() {
-      });
+        json, new TypeReference<List<GamePlayer>>() {
+        });
     super.getCurrentGame();
     String token = login(USER_EMAIL, USER_PASSWORD);
     for (GamePlayer gp : gamePlayers) {
       GamePlayer gamePlayer = GamePlayer.builder()
-        .gameId(gameId)
-        .firstName(gp.getFirstName() == null ? "first" : gp.getFirstName())
-        .lastName(gp.getLastName() == null ? "last" : gp.getLastName())
-        .boughtIn(gp.isBoughtIn())
-        .annualTocParticipant(gp.isAnnualTocParticipant())
-        .quarterlyTocParticipant(gp.isQuarterlyTocParticipant())
-        .rebought(gp.isRebought())
-        .place(gp.getPlace())
-        .chop(gp.getChop())
-        .build();
+          .gameId(gameId)
+          .firstName(gp.getFirstName() == null ? "first" : gp.getFirstName())
+          .lastName(gp.getLastName() == null ? "last" : gp.getLastName())
+          .boughtIn(gp.isBoughtIn())
+          .annualTocParticipant(gp.isAnnualTocParticipant())
+          .quarterlyTocParticipant(gp.isQuarterlyTocParticipant())
+          .rebought(gp.isRebought())
+          .place(gp.getPlace())
+          .chop(gp.getChop())
+          .build();
       addFirstTimePlayerToGame(gamePlayer, token);
     }
   }
@@ -76,7 +75,7 @@ public class GameCalculationsStepdefs extends BaseGameStepdefs {
     String token = login(USER_EMAIL, USER_PASSWORD);
     for (GamePlayer gp : gameRetrieved.getPlayers()) {
       if (gp.getFirstName().equals(updateGamePlayerInfo.getFirstName()) &&
-        gp.getLastName().equals(updateGamePlayerInfo.getLastName())) {
+          gp.getLastName().equals(updateGamePlayerInfo.getLastName())) {
         gp.setBoughtIn(updateGamePlayerInfo.isBoughtIn());
         gp.setAnnualTocParticipant(updateGamePlayerInfo.isAnnualTocParticipant());
         gp.setQuarterlyTocParticipant(updateGamePlayerInfo.isQuarterlyTocParticipant());
@@ -114,8 +113,10 @@ public class GameCalculationsStepdefs extends BaseGameStepdefs {
     assertEquals(expected.getAnnualTocCollected(), actual.getAnnualTocCollected());
     assertEquals(expected.getQuarterlyTocCollected(), actual.getQuarterlyTocCollected());
     assertEquals(expected.getTotalCollected(), actual.getTotalCollected());
-    assertEquals(expected.getAnnualTocFromRebuyAddOnCalculated(), actual.getAnnualTocFromRebuyAddOnCalculated());
-    assertEquals(expected.getRebuyAddOnLessAnnualTocCalculated(), actual.getRebuyAddOnLessAnnualTocCalculated());
+    assertEquals(expected.getAnnualTocFromRebuyAddOnCalculated(),
+        actual.getAnnualTocFromRebuyAddOnCalculated());
+    assertEquals(expected.getRebuyAddOnLessAnnualTocCalculated(),
+        actual.getRebuyAddOnLessAnnualTocCalculated());
     assertEquals(expected.getTotalCombinedTocCalculated(), actual.getTotalCombinedTocCalculated());
     assertEquals(expected.getKittyCalculated(), actual.getKittyCalculated());
     assertEquals(expected.getPrizePotCalculated(), actual.getPrizePotCalculated());
@@ -123,7 +124,9 @@ public class GameCalculationsStepdefs extends BaseGameStepdefs {
     assertEquals(expected.getNumPaidPlayers(), actual.getNumPaidPlayers());
     assertEquals(expected.isChopped(), actual.isChopped());
 
-    // TODO how is this field used?
+    // TODO
+    //  Q: how is this field used?
+    //  A: set by the the clock service when level greater than 7
     //assertEquals(expected.isCanRebuy(), actual.isCanRebuy());
 
     assertEquals(expected.getPayouts().size(), actual.getPayouts().size());
@@ -137,7 +140,8 @@ public class GameCalculationsStepdefs extends BaseGameStepdefs {
       if (expectedPayout.getChopAmount() == null) {
         Assert.assertNull(actualPayout.getChopAmount());
       } else {
-        assertEquals(expectedPayout.getChopAmount().intValue(), actualPayout.getChopAmount().intValue());
+        assertEquals(expectedPayout.getChopAmount().intValue(),
+            actualPayout.getChopAmount().intValue());
       }
     }
   }

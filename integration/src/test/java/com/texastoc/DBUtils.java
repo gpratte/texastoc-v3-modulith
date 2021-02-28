@@ -26,8 +26,8 @@ public class DBUtils {
       .of("season", "quarterly_season", "season_player", "quarterly_season_player",
           "seats_per_table", "table_request", "seat", "game_table", "game_player", "game_payout",
           "game", "seating", "quarterly_season_payout", "season_payout", "season_estimated_payout",
-          "season_payout_settings",
-          "toc_config", "settings", "version", "historical_season_player", "historical_season");
+          "season_payout_settings", "toc_config", "settings", "version", "historical_season_player",
+          "historical_season");
 
   static {
     try {

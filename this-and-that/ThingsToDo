@@ -1,10 +1,8 @@
 
-Move all repositories to Spring Data JDBC
-  SeasonPayoutSettingsRepository
+Heroku deploy
 
-Roles
-    Only admin can finalize/unfinalized a season
-    Shore up RestControllerAdvise - 400 when json date not correct has no info
+Enhance error messages (details)
+ For example: RestControllerAdvise - 400 when json date not correct has no info
 
 CICD
     Database versioning

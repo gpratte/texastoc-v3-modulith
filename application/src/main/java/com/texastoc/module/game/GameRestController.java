@@ -7,8 +7,12 @@ import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.model.Seating;
 import com.texastoc.module.game.service.GameService;
+import java.io.IOException;
+import java.util.List;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,10 +23,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
 
 @RestController
 public class GameRestController {
@@ -83,42 +83,49 @@ public class GameRestController {
     gameModule.finalize(id);
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @PutMapping(value = "/api/v2/games/{id}", consumes = CONTENT_TYPE_UNFINALIZE)
   public void unfinalizeGame(@PathVariable("id") int id) {
     gameModule.unfinalize(id);
   }
 
   @PostMapping(value = "/api/v2/games/{id}/players", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public GamePlayer createGamePlayer(@PathVariable("id") int id, @RequestBody GamePlayer gamePlayer) {
+  public GamePlayer createGamePlayer(@PathVariable("id") int id,
+      @RequestBody GamePlayer gamePlayer) {
     gamePlayer.setGameId(id);
     return gameModule.createGamePlayer(gamePlayer);
   }
 
   @PostMapping(value = "/api/v2/games/{id}/players", consumes = CONTENT_TYPE_NEW_GAME_PLAYER)
-  public GamePlayer createFirstTimeGamePlayer(@PathVariable("id") int id, @RequestBody GamePlayer gamePlayer) {
+  public GamePlayer createFirstTimeGamePlayer(@PathVariable("id") int id,
+      @RequestBody GamePlayer gamePlayer) {
     gamePlayer.setGameId(id);
     return gameModule.createFirstTimeGamePlayer(gamePlayer);
   }
 
   @PatchMapping(value = "/api/v2/games/{gameId}/players/{gamePlayerId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public void updateGamePlayer(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, @RequestBody GamePlayer gamePlayer) {
+  public void updateGamePlayer(@PathVariable("gameId") int gameId,
+      @PathVariable("gamePlayerId") int gamePlayerId, @RequestBody GamePlayer gamePlayer) {
     gamePlayer.setGameId(gameId);
     gamePlayer.setPlayerId(gamePlayerId);
     gameModule.updateGamePlayer(gamePlayer);
   }
 
   @PutMapping(value = "/api/v2/games/{gameId}/players/{gamePlayerId}", consumes = CONTENT_TYPE_KNOCKOUT)
-  public void toggleKnockedOut(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId) {
+  public void toggleKnockedOut(@PathVariable("gameId") int gameId,
+      @PathVariable("gamePlayerId") int gamePlayerId) {
     gameModule.toggleGamePlayerKnockedOut(gameId, gamePlayerId);
   }
 
   @PutMapping(value = "/api/v2/games/{gameId}/players/{gamePlayerId}", consumes = CONTENT_TYPE_REBUY)
-  public void toggleRebuy(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId) {
+  public void toggleRebuy(@PathVariable("gameId") int gameId,
+      @PathVariable("gamePlayerId") int gamePlayerId) {
     gameModule.toggleGamePlayerRebuy(gameId, gamePlayerId);
   }
 
   @DeleteMapping("/api/v2/games/{gameId}/players/{gamePlayerId}")
-  public void deleteGamePlayer(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId) {
+  public void deleteGamePlayer(@PathVariable("gameId") int gameId,
+      @PathVariable("gamePlayerId") int gamePlayerId) {
     gameModule.deleteGamePlayer(gameId, gamePlayerId);
   }
 
@@ -134,17 +141,20 @@ public class GameRestController {
   }
 
   @ExceptionHandler(value = {GameInProgressException.class})
-  protected void handleGameInProgressException(GameInProgressException ex, HttpServletResponse response) throws IOException {
+  protected void handleGameInProgressException(GameInProgressException ex,
+      HttpServletResponse response) throws IOException {
     response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
   }
 
   @ExceptionHandler(value = {GameIsFinalizedException.class})
-  protected void handleFinalizedException(GameIsFinalizedException ex, HttpServletResponse response) throws IOException {
+  protected void handleFinalizedException(GameIsFinalizedException ex, HttpServletResponse response)
+      throws IOException {
     response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
   }
 
   @ExceptionHandler(value = {SeatingException.class})
-  protected void handleSeatingException(SeatingException ex, HttpServletResponse response) throws IOException {
+  protected void handleSeatingException(SeatingException ex, HttpServletResponse response)
+      throws IOException {
     response.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
   }
 }

@@ -49,6 +49,11 @@ public class GameModuleImpl implements GameModule {
   }
 
   @Override
+  public List<Game> getByPlayerId(int playerId) {
+    return gameService.getByPlayerId(playerId);
+  }
+
+  @Override
   public List<Game> getByQuarterlySeasonId(Integer qSeasonId) {
     return gameService.getByQuarterlySeasonId(qSeasonId);
   }

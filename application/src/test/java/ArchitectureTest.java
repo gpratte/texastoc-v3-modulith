@@ -121,8 +121,8 @@ public class ArchitectureTest {
         .resideInAnyPackage("..player..", "..settings..", "..game..", "..season..", "..quarterly..",
             "..clock..")
         .should().dependOnClassesThat()
-        .resideInAnyPackage("..notification.config..", "..notification.connector..",
-            "..notification.exception..", "..notification.repository..", "..notification.service..")
+        .resideInAnyPackage("..notification.config..", "..notification.exception..",
+            "..notification.repository..", "..notification.connector..", "..notification.service..")
         .check(importedClasses);
   }
 

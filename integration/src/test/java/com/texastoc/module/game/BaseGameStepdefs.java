@@ -2,11 +2,10 @@ package com.texastoc.module.game;
 
 import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.game.model.Game;
+import java.time.LocalDate;
 import org.springframework.web.client.HttpClientErrorException;
 
-import java.time.LocalDate;
-
-public class BaseGameStepdefs extends BaseIntegrationTest {
+public abstract class BaseGameStepdefs extends BaseIntegrationTest {
 
   protected Game gameToCreate;
   protected Game gameCreated;
@@ -29,10 +28,10 @@ public class BaseGameStepdefs extends BaseIntegrationTest {
 
   protected void theGameStartsNow() throws Exception {
     gameToCreate = Game.builder()
-      .date(LocalDate.now())
-      .hostId(1)
-      .transportRequired(false)
-      .build();
+        .date(LocalDate.now())
+        .hostId(1)
+        .transportRequired(false)
+        .build();
   }
 
   protected void theGameIsCreated() throws Exception {

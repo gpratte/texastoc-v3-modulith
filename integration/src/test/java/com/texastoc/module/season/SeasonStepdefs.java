@@ -5,12 +5,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import com.texastoc.module.season.model.Season;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
-import org.junit.Before;
 
 public class SeasonStepdefs extends BaseSeasonStepdefs {
 
@@ -92,9 +92,9 @@ public class SeasonStepdefs extends BaseSeasonStepdefs {
   }
 
   private void verifySeasonCosts(Season season) throws Exception {
-    Assert.assertEquals(KITTY_PER_GAME, season.getKittyPerGame());
-    Assert.assertEquals(TOC_PER_GAME, season.getTocPerGame());
-    Assert.assertEquals(QUARTERLY_TOC_PER_GAME, season.getQuarterlyTocPerGame());
+    Assert.assertEquals(KITTY_PER_GAME, season.getKittyPerGameCost());
+    Assert.assertEquals(TOC_PER_GAME, season.getTocPerGameCost());
+    Assert.assertEquals(QUARTERLY_TOC_PER_GAME, season.getQuarterlyTocPerGameCost());
     Assert.assertEquals(QUARTERLY_NUM_PAYOUTS, season.getQuarterlyNumPayouts());
     Assert.assertEquals(GAME_BUY_IN, season.getBuyInCost());
     Assert.assertEquals(GAME_REBUY, season.getRebuyAddOnCost());
