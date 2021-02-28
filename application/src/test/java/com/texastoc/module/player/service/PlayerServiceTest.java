@@ -203,7 +203,7 @@ public class PlayerServiceTest {
     assertThatThrownBy(() -> {
       playerService.update(playersNewValues);
     }).isInstanceOf(PermissionDeniedException.class)
-        .hasMessageContaining("A player that is not an admin cannot update another player");
+        .hasMessageContaining("Admin permission required for this action");
   }
 
   @Test
@@ -332,7 +332,7 @@ public class PlayerServiceTest {
     assertThatThrownBy(() -> {
       playerService.delete(1);
     }).isInstanceOf(PermissionDeniedException.class)
-        .hasMessageContaining("A player that is not an admin cannot update another player");
+        .hasMessageContaining("Admin permission required for this action");
   }
 
   @Test
@@ -610,6 +610,6 @@ public class PlayerServiceTest {
     assertThatThrownBy(() -> {
       playerService.removeRole(1, 1);
     }).isInstanceOf(CannotRemoveRoleException.class)
-        .hasMessageContaining("Cannot remove role last role");
+        .hasMessageContaining("Cannot remove the last role for a user");
   }
 }

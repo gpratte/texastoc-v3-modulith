@@ -121,7 +121,7 @@ public class PlayerService implements PlayerModule {
 
     List<Game> games = getGameModule().getByPlayerId(id);
     if (games.size() > 0) {
-      throw new CannotDeletePlayerException("Player with ID " + id + " cannot be deleted");
+      throw new CannotDeletePlayerException(id);
     }
     playerRepository.deleteById(id);
   }
@@ -192,7 +192,7 @@ public class PlayerService implements PlayerModule {
 
     // found the role, now make sure it is not the only role
     if (existingRoles.size() < 2) {
-      throw new CannotRemoveRoleException("Cannot remove role last role");
+      throw new CannotRemoveRoleException("Cannot remove the last role for a user");
     }
 
     Set<Role> newRoles = new HashSet<>();
@@ -209,8 +209,7 @@ public class PlayerService implements PlayerModule {
   // verify the user is an admin
   private void verifyLoggedInUserIsAdmin() {
     if (!authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)) {
-      throw new PermissionDeniedException(
-          "A player that is not an admin cannot update another player");
+      throw new PermissionDeniedException();
     }
   }
 
@@ -224,8 +223,7 @@ public class PlayerService implements PlayerModule {
       }
       Player loggedInPlayer = players.get(0);
       if (loggedInPlayer.getId() != player.getId()) {
-        throw new PermissionDeniedException(
-            "A player that is not an admin cannot update another player");
+        throw new PermissionDeniedException();
       }
     }
   }

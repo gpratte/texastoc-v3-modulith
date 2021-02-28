@@ -80,7 +80,7 @@ public class GameHelper {
 
   public void checkFinalized(Game game) {
     if (game.isFinalized()) {
-      throw new GameIsFinalizedException("Game is finalized");
+      throw new GameIsFinalizedException();
     }
   }
 
