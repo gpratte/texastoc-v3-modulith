@@ -7,7 +7,6 @@ cache:
 script:
   - mvn clean
   - mvn -pl application test
-  - mvn install
 
 install:
   - mvn -N io.takari:maven:wrapper

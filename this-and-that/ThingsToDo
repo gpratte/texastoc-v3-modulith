@@ -1,9 +1,6 @@
 
 Heroku deploy
 
-Enhance error messages (details)
- For example: RestControllerAdvise - 400 when json date not correct has no info
-
 CICD
     Database versioning
 
