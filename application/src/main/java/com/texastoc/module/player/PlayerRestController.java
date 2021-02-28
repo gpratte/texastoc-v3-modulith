@@ -5,17 +5,23 @@ import com.texastoc.module.player.exception.CannotDeletePlayerException;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
 import com.texastoc.module.player.service.PlayerService;
+import java.io.IOException;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @SuppressWarnings("unused")
 @RestController
@@ -34,7 +40,8 @@ public class PlayerRestController implements PlayerModule {
   }
 
   @PutMapping("/api/v2/players/{id}")
-  public void update(@PathVariable("id") int id, @RequestBody @Valid Player player, HttpServletRequest request) {
+  public void update(@PathVariable("id") int id, @RequestBody @Valid Player player,
+      HttpServletRequest request) {
     player.setId(id);
     update(player);
   }
@@ -95,7 +102,8 @@ public class PlayerRestController implements PlayerModule {
   }
 
   @ExceptionHandler(value = {CannotDeletePlayerException.class})
-  protected void handleCannotDeletePlayerException(CannotDeletePlayerException ex, HttpServletResponse response) throws IOException {
+  protected void handleCannotDeletePlayerException(CannotDeletePlayerException ex,
+      HttpServletResponse response) throws IOException {
     response.sendError(HttpStatus.CONFLICT.value(), ex.getMessage());
   }
 
@@ -104,6 +112,7 @@ public class PlayerRestController implements PlayerModule {
   @AllArgsConstructor
   @JsonIgnoreProperties(ignoreUnknown = true)
   static class Forgot {
+
     private String email;
   }
 
@@ -112,6 +121,7 @@ public class PlayerRestController implements PlayerModule {
   @AllArgsConstructor
   @JsonIgnoreProperties(ignoreUnknown = true)
   static class Reset {
+
     private String code;
     private String password;
   }

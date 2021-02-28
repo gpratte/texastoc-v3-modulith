@@ -11,6 +11,7 @@ import org.springframework.data.annotation.Id;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SeatsPerTable {
+
   @Id
   private int id;
   private int numSeats;

@@ -7,11 +7,6 @@ import com.texastoc.module.settings.model.Payout;
 import com.texastoc.module.settings.model.Settings;
 import com.texastoc.module.settings.model.SystemSettings;
 import com.texastoc.module.settings.repository.SettingsRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Service;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -32,13 +31,14 @@ public class SettingsService implements SettingsModule {
   private Map<Integer, List<Payout>> payouts;
 
   public SettingsService(SettingsRepository settingsRepository, @Value("${payouts.fileName}")
-     String payoutsFileName) {
+      String payoutsFileName) {
     this.settingsRepository = settingsRepository;
     this.payoutsFileName = payoutsFileName;
 
     try {
-      payouts = OBJECT_MAPPER.readValue(getPayoutsAsJson(), new TypeReference<Map<Integer, List<Payout>>>() {
-      });
+      payouts = OBJECT_MAPPER
+          .readValue(getPayoutsAsJson(), new TypeReference<Map<Integer, List<Payout>>>() {
+          });
     } catch (Exception e) {
       log.warn("Could not process payouts json", e);
       payouts = new HashMap<>();
@@ -49,12 +49,14 @@ public class SettingsService implements SettingsModule {
   @Override
   public SystemSettings get() {
     Settings settings = settingsRepository.findById(1).get();
-    return new SystemSettings(settings.getId(), settings.getVersion(), settings.getTocConfigs(), payouts);
+    return new SystemSettings(settings.getId(), settings.getVersion(), settings.getTocConfigs(),
+        payouts);
   }
 
   private String getPayoutsAsJson() throws IOException {
     InputStream inputStream = new ClassPathResource(payoutsFileName).getInputStream();
-    try (BufferedReader bf = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+    try (BufferedReader bf = new BufferedReader(
+        new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
       return bf.lines().collect(Collectors.joining());
     }
   }

@@ -12,6 +12,7 @@ public class CacheConfig {
 
   @Bean
   public CacheManager cacheManager() {
-    return new ConcurrentMapCacheManager("currentGame", "currentSeason", "currentSeasonById", "points");
+    return new ConcurrentMapCacheManager("currentGame", "currentSeason", "currentSeasonById",
+        "points");
   }
 }

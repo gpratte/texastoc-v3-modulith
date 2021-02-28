@@ -1,6 +1,17 @@
 package com.texastoc.security;
 
-import io.jsonwebtoken.*;
+import static com.texastoc.security.SecurityConstants.AUTHORITIES_KEY;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -9,14 +20,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static com.texastoc.security.SecurityConstants.AUTHORITIES_KEY;
 
 @Slf4j
 @Component
@@ -44,9 +47,9 @@ public class JwtTokenProvider {
 
   private Claims getAllClaimsFromToken(String token) {
     return Jwts.parser()
-      .setSigningKey(signingKey)
-      .parseClaimsJws(token)
-      .getBody();
+        .setSigningKey(signingKey)
+        .parseClaimsJws(token)
+        .getBody();
   }
 
   private Boolean isTokenExpired(String token) {
@@ -56,15 +59,15 @@ public class JwtTokenProvider {
 
   public String generateToken(Authentication authentication) {
     final String authorities = authentication.getAuthorities().stream()
-      .map(GrantedAuthority::getAuthority)
-      .collect(Collectors.joining(","));
+        .map(GrantedAuthority::getAuthority)
+        .collect(Collectors.joining(","));
     return Jwts.builder()
-      .setSubject(authentication.getName())
-      .claim(AUTHORITIES_KEY, authorities)
-      .signWith(SignatureAlgorithm.HS256, signingKey)
-      .setIssuedAt(new Date(System.currentTimeMillis()))
-      .setExpiration(new Date(System.currentTimeMillis() + expireMinutes * 60 * 1000))
-      .compact();
+        .setSubject(authentication.getName())
+        .claim(AUTHORITIES_KEY, authorities)
+        .signWith(SignatureAlgorithm.HS256, signingKey)
+        .setIssuedAt(new Date(System.currentTimeMillis()))
+        .setExpiration(new Date(System.currentTimeMillis() + expireMinutes * 60 * 1000))
+        .compact();
   }
 
   public Boolean validateToken(String token, UserDetails userDetails) {
@@ -72,7 +75,8 @@ public class JwtTokenProvider {
     return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
   }
 
-  UsernamePasswordAuthenticationToken getAuthentication(final String token, final UserDetails userDetails) {
+  UsernamePasswordAuthenticationToken getAuthentication(final String token,
+      final UserDetails userDetails) {
 
     final JwtParser jwtParser = Jwts.parser().setSigningKey(signingKey);
 
@@ -81,9 +85,9 @@ public class JwtTokenProvider {
     final Claims claims = claimsJws.getBody();
 
     final Collection<? extends GrantedAuthority> authorities =
-      Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-        .map(SimpleGrantedAuthority::new)
-        .collect(Collectors.toList());
+        Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+            .map(SimpleGrantedAuthority::new)
+            .collect(Collectors.toList());
     return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
   }
 

@@ -1,14 +1,13 @@
 package com.texastoc.module.clock;
 
+import com.texastoc.module.clock.service.ClockService;
 import com.texastoc.module.game.model.clock.Clock;
 import com.texastoc.module.game.model.clock.Round;
-import com.texastoc.module.clock.service.ClockService;
+import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 public class ClockRestController {

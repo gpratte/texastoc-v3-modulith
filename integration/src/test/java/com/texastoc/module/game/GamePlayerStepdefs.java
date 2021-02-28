@@ -1,17 +1,16 @@
 package com.texastoc.module.game;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import com.texastoc.module.game.model.GamePlayer;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-
 import java.util.LinkedList;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class GamePlayerStepdefs extends BaseGameStepdefs {
 
@@ -37,9 +36,9 @@ public class GamePlayerStepdefs extends BaseGameStepdefs {
   @And("^a player is added with nothing set$")
   public void aPlayerIsAddedWithNothingSet() throws Exception {
     GamePlayer gamePlayer = GamePlayer.builder()
-      .playerId(GUEST_USER_PLAYER_ID)
-      .gameId(gameId)
-      .build();
+        .playerId(GUEST_USER_PLAYER_ID)
+        .gameId(gameId)
+        .build();
 
     String token = login(USER_EMAIL, USER_PASSWORD);
     gamePlayers.add(addPlayerToGame(gamePlayer, token));
@@ -48,17 +47,17 @@ public class GamePlayerStepdefs extends BaseGameStepdefs {
   @And("^a player is added with everything set$")
   public void aPlayerIsAddedWithEverythingSet() throws Exception {
     GamePlayer gamePlayer = GamePlayer.builder()
-      .playerId(GUEST_USER_PLAYER_ID)
-      .gameId(gameId)
-      .boughtIn(true)
-      .rebought(true)
-      .annualTocParticipant(true)
-      .quarterlyTocParticipant(true)
-      .knockedOut(true)
-      .roundUpdates(true)
-      .chop(111)
-      .place(1)
-      .build();
+        .playerId(GUEST_USER_PLAYER_ID)
+        .gameId(gameId)
+        .boughtIn(true)
+        .rebought(true)
+        .annualTocParticipant(true)
+        .quarterlyTocParticipant(true)
+        .knockedOut(true)
+        .roundUpdates(true)
+        .chop(111)
+        .place(1)
+        .build();
 
     String token = login(USER_EMAIL, USER_PASSWORD);
     gamePlayers.add(addPlayerToGame(gamePlayer, token));
@@ -67,20 +66,20 @@ public class GamePlayerStepdefs extends BaseGameStepdefs {
   @And("^a first time player is added with everything set$")
   public void aFirstTimePlayerIsAddedWithEverythingSet() throws Exception {
     GamePlayer gamePlayer = GamePlayer.builder()
-      .playerId(GUEST_USER_PLAYER_ID)
-      .firstName("first")
-      .lastName("last")
-      .email("firstlast@example.com")
-      .gameId(gameId)
-      .boughtIn(true)
-      .rebought(true)
-      .annualTocParticipant(true)
-      .quarterlyTocParticipant(true)
-      .knockedOut(true)
-      .roundUpdates(true)
-      .chop(111)
-      .place(1)
-      .build();
+        .playerId(GUEST_USER_PLAYER_ID)
+        .firstName("first")
+        .lastName("last")
+        .email("firstlast@example.com")
+        .gameId(gameId)
+        .boughtIn(true)
+        .rebought(true)
+        .annualTocParticipant(true)
+        .quarterlyTocParticipant(true)
+        .knockedOut(true)
+        .roundUpdates(true)
+        .chop(111)
+        .place(1)
+        .build();
 
     String token = login(USER_EMAIL, USER_PASSWORD);
     gamePlayers.add(addPlayerToGame(gamePlayer, token));
@@ -89,11 +88,11 @@ public class GamePlayerStepdefs extends BaseGameStepdefs {
   @And("^a first time player is added with nothing set$")
   public void aFirstTimePlayerIsAddedWithNothingSet() throws Exception {
     GamePlayer gamePlayer = GamePlayer.builder()
-      .firstName("first")
-      .lastName("last")
-      .email("firstlast@example.com")
-      .gameId(gameId)
-      .build();
+        .firstName("first")
+        .lastName("last")
+        .email("firstlast@example.com")
+        .gameId(gameId)
+        .build();
 
     String token = login(USER_EMAIL, USER_PASSWORD);
     gamePlayers.add(addPlayerToGame(gamePlayer, token));
@@ -136,7 +135,8 @@ public class GamePlayerStepdefs extends BaseGameStepdefs {
       assertFalse("bought-in should be false", gamePlayer.isBoughtIn());
       assertFalse("rebought should be false", gamePlayer.isRebought());
       assertFalse("annual toc participant should be false", gamePlayer.isAnnualTocParticipant());
-      assertFalse("quarterly toc participant should be false", gamePlayer.isQuarterlyTocParticipant());
+      assertFalse("quarterly toc participant should be false",
+          gamePlayer.isQuarterlyTocParticipant());
       assertFalse("knocked out should be false", gamePlayer.isKnockedOut());
       assertFalse("round updates should be false", gamePlayer.isRoundUpdates());
     }
@@ -148,13 +148,15 @@ public class GamePlayerStepdefs extends BaseGameStepdefs {
       assertFalse("bought-in should be false", gamePlayer.isBoughtIn());
       assertFalse("rebought should be false", gamePlayer.isRebought());
       assertFalse("annual toc participant be false", gamePlayer.isAnnualTocParticipant());
-      assertFalse("quarterly toc participant should be false", gamePlayer.isQuarterlyTocParticipant());
+      assertFalse("quarterly toc participant should be false",
+          gamePlayer.isQuarterlyTocParticipant());
       assertFalse("knocked out should be false", gamePlayer.isKnockedOut());
       assertFalse("round updates should be false", gamePlayer.isRoundUpdates());
       assertEquals("first name should be first", "first", gamePlayer.getFirstName());
       assertEquals("last name should be last", "last", gamePlayer.getLastName());
       assertEquals("name should be first last", "first last", gamePlayer.getName());
-      assertEquals("email should be firstlast@example.com", "firstlast@example.com", gamePlayer.getEmail());
+      assertEquals("email should be firstlast@example.com", "firstlast@example.com",
+          gamePlayer.getEmail());
     }
   }
 
@@ -164,7 +166,8 @@ public class GamePlayerStepdefs extends BaseGameStepdefs {
       assertTrue("bought-in should be true", gamePlayer.isBoughtIn());
       assertTrue("rebought should be true", gamePlayer.isRebought());
       assertTrue("annual toc participant be true", gamePlayer.isAnnualTocParticipant());
-      assertTrue("quarterly toc participant should be true", gamePlayer.isQuarterlyTocParticipant());
+      assertTrue("quarterly toc participant should be true",
+          gamePlayer.isQuarterlyTocParticipant());
       assertTrue("knocked out should be true", gamePlayer.isKnockedOut());
       assertTrue("round updates should be true", gamePlayer.isRoundUpdates());
       assertEquals("chop should be 111", 111, gamePlayer.getChop().intValue());
@@ -178,14 +181,16 @@ public class GamePlayerStepdefs extends BaseGameStepdefs {
       assertTrue("bought-in should be true", gamePlayer.isBoughtIn());
       assertTrue("rebought should be true", gamePlayer.isRebought());
       assertTrue("annual toc participant be true", gamePlayer.isAnnualTocParticipant());
-      assertTrue("quarterly toc participant should be true", gamePlayer.isQuarterlyTocParticipant());
+      assertTrue("quarterly toc participant should be true",
+          gamePlayer.isQuarterlyTocParticipant());
       assertTrue("knocked out should be true", gamePlayer.isKnockedOut());
       assertTrue("round updates should be true", gamePlayer.isRoundUpdates());
       assertEquals("chop should be 111", 111, gamePlayer.getChop().intValue());
       assertEquals("place should be 1", 1, gamePlayer.getPlace().intValue());
       assertEquals("last name should be last", "last", gamePlayer.getLastName());
       assertEquals("name should be first last", "first last", gamePlayer.getName());
-      assertEquals("email should be firstlast@example.com", "firstlast@example.com", gamePlayer.getEmail());
+      assertEquals("email should be firstlast@example.com", "firstlast@example.com",
+          gamePlayer.getEmail());
     }
   }
 

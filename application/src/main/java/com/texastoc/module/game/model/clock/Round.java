@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class Round {
+
   private String name;
   private int smallBlind;
   private int bigBlind;

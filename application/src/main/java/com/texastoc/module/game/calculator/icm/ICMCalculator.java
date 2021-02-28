@@ -14,6 +14,7 @@ import java.util.UUID;
  * See https://github.com/gpratte/icm-calculator
  */
 public class ICMCalculator {
+
   /**
    * Entry point to calculate the ICM
    *
@@ -51,7 +52,8 @@ public class ICMCalculator {
   }
 
   // Figure out what percent each player gets by comparing chip stacks
-  static void calculateProbabilities(List<String> stackIds, Map<String, List<Double>> stackProbabilities) {
+  static void calculateProbabilities(List<String> stackIds,
+      Map<String, List<Double>> stackProbabilities) {
     int sumAllStacks = sumAllStacks(stackIds);
 
     int numStacks = stackIds.size();
@@ -66,7 +68,8 @@ public class ICMCalculator {
         // which is needed for input for the Malmuth-Harville equation.
         List<List<String>> paths = Malmuth_Harville.rankings(stackIds, place);
         // Calculate the probability of coming in the place
-        double probablityForPlace = Malmuth_Harville.calculateProbabilityForPlace(stackId, sumAllStacks, paths);
+        double probablityForPlace = Malmuth_Harville
+            .calculateProbabilityForPlace(stackId, sumAllStacks, paths);
         // Store the probability
         stackProbabilities.get(stackId).add(probablityForPlace);
       }
@@ -76,7 +79,8 @@ public class ICMCalculator {
   }
 
   // Sum up each player's percent of each amount
-  static List<Double> calculateAmounts(List<Integer> amounts, Map<String, List<Double>> stackProbabilities) {
+  static List<Double> calculateAmounts(List<Integer> amounts,
+      Map<String, List<Double>> stackProbabilities) {
     List<Double> icmAmounts = new LinkedList<>();
 
     for (String stack : stackProbabilities.keySet()) {
@@ -98,8 +102,8 @@ public class ICMCalculator {
   // Add up all the stacks
   static Integer sumAllStacks(List<String> stacks) {
     return stacks.stream()
-      .mapToInt(ICMCalculator::stackToInt)
-      .sum();
+        .mapToInt(ICMCalculator::stackToInt)
+        .sum();
   }
 
   // Convert the stack with the unique identifier back to the number of chips

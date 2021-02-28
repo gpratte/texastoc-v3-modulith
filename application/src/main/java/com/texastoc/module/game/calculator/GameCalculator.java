@@ -3,9 +3,8 @@ package com.texastoc.module.game.calculator;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.repository.GameRepository;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
+import org.springframework.stereotype.Component;
 
 @Component
 public class GameCalculator {
@@ -37,7 +36,8 @@ public class GameCalculator {
         }
         rebuyAddOnCollected += gamePlayer.isRebought() ? game.getRebuyAddOnCost() : 0;
         annualTocCollected += gamePlayer.isAnnualTocParticipant() ? game.getAnnualTocCost() : 0;
-        quarterlyTocCollected += gamePlayer.isQuarterlyTocParticipant() ? game.getQuarterlyTocCost() : 0;
+        quarterlyTocCollected +=
+            gamePlayer.isQuarterlyTocParticipant() ? game.getQuarterlyTocCost() : 0;
         if (gamePlayer.isAnnualTocParticipant() && gamePlayer.isRebought()) {
           annualTocFromRebuyAddOnCalculated += game.getRebuyAddOnTocDebitCost();
         }
@@ -58,13 +58,16 @@ public class GameCalculator {
     game.setAnnualTocCollected(annualTocCollected);
     game.setQuarterlyTocCollected(quarterlyTocCollected);
     game.setChopped(chopped);
-  
-    totalCollected += buyInCollected + rebuyAddOnCollected + annualTocCollected + quarterlyTocCollected;
+
+    totalCollected +=
+        buyInCollected + rebuyAddOnCollected + annualTocCollected + quarterlyTocCollected;
     game.setTotalCollected(totalCollected);
     game.setKittyCalculated(kittyCalculated);
     game.setAnnualTocFromRebuyAddOnCalculated(annualTocFromRebuyAddOnCalculated);
-    game.setRebuyAddOnLessAnnualTocCalculated(rebuyAddOnCollected - annualTocFromRebuyAddOnCalculated);
-    int totalTocCalculated = annualTocCollected + quarterlyTocCollected + annualTocFromRebuyAddOnCalculated;
+    game.setRebuyAddOnLessAnnualTocCalculated(
+        rebuyAddOnCollected - annualTocFromRebuyAddOnCalculated);
+    int totalTocCalculated =
+        annualTocCollected + quarterlyTocCollected + annualTocFromRebuyAddOnCalculated;
     game.setTotalCombinedTocCalculated(totalTocCalculated);
 
     // prizePot = total collected minus total toc minus kitty

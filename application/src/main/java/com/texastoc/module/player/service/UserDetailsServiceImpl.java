@@ -2,16 +2,15 @@ package com.texastoc.module.player.service;
 
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.repository.PlayerRepository;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {

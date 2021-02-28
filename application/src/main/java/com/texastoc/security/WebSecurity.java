@@ -23,8 +23,9 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final JwtTokenProvider jwtTokenProvider;
 
-  public WebSecurity(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder,
-                     JwtTokenProvider jwtTokenProvider) {
+  public WebSecurity(UserDetailsServiceImpl userDetailsService,
+      BCryptPasswordEncoder bCryptPasswordEncoder,
+      JwtTokenProvider jwtTokenProvider) {
     this.userDetailsService = userDetailsService;
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     this.jwtTokenProvider = jwtTokenProvider;
@@ -34,23 +35,24 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     // @formatter:off
     http.cors().and()
-      .csrf().disable()
-      .headers().frameOptions().sameOrigin().and()
-      .authorizeRequests()
-      .antMatchers(HttpMethod.POST, "/login").permitAll()
-      .antMatchers(HttpMethod.GET, "/api/v2/settings").permitAll()
-      .antMatchers(HttpMethod.POST, "/password/reset").permitAll()
-      .antMatchers("/socket").permitAll()
-      .antMatchers("/socket/**").permitAll()
-      .antMatchers("/h2-console").permitAll()
-      .antMatchers("/h2-console/*").permitAll()
-      .antMatchers("/actuator/*").permitAll()
-      .antMatchers("/v2/api-docs").permitAll()
-      .anyRequest().authenticated().and()
-      .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider))
-      .addFilter(new JwtAuthorizationFilter(authenticationManager(), jwtTokenProvider, userDetailsService))
-      // this disables session creation on Spring Security
-      .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        .csrf().disable()
+        .headers().frameOptions().sameOrigin().and()
+        .authorizeRequests()
+        .antMatchers(HttpMethod.POST, "/login").permitAll()
+        .antMatchers(HttpMethod.GET, "/api/v2/settings").permitAll()
+        .antMatchers(HttpMethod.POST, "/password/reset").permitAll()
+        .antMatchers("/socket").permitAll()
+        .antMatchers("/socket/**").permitAll()
+        .antMatchers("/h2-console").permitAll()
+        .antMatchers("/h2-console/*").permitAll()
+        .antMatchers("/actuator/*").permitAll()
+        .antMatchers("/v2/api-docs").permitAll()
+        .anyRequest().authenticated().and()
+        .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider))
+        .addFilter(new JwtAuthorizationFilter(authenticationManager(), jwtTokenProvider,
+            userDetailsService))
+        // this disables session creation on Spring Security
+        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     // @formatter:on
   }
 

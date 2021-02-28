@@ -1,5 +1,11 @@
 package com.texastoc.module.player;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.player.model.Player;
@@ -8,19 +14,12 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
-
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
 public class PlayerStepdefs extends BaseIntegrationTest {
 
@@ -49,36 +48,36 @@ public class PlayerStepdefs extends BaseIntegrationTest {
   @Given("^a new player$")
   public void a_new_player() throws Exception {
     playerToCreate = Player.builder()
-      .firstName("John")
-      .lastName("Luther")
-      .email(UUID.randomUUID() + "@bbc.com")
-      // 2732833 = created on the phone keyboard
-      .phone("2732833")
-      .password("password")
-      .build();
+        .firstName("John")
+        .lastName("Luther")
+        .email(UUID.randomUUID() + "@bbc.com")
+        // 2732833 = created on the phone keyboard
+        .phone("2732833")
+        .password("password")
+        .build();
     playerCreated = createPlayer(playerToCreate, login(ADMIN_EMAIL, ADMIN_PASSWORD));
   }
 
   @Given("^another new player$")
   public void anotherNewPlayer() throws Exception {
     anotherPlayerToCreate = Player.builder()
-      .firstName("Jane")
-      .lastName("Rain")
-      .build();
+        .firstName("Jane")
+        .lastName("Rain")
+        .build();
     anotherPlayerCreated = createPlayer(anotherPlayerToCreate, login(ADMIN_EMAIL, ADMIN_PASSWORD));
   }
 
   @When("^the (admin|non-admin) updates the player$")
   public void updatePlayer(String who) throws Exception {
     updatePlayer = Player.builder()
-      .id(playerCreated.getId())
-      .firstName("updated_" + playerCreated.getFirstName())
-      .lastName("updated_" + playerCreated.getLastName())
-      .email("updated_" + playerCreated.getEmail())
-      // 8732833 = updated on phone keyboard
-      .phone("8732833z")
-      .password("updated_" + "password")
-      .build();
+        .id(playerCreated.getId())
+        .firstName("updated_" + playerCreated.getFirstName())
+        .lastName("updated_" + playerCreated.getLastName())
+        .email("updated_" + playerCreated.getEmail())
+        // 8732833 = updated on phone keyboard
+        .phone("8732833z")
+        .password("updated_" + "password")
+        .build();
 
     String token = getToken(who);
     try {
@@ -113,9 +112,9 @@ public class PlayerStepdefs extends BaseIntegrationTest {
     String token = getToken(who);
     try {
       addRole(playerCreated.getId(), Role.builder()
-          .type(Role.Type.ADMIN)
-          .build(),
-        token);
+              .type(Role.Type.ADMIN)
+              .build(),
+          token);
     } catch (Exception e) {
       exception = e;
     }
@@ -125,8 +124,8 @@ public class PlayerStepdefs extends BaseIntegrationTest {
   public void removeRole(String who) throws Exception {
     String token = getToken(who);
     Role role = StreamSupport.stream(playerRetrieved.getRoles().spliterator(), false)
-      .filter(r -> r.getType() == Role.Type.ADMIN)
-      .findFirst().get();
+        .filter(r -> r.getType() == Role.Type.ADMIN)
+        .findFirst().get();
 
     try {
       removeRole(playerCreated.getId(), role.getId(), token);
@@ -153,14 +152,16 @@ public class PlayerStepdefs extends BaseIntegrationTest {
 
   @Then("^the player has one role$")
   public void playerHasOneRole() throws Exception {
-    List<Role> roles = StreamSupport.stream(playerRetrieved.getRoles().spliterator(), false).collect(Collectors.toList());
+    List<Role> roles = StreamSupport.stream(playerRetrieved.getRoles().spliterator(), false)
+        .collect(Collectors.toList());
     assertEquals("should only have one role", 1, roles.size());
     assertEquals("should be USER role", Role.Type.USER, roles.get(0).getType());
   }
 
   @Then("^the player has two roles$")
   public void playerHasTwoRoles() throws Exception {
-    List<Role> roles = StreamSupport.stream(playerRetrieved.getRoles().spliterator(), false).collect(Collectors.toList());
+    List<Role> roles = StreamSupport.stream(playerRetrieved.getRoles().spliterator(), false)
+        .collect(Collectors.toList());
     assertEquals("should only have two roles", 2, roles.size());
     List<Role.Type> types = roles.stream().map(Role::getType).collect(Collectors.toList());
     assertThat(types).containsExactlyInAnyOrder(Role.Type.USER, Role.Type.ADMIN);
@@ -169,15 +170,17 @@ public class PlayerStepdefs extends BaseIntegrationTest {
 
   @Then("^a forbidden error happens$")
   public void checkForbidden() throws Exception {
-    assertTrue("exception should be HttpClientErrorException", (exception instanceof HttpClientErrorException));
-    HttpClientErrorException e = (HttpClientErrorException)exception;
+    assertTrue("exception should be HttpClientErrorException",
+        (exception instanceof HttpClientErrorException));
+    HttpClientErrorException e = (HttpClientErrorException) exception;
     assertEquals("status should be forbidden", HttpStatus.FORBIDDEN, e.getStatusCode());
   }
 
   @Then("^a not found error happens$")
   public void checkNotFound() throws Exception {
-    assertTrue("exception should be HttpClientErrorException", (exception instanceof HttpClientErrorException));
-    HttpClientErrorException e = (HttpClientErrorException)exception;
+    assertTrue("exception should be HttpClientErrorException",
+        (exception instanceof HttpClientErrorException));
+    HttpClientErrorException e = (HttpClientErrorException) exception;
     assertEquals("status should be not found", HttpStatus.NOT_FOUND, e.getStatusCode());
   }
 
@@ -189,7 +192,8 @@ public class PlayerStepdefs extends BaseIntegrationTest {
     assertNull("password should be null", response.getPassword());
     assertEquals("should only have one role", 1, response.getRoles().size());
 
-    List<Role> roles = StreamSupport.stream(response.getRoles().spliterator(), false).collect(Collectors.toList());
+    List<Role> roles = StreamSupport.stream(response.getRoles().spliterator(), false)
+        .collect(Collectors.toList());
     assertEquals("should only have one role", 1, roles.size());
     assertEquals("should be USER role", Role.Type.USER, roles.get(0).getType());
   }
@@ -199,7 +203,8 @@ public class PlayerStepdefs extends BaseIntegrationTest {
     boolean firstMatch = false;
     for (Player player : playersRetrieved) {
       if (player.getId() == playerCreated.getId()) {
-        assertEquals("first name should match", playerToCreate.getFirstName(), player.getFirstName());
+        assertEquals("first name should match", playerToCreate.getFirstName(),
+            player.getFirstName());
         assertEquals("last name should match", playerToCreate.getLastName(), player.getLastName());
         firstMatch = true;
       }
@@ -209,8 +214,10 @@ public class PlayerStepdefs extends BaseIntegrationTest {
     boolean secondMatch = false;
     for (Player player : playersRetrieved) {
       if (player.getId() == anotherPlayerCreated.getId()) {
-        assertEquals("first name should match", anotherPlayerToCreate.getFirstName(), player.getFirstName());
-        assertEquals("last name should match", anotherPlayerToCreate.getLastName(), player.getLastName());
+        assertEquals("first name should match", anotherPlayerToCreate.getFirstName(),
+            player.getFirstName());
+        assertEquals("last name should match", anotherPlayerToCreate.getLastName(),
+            player.getLastName());
         secondMatch = true;
       }
     }

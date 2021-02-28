@@ -1,5 +1,8 @@
 package com.texastoc.module.settings;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.settings.model.Payout;
 import com.texastoc.module.settings.model.SystemSettings;
@@ -7,11 +10,7 @@ import com.texastoc.module.settings.model.TocConfig;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class SettingsStepdefs extends BaseIntegrationTest {
 
