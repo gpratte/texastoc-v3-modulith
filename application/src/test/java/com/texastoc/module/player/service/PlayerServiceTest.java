@@ -1,29 +1,5 @@
 package com.texastoc.module.player.service;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.texastoc.common.AuthorizationHelper;
-import com.texastoc.exception.NotFoundException;
-import com.texastoc.exception.PermissionDeniedException;
-import com.texastoc.module.notification.NotificationModule;
-import com.texastoc.module.player.exception.CannotRemoveRoleException;
-import com.texastoc.module.player.model.Player;
-import com.texastoc.module.player.model.Role;
-import com.texastoc.module.player.repository.PlayerRepository;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
@@ -36,6 +12,32 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.texastoc.common.AuthorizationHelper;
+import com.texastoc.exception.NotFoundException;
+import com.texastoc.exception.PermissionDeniedException;
+import com.texastoc.module.game.GameModule;
+import com.texastoc.module.game.model.Game;
+import com.texastoc.module.notification.NotificationModule;
+import com.texastoc.module.player.exception.CannotDeletePlayerException;
+import com.texastoc.module.player.exception.CannotRemoveRoleException;
+import com.texastoc.module.player.model.Player;
+import com.texastoc.module.player.model.Role;
+import com.texastoc.module.player.repository.PlayerRepository;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
+
 public class PlayerServiceTest {
 
   private PlayerService playerService;
@@ -43,24 +45,29 @@ public class PlayerServiceTest {
   private BCryptPasswordEncoder bCryptPasswordEncoder;
   private AuthorizationHelper authorizationHelper;
 
+  private GameModule gameModule;
+
   @Before
   public void before() {
     bCryptPasswordEncoder = mock(BCryptPasswordEncoder.class);
     playerRepository = mock(PlayerRepository.class);
     authorizationHelper = mock(AuthorizationHelper.class);
     playerService = new PlayerService(playerRepository, bCryptPasswordEncoder, authorizationHelper);
+
+    gameModule = mock(GameModule.class);
+    ReflectionTestUtils.setField(playerService, "gameModule", gameModule);
   }
 
   @Test
   public void testCreatePlayer() {
     // Arrange
     Player expected = Player.builder()
-      .firstName("bobs")
-      .lastName("youruncle")
-      .phone("1234567890")
-      .email("abc@xyz.com")
-      .password("password")
-      .build();
+        .firstName("bobs")
+        .lastName("youruncle")
+        .phone("1234567890")
+        .email("abc@xyz.com")
+        .password("password")
+        .build();
 
     when(playerRepository.save((Player) notNull())).thenReturn(Player.builder().id(1).build());
 
@@ -80,8 +87,8 @@ public class PlayerServiceTest {
     assertEquals("1234567890", param.getPhone());
     assertEquals("abc@xyz.com", param.getEmail());
     assertThat(param.getRoles()).containsExactly(Role.builder()
-      .type(Role.Type.USER)
-      .build());
+        .type(Role.Type.USER)
+        .build());
   }
 
   @Test
@@ -97,36 +104,38 @@ public class PlayerServiceTest {
   private void testUpdate(Role.Type roleType) {
     // Arrange
     Role existingRole = Role.builder()
-      .id(1)
-      .type(Role.Type.USER)
-      .build();
+        .id(1)
+        .type(Role.Type.USER)
+        .build();
     Player existingPlayer = Player.builder()
-      .id(1)
-      .firstName("existingFirstName")
-      .lastName("existingLastName")
-      .email("existing@xyz.com")
-      .phone("existingPhone")
-      .password("existingEncodedPassword")
-      .roles(ImmutableSet.of(existingRole))
-      .build();
-    when(playerRepository.findById(ArgumentMatchers.eq(1))).thenReturn(java.util.Optional.ofNullable(existingPlayer));
+        .id(1)
+        .firstName("existingFirstName")
+        .lastName("existingLastName")
+        .email("existing@xyz.com")
+        .phone("existingPhone")
+        .password("existingEncodedPassword")
+        .roles(ImmutableSet.of(existingRole))
+        .build();
+    when(playerRepository.findById(ArgumentMatchers.eq(1)))
+        .thenReturn(java.util.Optional.ofNullable(existingPlayer));
 
     Player playersNewValues = Player.builder()
-      .id(1)
-      .firstName("updatedFirstName")
-      .lastName("updatedLastName")
-      .email("updated@xyz.com")
-      .phone("updatedPhone")
-      .password("updatedPassword") // will be ignored
-      .roles(ImmutableSet.of(Role.builder() // will be ignored
-        .type(Role.Type.ADMIN)
-        .build()))
-      .build();
+        .id(1)
+        .firstName("updatedFirstName")
+        .lastName("updatedLastName")
+        .email("updated@xyz.com")
+        .phone("updatedPhone")
+        .password("updatedPassword") // will be ignored
+        .roles(ImmutableSet.of(Role.builder() // will be ignored
+            .type(Role.Type.ADMIN)
+            .build()))
+        .build();
 
     // mock out to pass the authorization check
     if (roleType == Role.Type.USER) {
       when(authorizationHelper.getLoggedInUserEmail()).thenReturn("existing@xyz.com");
-      when(playerRepository.findByEmail("existing@xyz.com")).thenReturn(ImmutableList.of(existingPlayer));
+      when(playerRepository.findByEmail("existing@xyz.com"))
+          .thenReturn(ImmutableList.of(existingPlayer));
     } else {
       when(authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)).thenReturn(true);
     }
@@ -157,57 +166,59 @@ public class PlayerServiceTest {
   public void testUpdateNotAllowed() {
     // Arrange
     Role existingRole = Role.builder()
-      .id(1)
-      .type(Role.Type.USER)
-      .build();
+        .id(1)
+        .type(Role.Type.USER)
+        .build();
     Player existingPlayer = Player.builder()
-      .id(1)
-      .firstName("existingFirstName")
-      .lastName("existingLastName")
-      .email("existing@xyz.com")
-      .phone("existingPhone")
-      .password("existingEncodedPassword")
-      .roles(ImmutableSet.of(existingRole))
-      .build();
-    when(playerRepository.findById(ArgumentMatchers.eq(1))).thenReturn(java.util.Optional.ofNullable(existingPlayer));
+        .id(1)
+        .firstName("existingFirstName")
+        .lastName("existingLastName")
+        .email("existing@xyz.com")
+        .phone("existingPhone")
+        .password("existingEncodedPassword")
+        .roles(ImmutableSet.of(existingRole))
+        .build();
+    when(playerRepository.findById(ArgumentMatchers.eq(1)))
+        .thenReturn(java.util.Optional.ofNullable(existingPlayer));
 
     // different user
     Player playersNewValues = Player.builder()
-      .id(2)
-      .firstName("updatedFirstName")
-      .lastName("updatedLastName")
-      .email("updated@xyz.com")
-      .phone("updatedPhone")
-      .password("updatedPassword") // will be ignored
-      .roles(ImmutableSet.of(Role.builder() // will be ignored
-        .type(Role.Type.ADMIN)
-        .build()))
-      .build();
+        .id(2)
+        .firstName("updatedFirstName")
+        .lastName("updatedLastName")
+        .email("updated@xyz.com")
+        .phone("updatedPhone")
+        .password("updatedPassword") // will be ignored
+        .roles(ImmutableSet.of(Role.builder() // will be ignored
+            .type(Role.Type.ADMIN)
+            .build()))
+        .build();
 
     // mock out authorization check
     when(authorizationHelper.getLoggedInUserEmail()).thenReturn("existing@xyz.com");
-    when(playerRepository.findByEmail("existing@xyz.com")).thenReturn(ImmutableList.of(existingPlayer));
+    when(playerRepository.findByEmail("existing@xyz.com"))
+        .thenReturn(ImmutableList.of(existingPlayer));
 
     // Act
     assertThatThrownBy(() -> {
       playerService.update(playersNewValues);
     }).isInstanceOf(PermissionDeniedException.class)
-      .hasMessageContaining("A player that is not an admin cannot update another player");
+        .hasMessageContaining("A player that is not an admin cannot update another player");
   }
 
   @Test
   public void testGetAll() {
     // Arrange
     Player player2 = Player.builder()
-      .id(1)
-      .firstName("firstName2")
-      .lastName("lastName2")
-      .build();
+        .id(1)
+        .firstName("firstName2")
+        .lastName("lastName2")
+        .build();
     Player player1 = Player.builder()
-      .id(1)
-      .firstName("firstName1")
-      .lastName("lastName1")
-      .build();
+        .id(1)
+        .firstName("firstName1")
+        .lastName("lastName1")
+        .build();
     when(playerRepository.findAll()).thenReturn(ImmutableSet.of(player2, player1));
 
     // Act
@@ -229,17 +240,17 @@ public class PlayerServiceTest {
     assertThatThrownBy(() -> {
       playerService.get(123);
     }).isInstanceOf(NotFoundException.class)
-      .hasMessageContaining("Player with id 123 not found");
+        .hasMessageContaining("Player with id 123 not found");
   }
 
   @Test
   public void testGetFound() {
     // Arrange
     Player player = Player.builder()
-      .id(1)
-      .firstName("firstName1")
-      .lastName("lastName1")
-      .build();
+        .id(1)
+        .firstName("firstName1")
+        .lastName("lastName1")
+        .build();
     when(playerRepository.findById(1)).thenReturn(Optional.of(player));
 
     // Act
@@ -258,7 +269,7 @@ public class PlayerServiceTest {
     assertThatThrownBy(() -> {
       playerService.getByEmail("abc");
     }).isInstanceOf(NotFoundException.class)
-      .hasMessageStartingWith("Could not find player with email");
+        .hasMessageStartingWith("Could not find player with email");
   }
 
   @Test
@@ -266,11 +277,11 @@ public class PlayerServiceTest {
     // Arrange
     String email = "abc@def.com";
     Player player = Player.builder()
-      .id(1)
-      .firstName("firstName1")
-      .lastName("lastName1")
-      .email(email)
-      .build();
+        .id(1)
+        .firstName("firstName1")
+        .lastName("lastName1")
+        .email(email)
+        .build();
     when(playerRepository.findByEmail(email)).thenReturn(ImmutableList.of(player));
 
     // Act
@@ -286,12 +297,29 @@ public class PlayerServiceTest {
     // Arrange
     // mock out to pass the authorization check
     when(authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)).thenReturn(true);
+    // mock out no games for the player
+    when(gameModule.getByPlayerId(1)).thenReturn(Collections.emptyList());
 
     // Act
     playerService.delete(1);
 
     // Assert
     Mockito.verify(playerRepository, Mockito.times(1)).deleteById(1);
+  }
+
+  @Test
+  public void testCannotDeletePlayer() {
+    // Arrange
+    // mock out to pass the authorization check
+    when(authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)).thenReturn(true);
+    // mock out one game for the player
+    when(gameModule.getByPlayerId(1)).thenReturn(Collections.singletonList(Game.builder().build()));
+
+    // Act
+    assertThatThrownBy(() -> {
+      playerService.delete(1);
+    }).isInstanceOf(CannotDeletePlayerException.class)
+        .hasMessageContaining("Player with ID 1 cannot be deleted");
   }
 
   @Test
@@ -304,7 +332,7 @@ public class PlayerServiceTest {
     assertThatThrownBy(() -> {
       playerService.delete(1);
     }).isInstanceOf(PermissionDeniedException.class)
-      .hasMessageContaining("A player that is not an admin cannot update another player");
+        .hasMessageContaining("A player that is not an admin cannot update another player");
   }
 
   @Test
@@ -338,11 +366,11 @@ public class PlayerServiceTest {
     System.out.println(code);
 
     Player player = Player.builder()
-      .id(1)
-      .firstName("firstName1")
-      .lastName("lastName1")
-      .email(email)
-      .build();
+        .id(1)
+        .firstName("firstName1")
+        .lastName("lastName1")
+        .email(email)
+        .build();
     when(playerRepository.findByEmail(email)).thenReturn(ImmutableList.of(player));
 
     // Act
@@ -371,13 +399,12 @@ public class PlayerServiceTest {
     String code = argument.getAllValues().get(0);
 
     Player player = Player.builder()
-      .id(1)
-      .firstName("firstName1")
-      .lastName("lastName1")
-      .email(email)
-      .build();
+        .id(1)
+        .firstName("firstName1")
+        .lastName("lastName1")
+        .email(email)
+        .build();
     when(playerRepository.findByEmail(email)).thenReturn(ImmutableList.of(player));
-
 
     // Act
     playerService.resetPassword(code, password);
@@ -386,36 +413,37 @@ public class PlayerServiceTest {
     assertThatThrownBy(() -> {
       playerService.resetPassword(code, password);
     }).isInstanceOf(NotFoundException.class)
-      .hasMessageContaining("No code found");
+        .hasMessageContaining("No code found");
   }
 
   @Test
   public void testAddRole() {
     // Arrange
     Role existingRole = Role.builder()
-      .id(1)
-      .type(Role.Type.USER)
-      .build();
+        .id(1)
+        .type(Role.Type.USER)
+        .build();
     HashSet<Role> roles = new HashSet<>();
     roles.add(existingRole);
     Player existingPlayer = Player.builder()
-      .id(1)
-      .firstName("existingFirstName")
-      .lastName("existingLastName")
-      .email("existing@xyz.com")
-      .phone("existingPhone")
-      .password("existingEncodedPassword")
-      .roles(roles)
-      .build();
-    when(playerRepository.findById(ArgumentMatchers.eq(1))).thenReturn(java.util.Optional.ofNullable(existingPlayer));
+        .id(1)
+        .firstName("existingFirstName")
+        .lastName("existingLastName")
+        .email("existing@xyz.com")
+        .phone("existingPhone")
+        .password("existingEncodedPassword")
+        .roles(roles)
+        .build();
+    when(playerRepository.findById(ArgumentMatchers.eq(1)))
+        .thenReturn(java.util.Optional.ofNullable(existingPlayer));
 
     // mock out to pass the authorization check
     when(authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)).thenReturn(true);
 
     Role newRole = Role.builder()
-      .id(1)
-      .type(Role.Type.ADMIN)
-      .build();
+        .id(1)
+        .type(Role.Type.ADMIN)
+        .build();
 
     // Act
     playerService.addRole(1, newRole);
@@ -442,24 +470,25 @@ public class PlayerServiceTest {
   public void testAddRoleThatExists() {
     // Arrange
     Role existingRole = Role.builder()
-      .id(1)
-      .type(Role.Type.USER)
-      .build();
+        .id(1)
+        .type(Role.Type.USER)
+        .build();
     HashSet<Role> roles = new HashSet<>();
     roles.add(existingRole);
     Player existingPlayer = Player.builder()
-      .id(1)
-      .roles(roles)
-      .build();
-    when(playerRepository.findById(ArgumentMatchers.eq(1))).thenReturn(java.util.Optional.ofNullable(existingPlayer));
+        .id(1)
+        .roles(roles)
+        .build();
+    when(playerRepository.findById(ArgumentMatchers.eq(1)))
+        .thenReturn(java.util.Optional.ofNullable(existingPlayer));
 
     // mock out to pass the authorization check
     when(authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)).thenReturn(true);
 
     Role newRole = Role.builder()
-      .id(1)
-      .type(Role.Type.USER)
-      .build();
+        .id(1)
+        .type(Role.Type.USER)
+        .build();
 
     // Act
     playerService.addRole(1, newRole);
@@ -473,27 +502,28 @@ public class PlayerServiceTest {
   public void testRemoveRole() {
     // Arrange
     Role existingUserRole = Role.builder()
-      .id(1)
-      .type(Role.Type.USER)
-      .build();
+        .id(1)
+        .type(Role.Type.USER)
+        .build();
     Role existingAdminRole = Role.builder()
-      .id(2)
-      .type(Role.Type.ADMIN)
-      .build();
+        .id(2)
+        .type(Role.Type.ADMIN)
+        .build();
     HashSet<Role> roles = new HashSet<>();
     roles.add(existingUserRole);
     roles.add(existingAdminRole);
 
     Player existingPlayer = Player.builder()
-      .id(1)
-      .firstName("existingFirstName")
-      .lastName("existingLastName")
-      .email("existing@xyz.com")
-      .phone("existingPhone")
-      .password("existingEncodedPassword")
-      .roles(roles)
-      .build();
-    when(playerRepository.findById(ArgumentMatchers.eq(1))).thenReturn(java.util.Optional.ofNullable(existingPlayer));
+        .id(1)
+        .firstName("existingFirstName")
+        .lastName("existingLastName")
+        .email("existing@xyz.com")
+        .phone("existingPhone")
+        .password("existingEncodedPassword")
+        .roles(roles)
+        .build();
+    when(playerRepository.findById(ArgumentMatchers.eq(1)))
+        .thenReturn(java.util.Optional.ofNullable(existingPlayer));
 
     // mock out to pass the authorization check
     when(authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)).thenReturn(true);
@@ -523,22 +553,23 @@ public class PlayerServiceTest {
   public void testRemoveUnknownRole() {
     // Arrange
     Role existingUserRole = Role.builder()
-      .id(1)
-      .type(Role.Type.USER)
-      .build();
+        .id(1)
+        .type(Role.Type.USER)
+        .build();
     HashSet<Role> roles = new HashSet<>();
     roles.add(existingUserRole);
 
     Player existingPlayer = Player.builder()
-      .id(1)
-      .firstName("existingFirstName")
-      .lastName("existingLastName")
-      .email("existing@xyz.com")
-      .phone("existingPhone")
-      .password("existingEncodedPassword")
-      .roles(roles)
-      .build();
-    when(playerRepository.findById(ArgumentMatchers.eq(1))).thenReturn(java.util.Optional.ofNullable(existingPlayer));
+        .id(1)
+        .firstName("existingFirstName")
+        .lastName("existingLastName")
+        .email("existing@xyz.com")
+        .phone("existingPhone")
+        .password("existingEncodedPassword")
+        .roles(roles)
+        .build();
+    when(playerRepository.findById(ArgumentMatchers.eq(1)))
+        .thenReturn(java.util.Optional.ofNullable(existingPlayer));
 
     // mock out to pass the authorization check
     when(authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)).thenReturn(true);
@@ -547,29 +578,30 @@ public class PlayerServiceTest {
     assertThatThrownBy(() -> {
       playerService.removeRole(1, 2);
     }).isInstanceOf(NotFoundException.class)
-      .hasMessageContaining("Role with id 2 not found");
+        .hasMessageContaining("Role with id 2 not found");
   }
 
   @Test
   public void testRemoveLastRole() {
     // Arrange
     Role existingUserRole = Role.builder()
-      .id(1)
-      .type(Role.Type.USER)
-      .build();
+        .id(1)
+        .type(Role.Type.USER)
+        .build();
     HashSet<Role> roles = new HashSet<>();
     roles.add(existingUserRole);
 
     Player existingPlayer = Player.builder()
-      .id(1)
-      .firstName("existingFirstName")
-      .lastName("existingLastName")
-      .email("existing@xyz.com")
-      .phone("existingPhone")
-      .password("existingEncodedPassword")
-      .roles(roles)
-      .build();
-    when(playerRepository.findById(ArgumentMatchers.eq(1))).thenReturn(java.util.Optional.ofNullable(existingPlayer));
+        .id(1)
+        .firstName("existingFirstName")
+        .lastName("existingLastName")
+        .email("existing@xyz.com")
+        .phone("existingPhone")
+        .password("existingEncodedPassword")
+        .roles(roles)
+        .build();
+    when(playerRepository.findById(ArgumentMatchers.eq(1)))
+        .thenReturn(java.util.Optional.ofNullable(existingPlayer));
 
     // mock out to pass the authorization check
     when(authorizationHelper.isLoggedInUserHaveRole(Role.Type.ADMIN)).thenReturn(true);
@@ -578,6 +610,6 @@ public class PlayerServiceTest {
     assertThatThrownBy(() -> {
       playerService.removeRole(1, 1);
     }).isInstanceOf(CannotRemoveRoleException.class)
-      .hasMessageContaining("Cannot remove role last role");
+        .hasMessageContaining("Cannot remove role last role");
   }
 }

@@ -4,9 +4,13 @@ import com.google.common.collect.ImmutableSet;
 import com.texastoc.common.AuthorizationHelper;
 import com.texastoc.exception.NotFoundException;
 import com.texastoc.exception.PermissionDeniedException;
+import com.texastoc.module.game.GameModule;
+import com.texastoc.module.game.GameModuleFactory;
+import com.texastoc.module.game.model.Game;
 import com.texastoc.module.notification.NotificationModule;
 import com.texastoc.module.notification.NotificationModuleFactory;
 import com.texastoc.module.player.PlayerModule;
+import com.texastoc.module.player.exception.CannotDeletePlayerException;
 import com.texastoc.module.player.exception.CannotRemoveRoleException;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
@@ -36,6 +40,7 @@ public class PlayerService implements PlayerModule {
   private final AuthorizationHelper authorizationHelper;
 
   private NotificationModule notificationModule;
+  private GameModule gameModule;
 
   // Only one server so cache the forgot password codes here
   private Map<String, String> forgotPasswordCodes = new HashMap<>();
@@ -113,11 +118,11 @@ public class PlayerService implements PlayerModule {
   @Transactional
   public void delete(int id) {
     verifyLoggedInUserIsAdmin();
-    // ;;
-    // TODO call game service to see if player has any games
-//    if (player has any games) {
-//      throw new CannotDeletePlayerException("Player with ID " + id + " cannot be deleted");
-//    }
+
+    List<Game> games = getGameModule().getByPlayerId(id);
+    if (games.size() > 0) {
+      throw new CannotDeletePlayerException("Player with ID " + id + " cannot be deleted");
+    }
     playerRepository.deleteById(id);
   }
 
@@ -230,5 +235,12 @@ public class PlayerService implements PlayerModule {
       notificationModule = NotificationModuleFactory.getNotificationModule();
     }
     return notificationModule;
+  }
+
+  private GameModule getGameModule() {
+    if (gameModule == null) {
+      gameModule = GameModuleFactory.getGameModule();
+    }
+    return gameModule;
   }
 }

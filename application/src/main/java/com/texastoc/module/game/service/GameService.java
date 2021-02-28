@@ -130,6 +130,11 @@ public class GameService {
   }
 
   @Transactional(readOnly = true)
+  public List<Game> getByPlayerId(int playerId) {
+    return gameRepository.findByPlayerId(playerId);
+  }
+
+  @Transactional(readOnly = true)
   public List<Game> getByQuarterlySeasonId(Integer qSeasonId) {
     return gameRepository.findByQuarterlySeasonId(qSeasonId);
   }

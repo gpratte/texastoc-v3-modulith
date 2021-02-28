@@ -62,16 +62,22 @@ public interface GameModule {
    *
    * @param seasonId the season Id
    * @return the games for the corresponding season
-   * @throws NotFoundException
    */
   List<Game> getBySeasonId(Integer seasonId);
+
+  /**
+   * Get the games for the given player Id.
+   *
+   * @param playerId the player Id
+   * @return the games for the corresponding player
+   */
+  List<Game> getByPlayerId(int playerId);
 
   /**
    * Get the games for the given quarterly season Id.
    *
    * @param qSeasonId the quarterly season Id
    * @return the games for the corresponding quarterly season
-   * @throws NotFoundException
    */
   List<Game> getByQuarterlySeasonId(Integer qSeasonId);
 

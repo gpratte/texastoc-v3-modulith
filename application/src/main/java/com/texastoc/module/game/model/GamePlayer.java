@@ -1,5 +1,7 @@
 package com.texastoc.module.game.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,13 +9,13 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.Id;
 
-import java.util.Objects;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GamePlayer implements Comparable<GamePlayer> {
+
   // Read-only id set when game player is created
   @Id
   private int id;
@@ -124,11 +126,15 @@ public class GamePlayer implements Comparable<GamePlayer> {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     GamePlayer that = (GamePlayer) o;
     return playerId == that.playerId &&
-      gameId == that.gameId;
+        gameId == that.gameId;
   }
 
   @Override
