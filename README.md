@@ -162,6 +162,5 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 42-error-messages
-Finalized the exception messages. Configured Spring Boot to include the exception
-messages in the response.
+## Current Branch: 43-do-not-return-void
+Instead of returning void return the object acted on.
