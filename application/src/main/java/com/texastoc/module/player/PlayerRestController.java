@@ -40,15 +40,15 @@ public class PlayerRestController implements PlayerModule {
   }
 
   @PutMapping("/api/v2/players/{id}")
-  public void update(@PathVariable("id") int id, @RequestBody @Valid Player player,
+  public Player update(@PathVariable("id") int id, @RequestBody @Valid Player player,
       HttpServletRequest request) {
     player.setId(id);
-    update(player);
+    return update(player);
   }
 
   @Override
-  public void update(Player player) {
-    playerService.update(player);
+  public Player update(Player player) {
+    return playerService.update(player);
   }
 
   @Override
@@ -91,14 +91,14 @@ public class PlayerRestController implements PlayerModule {
 
   @Override
   @PostMapping("/api/v2/players/{id}/roles")
-  public void addRole(@PathVariable("id") int id, @RequestBody @Valid Role role) {
-    playerService.addRole(id, role);
+  public Player addRole(@PathVariable("id") int id, @RequestBody @Valid Role role) {
+    return playerService.addRole(id, role);
   }
 
   @Override
   @DeleteMapping("/api/v2/players/{id}/roles/{roleId}")
-  public void removeRole(@PathVariable("id") int id, @PathVariable("roleId") int roleId) {
-    playerService.removeRole(id, roleId);
+  public Player removeRole(@PathVariable("id") int id, @PathVariable("roleId") int roleId) {
+    return playerService.removeRole(id, roleId);
   }
 
   @ExceptionHandler(value = {CannotDeletePlayerException.class})

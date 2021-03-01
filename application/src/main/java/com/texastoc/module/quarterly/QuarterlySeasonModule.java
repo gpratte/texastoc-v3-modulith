@@ -12,7 +12,7 @@ public interface QuarterlySeasonModule {
    * @param seasonId  the season Id
    * @param startYear the year the season starts
    */
-  void create(int seasonId, int startYear);
+  List<QuarterlySeason> create(int seasonId, int startYear);
 
   List<QuarterlySeason> getBySeasonId(int seasonId);
 

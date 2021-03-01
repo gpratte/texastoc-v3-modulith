@@ -74,12 +74,14 @@ public class PlayerService implements PlayerModule {
 
   @Override
   @Transactional
-  public void update(Player player) {
+  public Player update(Player player) {
     verifyLoggedInUserIsAdminOrSelf(player);
     Player existingPlayer = playerRepository.findById(player.getId()).get();
     player.setPassword(existingPlayer.getPassword());
     player.setRoles((existingPlayer.getRoles()));
     playerRepository.save(player);
+    player.setPassword(null);
+    return player;
   }
 
   @Override
@@ -159,21 +161,24 @@ public class PlayerService implements PlayerModule {
   }
 
   @Override
-  public void addRole(int id, Role role) {
+  public Player addRole(int id, Role role) {
     verifyLoggedInUserIsAdmin();
     Player existingPlayer = get(id);
     // Check that role is not already set
     for (Role existingRole : existingPlayer.getRoles()) {
       if (existingRole.getType() == role.getType()) {
-        return;
+        existingPlayer.setPassword(null);
+        return existingPlayer;
       }
     }
     existingPlayer.getRoles().add(role);
     playerRepository.save(existingPlayer);
+    existingPlayer.setPassword(null);
+    return existingPlayer;
   }
 
   @Override
-  public void removeRole(int id, int roleId) {
+  public Player removeRole(int id, int roleId) {
     verifyLoggedInUserIsAdmin();
     Player existingPlayer = get(id);
     // Check that role is set
@@ -204,6 +209,8 @@ public class PlayerService implements PlayerModule {
 
     existingPlayer.setRoles(newRoles);
     playerRepository.save(existingPlayer);
+    existingPlayer.setPassword(null);
+    return existingPlayer;
   }
 
   // verify the user is an admin

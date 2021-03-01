@@ -55,14 +55,14 @@ public class SeasonRestController {
 
   @PreAuthorize("hasRole('ADMIN')")
   @PutMapping(value = "/api/v2/seasons/{id}", consumes = "application/vnd.texastoc.finalize+json")
-  public void finalizeSeason(@PathVariable("id") int id) {
-    seasonService.end(id);
+  public Season finalizeSeason(@PathVariable("id") int id) {
+    return seasonService.end(id);
   }
 
   @PreAuthorize("hasRole('ADMIN')")
   @PutMapping(value = "/api/v2/seasons/{id}", consumes = "application/vnd.texastoc.unfinalize+json")
-  public void unfinalizeSeason(@PathVariable("id") int id) {
-    seasonService.open(id);
+  public Season unfinalizeSeason(@PathVariable("id") int id) {
+    return seasonService.open(id);
   }
 
   @GetMapping("/api/v2/seasons/history")

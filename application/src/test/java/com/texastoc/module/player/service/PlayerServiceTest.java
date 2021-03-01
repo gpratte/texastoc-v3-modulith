@@ -156,8 +156,6 @@ public class PlayerServiceTest {
     assertEquals("updatedPhone", param.getPhone());
     assertEquals("updated@xyz.com", param.getEmail());
 
-    // password should not change
-    assertEquals("existingEncodedPassword", param.getPassword());
     // roles should not change
     assertThat(param.getRoles()).containsExactly(existingRole);
   }

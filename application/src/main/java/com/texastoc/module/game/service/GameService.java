@@ -84,7 +84,7 @@ public class GameService {
 
   //@CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
   @Transactional
-  public void update(Game game) {
+  public Game update(Game game) {
     // TODO bean validation https://www.baeldung.com/javax-validation
     Game currentGame = get(game.getId());
     gameHelper.checkFinalized(currentGame);
@@ -93,15 +93,17 @@ public class GameService {
     currentGame.setTransportRequired(game.isTransportRequired());
     gameRepository.save(currentGame);
     gameHelper.sendUpdatedGame();
+    return currentGame;
   }
 
 
   //@CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
   @Transactional
-  public void updateCanRebuy(int id, boolean value) {
+  public Game updateCanRebuy(int id, boolean value) {
     Game game = get(id);
     game.setCanRebuy(value);
     gameRepository.save(game);
+    return game;
   }
 
   @Transactional(readOnly = true)
@@ -142,12 +144,12 @@ public class GameService {
   //  @CacheEvict(value = {"currentGame", "currentSeason",
 //      "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   @Transactional
-  public void finalize(int id) {
+  public Game finalize(int id) {
     // TODO check that the game has the appropriate finishes (e.g. 1st, 2nd, ...)
     Game game = get(id);
 
     if (game.isFinalized()) {
-      return;
+      return game;
     }
 
     gameHelper.recalculate(game.getId());
@@ -159,15 +161,16 @@ public class GameService {
     gameHelper.sendUpdatedGame();
     // TODO message clock to end
     gameHelper.sendGameSummary(id);
+    return game;
   }
 
   //  @CacheEvict(value = {"currentGame", "currentSeason",
 //      "currentSeasonById"}, allEntries = true, beforeInvocation = false)
-  public void unfinalize(int id) {
+  public Game unfinalize(int id) {
     Game gameToOpen = get(id);
 
     if (!gameToOpen.isFinalized()) {
-      return;
+      return gameToOpen;
     }
 
     Season season = getSeasonModule().get(gameToOpen.getSeasonId());
@@ -190,6 +193,7 @@ public class GameService {
     gameToOpen.setFinalized(false);
     gameRepository.save(gameToOpen);
     gameHelper.sendUpdatedGame();
+    return gameToOpen;
   }
 
   private PlayerModule getPlayerModule() {

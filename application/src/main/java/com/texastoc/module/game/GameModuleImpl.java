@@ -29,8 +29,8 @@ public class GameModuleImpl implements GameModule {
   }
 
   @Override
-  public void update(Game game) {
-    gameService.update(game);
+  public Game update(Game game) {
+    return gameService.update(game);
   }
 
   @Override
@@ -59,13 +59,13 @@ public class GameModuleImpl implements GameModule {
   }
 
   @Override
-  public void finalize(int id) {
-    gameService.finalize(id);
+  public Game finalize(int id) {
+    return gameService.finalize(id);
   }
 
   @Override
-  public void unfinalize(int id) {
-    gameService.unfinalize(id);
+  public Game unfinalize(int id) {
+    return gameService.unfinalize(id);
   }
 
   @Override
@@ -79,18 +79,18 @@ public class GameModuleImpl implements GameModule {
   }
 
   @Override
-  public void updateGamePlayer(GamePlayer gamePlayer) {
-    gamePlayerService.updateGamePlayer(gamePlayer);
+  public GamePlayer updateGamePlayer(GamePlayer gamePlayer) {
+    return gamePlayerService.updateGamePlayer(gamePlayer);
   }
 
   @Override
-  public void toggleGamePlayerKnockedOut(int gameId, int gamePlayerId) {
-    gamePlayerService.toggleGamePlayerKnockedOut(gameId, gamePlayerId);
+  public GamePlayer toggleGamePlayerKnockedOut(int gameId, int gamePlayerId) {
+    return gamePlayerService.toggleGamePlayerKnockedOut(gameId, gamePlayerId);
   }
 
   @Override
-  public void toggleGamePlayerRebuy(int gameId, int gamePlayerId) {
-    gamePlayerService.toggleGamePlayerRebuy(gameId, gamePlayerId);
+  public GamePlayer toggleGamePlayerRebuy(int gameId, int gamePlayerId) {
+    return gamePlayerService.toggleGamePlayerRebuy(gameId, gamePlayerId);
   }
 
   @Override
@@ -109,7 +109,7 @@ public class GameModuleImpl implements GameModule {
   }
 
   @Override
-  public void updateCanRebuy(int gameId, boolean value) {
-    gameService.updateCanRebuy(gameId, value);
+  public Game updateCanRebuy(int gameId, boolean value) {
+    return gameService.updateCanRebuy(gameId, value);
   }
 }
