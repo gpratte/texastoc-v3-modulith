@@ -72,7 +72,7 @@ public class GamePlayerService {
 
   @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
   @Transactional
-  public void updateGamePlayer(GamePlayer gamePlayer) {
+  public GamePlayer updateGamePlayer(GamePlayer gamePlayer) {
     Game game = gameHelper.get(gamePlayer.getGameId());
     gameHelper.checkFinalized(game);
 
@@ -97,11 +97,12 @@ public class GamePlayerService {
     gameRepository.save(game);
     gameHelper.recalculate(game.getId());
     gameHelper.sendUpdatedGame();
+    return existingGamePlayer;
   }
 
   @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
   @Transactional
-  public void toggleGamePlayerKnockedOut(int gameId, int gamePlayerId) {
+  public GamePlayer toggleGamePlayerKnockedOut(int gameId, int gamePlayerId) {
     Game game = gameHelper.get(gameId);
     gameHelper.checkFinalized(game);
 
@@ -115,11 +116,12 @@ public class GamePlayerService {
     gamePlayer.setKnockedOut(!gamePlayer.isKnockedOut());
     gameRepository.save(game);
     gameHelper.sendUpdatedGame();
+    return gamePlayer;
   }
 
   @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
   @Transactional
-  public void toggleGamePlayerRebuy(int gameId, int gamePlayerId) {
+  public GamePlayer toggleGamePlayerRebuy(int gameId, int gamePlayerId) {
     Game game = gameHelper.get(gameId);
     gameHelper.checkFinalized(game);
 
@@ -134,6 +136,7 @@ public class GamePlayerService {
     gameRepository.save(game);
     gameHelper.recalculate(game.getId());
     gameHelper.sendUpdatedGame();
+    return gamePlayer;
   }
 
   @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)

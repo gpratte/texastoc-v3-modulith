@@ -35,7 +35,7 @@ public interface GameModule {
    * @param game a game with the hostId, date and transportRequired fields set
    * @throws NotFoundException
    */
-  void update(Game game);
+  Game update(Game game);
 
   /**
    * Get a game
@@ -87,7 +87,7 @@ public interface GameModule {
    * @param id the game Id
    * @throws NotFoundException
    */
-  void finalize(int id);
+  Game finalize(int id);
 
   /**
    * Unfinalize (reopen) a game. Restricted to admins only.
@@ -95,7 +95,7 @@ public interface GameModule {
    * @param id the game Id
    * @throws NotFoundException
    */
-  void unfinalize(int id);
+  Game unfinalize(int id);
 
   /**
    * Create a game player. The only fields of the GamePlayer that are pertinent are
@@ -145,7 +145,7 @@ public interface GameModule {
    * @param gamePlayer the game player some or none of the pertinent fields
    * @throws NotFoundException
    */
-  void updateGamePlayer(GamePlayer gamePlayer);
+  GamePlayer updateGamePlayer(GamePlayer gamePlayer);
 
   /**
    * Toggles the knocked out field of the game player
@@ -154,7 +154,7 @@ public interface GameModule {
    * @param gamePlayerId the game player Id
    * @throws NotFoundException
    */
-  void toggleGamePlayerKnockedOut(int gameId, int gamePlayerId);
+  GamePlayer toggleGamePlayerKnockedOut(int gameId, int gamePlayerId);
 
   /**
    * Toggles the rebuy field of the game player
@@ -163,7 +163,7 @@ public interface GameModule {
    * @param gamePlayerId the game player Id
    * @throws NotFoundException
    */
-  void toggleGamePlayerRebuy(int gameId, int gamePlayerId);
+  GamePlayer toggleGamePlayerRebuy(int gameId, int gamePlayerId);
 
   /**
    * Deletes the game player
@@ -195,5 +195,11 @@ public interface GameModule {
    */
   void notifySeating(int gameId);
 
-  void updateCanRebuy(int gameId, boolean value);
+  /**
+   * Update the <i>canRebuy</i> field of a game
+   *
+   * @param gameId the game Id
+   * @param value  true or falsd
+   */
+  Game updateCanRebuy(int gameId, boolean value);
 }

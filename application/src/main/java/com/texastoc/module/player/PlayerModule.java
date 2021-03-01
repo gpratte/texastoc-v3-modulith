@@ -26,7 +26,7 @@ public interface PlayerModule {
    *
    * @param player
    */
-  void update(Player player);
+  Player update(Player player);
 
   /**
    * Add a role to a player. Restricted to admins only.
@@ -34,7 +34,7 @@ public interface PlayerModule {
    * @param id   the player's Id
    * @param role the role to add
    */
-  void addRole(int id, Role role);
+  Player addRole(int id, Role role);
 
   /**
    * Remove a role from a player. Restricted to admins only.
@@ -42,7 +42,7 @@ public interface PlayerModule {
    * @param id     the player's Id
    * @param roleId the Id of role to remove
    */
-  void removeRole(int id, int roleId);
+  Player removeRole(int id, int roleId);
 
   /**
    * Get all players

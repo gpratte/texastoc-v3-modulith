@@ -153,7 +153,7 @@ public class SeasonService {
 
   //  @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   @Transactional
-  public void end(int seasonId) {
+  public Season end(int seasonId) {
     Season season = get(seasonId);
     // Make sure no games are open
     List<Game> games = getGameModule().getBySeasonId(seasonId);
@@ -183,15 +183,17 @@ public class SeasonService {
             .entries(seasonPlayer.getEntries())
             .build()));
     seasonHistoryRepository.save(historicalSeason);
+
+    return season;
   }
 
   //  @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
   @Transactional
-  public void open(int seasonId) {
+  public Season open(int seasonId) {
     Season season = get(seasonId);
 
     if (!season.isFinalized()) {
-      return;
+      return season;
     }
 
     season.setFinalized(false);
@@ -199,6 +201,8 @@ public class SeasonService {
 
     // Clear out the historical season
     seasonHistoryRepository.deleteById(seasonId);
+
+    return season;
   }
 
   private LocalDate findNextThursday(LocalDate day) {

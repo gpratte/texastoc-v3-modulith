@@ -51,9 +51,9 @@ public class GameRestController {
   }
 
   @PatchMapping(value = "/api/v2/games/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public void updateGame(@PathVariable("id") int id, @RequestBody Game game) {
+  public Game updateGame(@PathVariable("id") int id, @RequestBody Game game) {
     game.setId(id);
-    gameModule.update(game);
+    return gameModule.update(game);
   }
 
   @GetMapping("/api/v2/games/{id}")
@@ -79,14 +79,14 @@ public class GameRestController {
   }
 
   @PutMapping(value = "/api/v2/games/{id}", consumes = CONTENT_TYPE_FINALIZE)
-  public void finalizeGame(@PathVariable("id") int id) {
-    gameModule.finalize(id);
+  public Game finalizeGame(@PathVariable("id") int id) {
+    return gameModule.finalize(id);
   }
 
   @PreAuthorize("hasRole('ADMIN')")
   @PutMapping(value = "/api/v2/games/{id}", consumes = CONTENT_TYPE_UNFINALIZE)
-  public void unfinalizeGame(@PathVariable("id") int id) {
-    gameModule.unfinalize(id);
+  public Game unfinalizeGame(@PathVariable("id") int id) {
+    return gameModule.unfinalize(id);
   }
 
   @PostMapping(value = "/api/v2/games/{id}/players", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -104,23 +104,23 @@ public class GameRestController {
   }
 
   @PatchMapping(value = "/api/v2/games/{gameId}/players/{gamePlayerId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public void updateGamePlayer(@PathVariable("gameId") int gameId,
+  public GamePlayer updateGamePlayer(@PathVariable("gameId") int gameId,
       @PathVariable("gamePlayerId") int gamePlayerId, @RequestBody GamePlayer gamePlayer) {
     gamePlayer.setGameId(gameId);
     gamePlayer.setPlayerId(gamePlayerId);
-    gameModule.updateGamePlayer(gamePlayer);
+    return gameModule.updateGamePlayer(gamePlayer);
   }
 
   @PutMapping(value = "/api/v2/games/{gameId}/players/{gamePlayerId}", consumes = CONTENT_TYPE_KNOCKOUT)
-  public void toggleKnockedOut(@PathVariable("gameId") int gameId,
+  public GamePlayer toggleKnockedOut(@PathVariable("gameId") int gameId,
       @PathVariable("gamePlayerId") int gamePlayerId) {
-    gameModule.toggleGamePlayerKnockedOut(gameId, gamePlayerId);
+    return gameModule.toggleGamePlayerKnockedOut(gameId, gamePlayerId);
   }
 
   @PutMapping(value = "/api/v2/games/{gameId}/players/{gamePlayerId}", consumes = CONTENT_TYPE_REBUY)
-  public void toggleRebuy(@PathVariable("gameId") int gameId,
+  public GamePlayer toggleRebuy(@PathVariable("gameId") int gameId,
       @PathVariable("gamePlayerId") int gamePlayerId) {
-    gameModule.toggleGamePlayerRebuy(gameId, gamePlayerId);
+    return gameModule.toggleGamePlayerRebuy(gameId, gamePlayerId);
   }
 
   @DeleteMapping("/api/v2/games/{gameId}/players/{gamePlayerId}")

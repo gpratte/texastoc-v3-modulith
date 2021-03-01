@@ -13,6 +13,7 @@ import com.texastoc.module.settings.model.TocConfig;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +35,11 @@ public class QuarterlySeasonService implements QuarterlySeasonModule {
   }
 
   @Override
-  public void create(int seasonId, int seasonStartYear) {
+  public List<QuarterlySeason> create(int seasonId, int seasonStartYear) {
     Settings settings = getSettingsModule().get();
     TocConfig tocConfig = settings.getTocConfigs().get(seasonStartYear);
 
+    List<QuarterlySeason> quarterlySeasons = new ArrayList<>(4);
     for (int i = 1; i <= 4; ++i) {
       LocalDate qStart = null;
       LocalDate qEnd = null;
@@ -89,8 +91,9 @@ public class QuarterlySeasonService implements QuarterlySeasonModule {
           .qTocPerGameCost(tocConfig.getQuarterlyTocCost())
           .numPayouts(tocConfig.getQuarterlyNumPayouts())
           .build();
-      qSeasonRepository.save(qSeason);
+      quarterlySeasons.add(qSeasonRepository.save(qSeason));
     }
+    return quarterlySeasons;
   }
 
   @Override
