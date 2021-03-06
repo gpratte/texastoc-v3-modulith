@@ -1,5 +1,6 @@
 package com.texastoc.module.season.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +13,7 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class HistoricalSeason {
 
   @Id
@@ -26,6 +28,7 @@ public class HistoricalSeason {
   @Data
   @NoArgsConstructor
   @AllArgsConstructor
+  @JsonIgnoreProperties(ignoreUnknown = true)
   public static class HistoricalSeasonPlayer {
 
     @Id
