@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.texastoc.TestConstants;
+import com.texastoc.common.PointsGenerator;
 import com.texastoc.module.settings.model.Payout;
 import com.texastoc.module.settings.model.Settings;
 import com.texastoc.module.settings.model.SystemSettings;
@@ -16,15 +18,20 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class SettingsServiceTest {
+public class SettingsServiceTest implements TestConstants {
 
   private SettingsService settingsService;
   private SettingsRepository settingsRepository;
+  private PointsGenerator pointsGenerator;
 
   @Before
   public void before() {
     settingsRepository = mock(SettingsRepository.class);
-    settingsService = new SettingsService(settingsRepository, "payouts-percentages.json");
+    pointsGenerator = new PointsGenerator(CHOP_TENTH_PLACE_INCR,
+        CHOP_TENTH_PLACE_POINTS,
+        CHOP_MULTIPLIER);
+    settingsService = new SettingsService(settingsRepository, "payouts-percentages.json",
+        pointsGenerator);
   }
 
   @Test
@@ -58,6 +65,14 @@ public class SettingsServiceTest {
     Payout thirdPlaceOfThree = actual.getPayouts().get(3).get(2);
     assertEquals(3, thirdPlaceOfThree.getPlace());
     assertEquals(0.2, thirdPlaceOfThree.getPercent(), 0.0);
+
+    Map<Integer, Integer> pointsForTwo = actual.getPoints().get(2);
+    // first place points
+    assertEquals(30, pointsForTwo.get(1).intValue());
+    // second place points
+    assertEquals(23, pointsForTwo.get(2).intValue());
+    // third place points
+    assertEquals(0, pointsForTwo.get(3).intValue());
   }
 
   @Test
@@ -67,7 +82,8 @@ public class SettingsServiceTest {
     when(settingsRepository.findById(1)).thenReturn(java.util.Optional.of(settings));
 
     // Act
-    SettingsService ss = new SettingsService(settingsRepository, "does-not-exist.json");
+    SettingsService ss = new SettingsService(settingsRepository, "does-not-exist.json",
+        pointsGenerator);
     SystemSettings actual = ss.get();
 
     // Assert
@@ -83,7 +99,8 @@ public class SettingsServiceTest {
     when(settingsRepository.findById(1)).thenReturn(java.util.Optional.of(settings));
 
     // Act
-    SettingsService ss = new SettingsService(settingsRepository, "bad-payout-percentages.json");
+    SettingsService ss = new SettingsService(settingsRepository, "bad-payout-percentages.json",
+        pointsGenerator);
     SystemSettings actual = ss.get();
 
     // Assert
