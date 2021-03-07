@@ -3,6 +3,7 @@ package com.texastoc.module.game.service;
 import com.texastoc.module.game.event.GameEventProducer;
 import com.texastoc.module.game.exception.GameInProgressException;
 import com.texastoc.module.game.model.Game;
+import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.repository.GameRepository;
 import com.texastoc.module.player.PlayerModule;
 import com.texastoc.module.player.PlayerModuleFactory;
@@ -13,6 +14,7 @@ import com.texastoc.module.quarterly.model.QuarterlySeason;
 import com.texastoc.module.season.SeasonModule;
 import com.texastoc.module.season.SeasonModuleFactory;
 import com.texastoc.module.season.model.Season;
+import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -128,7 +130,13 @@ public class GameService {
       seasonId = getSeasonModule().getCurrentId();
     }
 
-    return gameRepository.findBySeasonId(seasonId);
+    List<Game> games = gameRepository.findBySeasonId(seasonId);
+    games.forEach(game -> {
+      List<GamePlayer> gamePlayers = game.getPlayers();
+      Collections.sort(gamePlayers);
+      game.setPlayers(gamePlayers);
+    });
+    return games;
   }
 
   @Transactional(readOnly = true)

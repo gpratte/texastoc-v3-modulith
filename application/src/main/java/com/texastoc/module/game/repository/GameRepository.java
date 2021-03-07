@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GameRepository extends CrudRepository<Game, Integer> {
 
-  @Query("select * from game where season_id=:seasonId")
+  @Query("select * from game where season_id=:seasonId order by game_date desc")
   List<Game> findBySeasonId(@Param("seasonId") int seasonId);
 
   @Query("select * from game where q_season_id=:qSeasonId")

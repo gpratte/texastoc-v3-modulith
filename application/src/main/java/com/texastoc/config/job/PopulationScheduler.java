@@ -211,9 +211,9 @@ public class PopulationScheduler {
     for (GamePlayer gamePlayer : gamePlayers) {
       if (random.nextBoolean()) {
         gamePlayer.setRebought(true);
+        gamePlayerService.updateGamePlayer(gamePlayer);
       }
     }
-    gameService.update(game);
   }
 
   private void addGamePlayersFinish(int gameId) {
