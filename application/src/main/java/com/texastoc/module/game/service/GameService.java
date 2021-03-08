@@ -133,8 +133,10 @@ public class GameService {
     List<Game> games = gameRepository.findBySeasonId(seasonId);
     games.forEach(game -> {
       List<GamePlayer> gamePlayers = game.getPlayers();
-      Collections.sort(gamePlayers);
-      game.setPlayers(gamePlayers);
+      if (gamePlayers != null) {
+        Collections.sort(gamePlayers);
+        game.setPlayers(gamePlayers);
+      }
     });
     return games;
   }

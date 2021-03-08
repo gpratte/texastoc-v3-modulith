@@ -48,6 +48,18 @@ public class SeatingService {
       seating.setTableRequests(Collections.emptyList());
     }
 
+    // Set the name of the player requesting a table
+    seating.getTableRequests().forEach(tableRequest -> {
+      if (tableRequest.getGamePlayerName() == null) {
+        for (GamePlayer gp : game.getPlayers()) {
+          if (tableRequest.getGamePlayerId() == gp.getId()) {
+            tableRequest.setGamePlayerName(gp.getName());
+            break;
+          }
+        }
+      }
+    });
+
     int numTables = seating.getSeatsPerTables().size();
     List<GameTable> gameTables = new ArrayList<>(numTables);
     seating.setGameTables(gameTables);
