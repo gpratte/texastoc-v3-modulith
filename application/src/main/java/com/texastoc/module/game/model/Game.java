@@ -90,6 +90,6 @@ public class Game {
   private List<GamePlayer> players;
   @MappedCollection
   private List<GamePayout> payouts;
-  @MappedCollection(idColumn = "ID")
+  @MappedCollection(idColumn = "GAME_ID")
   private Seating seating;
 }

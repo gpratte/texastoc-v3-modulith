@@ -3,6 +3,10 @@ spring:
     console:
       enabled: true
 
+#logging:
+#  level:
+#    org.springframework.jdbc.core: TRACE
+
 server:
   error:
     include-message: always

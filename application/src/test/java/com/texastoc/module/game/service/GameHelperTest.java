@@ -18,9 +18,7 @@ import com.texastoc.module.game.repository.GameRepository;
 import com.texastoc.module.player.PlayerModule;
 import com.texastoc.module.season.SeasonModule;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,9 +88,8 @@ public class GameHelperTest {
         .id(111)
         .date(now)
         .build();
-    List<Game> games = new ArrayList<>();
-    games.add(game);
-    when(gameRepository.findUnfinalizedBySeasonId(2)).thenReturn(games);
+    when(gameRepository.findUnfinalizedBySeasonId(2)).thenReturn(Collections.singletonList(111));
+    when(gameRepository.findById(111)).thenReturn(Optional.of(game));
 
     // Act
     Game actual = gameHelper.getCurrent();
@@ -114,9 +111,8 @@ public class GameHelperTest {
         .id(112)
         .date(now)
         .build();
-    List<Game> games = new ArrayList<>();
-    games.add(game);
-    when(gameRepository.findMostRecentBySeasonId(2)).thenReturn(games);
+    when(gameRepository.findMostRecentBySeasonId(2)).thenReturn(Collections.singletonList(112));
+    when(gameRepository.findById(112)).thenReturn(Optional.of(game));
 
     // Act
     Game actual = gameHelper.getCurrent();
@@ -187,9 +183,8 @@ public class GameHelperTest {
         .id(111)
         .date(now)
         .build();
-    List<Game> games = new ArrayList<>();
-    games.add(game);
-    when(gameRepository.findUnfinalizedBySeasonId(2)).thenReturn(games);
+    when(gameRepository.findUnfinalizedBySeasonId(2)).thenReturn(Collections.singletonList(111));
+    when(gameRepository.findById(111)).thenReturn(Optional.of(game));
 
     // Act
     gameHelper.sendUpdatedGame();
