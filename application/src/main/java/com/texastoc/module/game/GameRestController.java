@@ -107,7 +107,7 @@ public class GameRestController {
   public GamePlayer updateGamePlayer(@PathVariable("gameId") int gameId,
       @PathVariable("gamePlayerId") int gamePlayerId, @RequestBody GamePlayer gamePlayer) {
     gamePlayer.setGameId(gameId);
-    gamePlayer.setPlayerId(gamePlayerId);
+    gamePlayer.setId(gamePlayerId);
     return gameModule.updateGamePlayer(gamePlayer);
   }
 

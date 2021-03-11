@@ -94,6 +94,7 @@ public class GameService {
     currentGame.setDate(game.getDate());
     currentGame.setTransportRequired(game.isTransportRequired());
     gameRepository.save(currentGame);
+    Collections.sort(currentGame.getPlayers());
     gameHelper.sendUpdatedGame();
     return currentGame;
   }
@@ -105,18 +106,23 @@ public class GameService {
     Game game = get(id);
     game.setCanRebuy(value);
     gameRepository.save(game);
+    Collections.sort(game.getPlayers());
     return game;
   }
 
   @Transactional(readOnly = true)
   public Game get(int id) {
-    return gameHelper.get(id);
+    Game game = gameHelper.get(id);
+    Collections.sort(game.getPlayers());
+    return game;
   }
 
   @Transactional(readOnly = true)
   //@Cacheable("currentGame")
   public Game getCurrent() {
-    return gameHelper.getCurrent();
+    Game game = gameHelper.getCurrent();
+    Collections.sort(game.getPlayers());
+    return game;
   }
 
 
@@ -143,12 +149,28 @@ public class GameService {
 
   @Transactional(readOnly = true)
   public List<Game> getByPlayerId(int playerId) {
-    return gameRepository.findByPlayerId(playerId);
+    List<Game> games = gameRepository.findByPlayerId(playerId);
+    games.forEach(game -> {
+      List<GamePlayer> gamePlayers = game.getPlayers();
+      if (gamePlayers != null) {
+        Collections.sort(gamePlayers);
+        game.setPlayers(gamePlayers);
+      }
+    });
+    return games;
   }
 
   @Transactional(readOnly = true)
   public List<Game> getByQuarterlySeasonId(Integer qSeasonId) {
-    return gameRepository.findByQuarterlySeasonId(qSeasonId);
+    List<Game> games = gameRepository.findByQuarterlySeasonId(qSeasonId);
+    games.forEach(game -> {
+      List<GamePlayer> gamePlayers = game.getPlayers();
+      if (gamePlayers != null) {
+        Collections.sort(gamePlayers);
+        game.setPlayers(gamePlayers);
+      }
+    });
+    return games;
   }
 
   //  @CacheEvict(value = {"currentGame", "currentSeason",
@@ -159,6 +181,7 @@ public class GameService {
     Game game = get(id);
 
     if (game.isFinalized()) {
+      Collections.sort(game.getPlayers());
       return game;
     }
 
@@ -167,6 +190,7 @@ public class GameService {
     game.setFinalized(true);
     game.setSeating(null);
     gameRepository.save(game);
+    Collections.sort(game.getPlayers());
     gameEventProducer.notifyGameFinalized(id, game.getSeasonId(), game.getQSeasonId(), true);
     gameHelper.sendUpdatedGame();
     // TODO message clock to end
@@ -180,6 +204,7 @@ public class GameService {
     Game gameToOpen = get(id);
 
     if (!gameToOpen.isFinalized()) {
+      Collections.sort(gameToOpen.getPlayers());
       return gameToOpen;
     }
 
@@ -202,6 +227,7 @@ public class GameService {
 
     gameToOpen.setFinalized(false);
     gameRepository.save(gameToOpen);
+    Collections.sort(gameToOpen.getPlayers());
     gameHelper.sendUpdatedGame();
     return gameToOpen;
   }
