@@ -375,7 +375,6 @@ CREATE TABLE historical_season
 CREATE TABLE historical_season_player
 (
     id                    int NOT NULL AUTO_INCREMENT,
-    season_id             int NOT NULL,
     name                  varchar(64),
     points                int,
     entries               int,
