@@ -51,10 +51,23 @@ public class PopulationScheduler {
     this.seatingService = seatingService;
   }
 
-  // delay one minute then run every hour
-  //@Scheduled(fixedDelay = 3600000, initialDelay = 60000)
-  @Scheduled(fixedDelay = 3600000, initialDelay = 5000)
+  @Scheduled(fixedDelay = 3600000)
   public void populate() {
+    while (true) {
+      // Wait for the modules to be ready
+      try {
+        getPlayerModule();
+        getSettingsModule();
+        break;
+      } catch (Exception e) {
+        try {
+          log.info("#");
+          Thread.sleep(1000l);
+        } catch (Exception e2) {
+          // do nothing
+        }
+      }
+    }
     createSeason();
   }
 
