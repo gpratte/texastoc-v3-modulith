@@ -50,9 +50,6 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"",
-									"var jsonData = pm.response.json();",
-									"pm.environment.set(\"token\", jsonData.token);",
 									""
 								],
 								"type": "text/javascript"
@@ -92,9 +89,6 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"",
-									"var jsonData = pm.response.json();",
-									"pm.environment.set(\"token\", jsonData.token);",
 									""
 								],
 								"type": "text/javascript"
@@ -112,7 +106,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"code\": \"RPIOJ\", \n  \"password\": \"password\"\n}"
+							"raw": "{\n  \"code\": \"WKOUT\", \n  \"password\": \"password\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/password/reset",
@@ -134,6 +128,22 @@
 			"item": [
 				{
 					"name": "create season",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData) {",
+									"    pm.environment.set(\"seasonId\", jsonData.id);",
+									"    console.log('seasonId set to created season id ' + jsonData.id)",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -158,13 +168,13 @@
 							"raw": "{\n    \"startYear\": 2021\n}"
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/seasons",
+							"raw": "{{url}}/api/v3/seasons",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"seasons"
 							]
 						}
@@ -214,13 +224,13 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/seasons",
+							"raw": "{{url}}/api/v3/seasons",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"seasons"
 							]
 						}
@@ -250,13 +260,13 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/seasons/{{seasonId}}",
+							"raw": "{{url}}/api/v3/seasons/{{seasonId}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"seasons",
 								"{{seasonId}}"
 							]
@@ -306,13 +316,13 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/seasons/current",
+							"raw": "{{url}}/api/v3/seasons/current",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"seasons",
 								"current"
 							]
@@ -349,13 +359,13 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/seasons/history",
+							"raw": "{{url}}/api/v3/seasons/history",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"seasons",
 								"history"
 							]
@@ -389,13 +399,13 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/seasons/{{seasonId}}",
+							"raw": "{{url}}/api/v3/seasons/{{seasonId}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"seasons",
 								"{{seasonId}}"
 							]
@@ -429,13 +439,13 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/seasons/{{seasonId}}",
+							"raw": "{{url}}/api/v3/seasons/{{seasonId}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"seasons",
 								"{{seasonId}}"
 							]
@@ -453,6 +463,22 @@
 					"item": [
 						{
 							"name": "create game player",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"if (jsonData) {",
+											"    pm.environment.set(\"gamePlayerId\", jsonData.id);",
+											"    console.log('gamePlayerId set to created game player id ' + jsonData.id)",
+											"}",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -474,16 +500,16 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"playerId\": 1,\n    \"buyInCollected\": true,\n    \"annualTocCollected\": true,\n    \"quarterlyTocCollected\": true\n}"
+									"raw": "{\n    \"playerId\": 1,\n    \"boughtIn\": true,\n    \"annualTocParticipant\": true,\n    \"quarterlyTocParticipant\": true\n}"
 								},
 								"url": {
-									"raw": "{{url}}/api/v2/games/{{gameId}}/players",
+									"raw": "{{url}}/api/v3/games/{{gameId}}/players",
 									"host": [
 										"{{url}}"
 									],
 									"path": [
 										"api",
-										"v2",
+										"v3",
 										"games",
 										"{{gameId}}",
 										"players"
@@ -494,6 +520,22 @@
 						},
 						{
 							"name": "create first time game player",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"pm.environment.set(\"gamePlayerId\", jsonData.id);",
+											"console.log('gamePlayerId set to ' + jsonData.id)",
+											"pm.environment.set(\"playerId\", jsonData.playerId);",
+											"console.log('playerId set to ' + jsonData.playerId)",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -510,21 +552,21 @@
 									{
 										"key": "Content-Type",
 										"type": "text",
-										"value": "application/vnd.texastoc.new-player+json"
+										"value": "application/vnd.texastoc.first-time+json"
 									}
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"firstName\": \"first-{{$timestamp}}\",\n    \"lastName\": \"last-{{$timestamp}}\",\n    \"email\": \"{{$randomEmail}}\",\n    \"buyInCollected\": true,\n    \"annualTocCollected\": true,\n    \"quarterlyTocCollected\": true\n}"
+									"raw": "{\n    \"firstName\": \"first-{{$timestamp}}\",\n    \"lastName\": \"last-{{$timestamp}}\",\n    \"email\": \"{{$randomEmail}}\",\n    \"boughtIn\": true,\n    \"annualTocParticipant\": true,\n    \"quarterlyTocParticipant\": true\n}"
 								},
 								"url": {
-									"raw": "{{url}}/api/v2/games/{{gameId}}/players",
+									"raw": "{{url}}/api/v3/games/{{gameId}}/players",
 									"host": [
 										"{{url}}"
 									],
 									"path": [
 										"api",
-										"v2",
+										"v3",
 										"games",
 										"{{gameId}}",
 										"players"
@@ -546,7 +588,7 @@
 										}
 									]
 								},
-								"method": "PUT",
+								"method": "PATCH",
 								"header": [
 									{
 										"key": "Content-Type",
@@ -556,16 +598,16 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"#place\": 1,\n    \"knockedOut\": true,\n    \"roundUpdates\": true,\n    \"buyInCollected\": true,\n    \"rebuyAddOnCollected\": true,\n    \"annualTocCollected\": true,\n    \"quarterlyTocCollected\": true,\n    \"#chop\": 11000\n}"
+									"raw": "{\n    \"place\": 2,\n    \"knockedOut\": true,\n    \"roundUpdates\": true,\n    \"boughtIn\": true,\n    \"rebought\": true,\n    \"annualTocParticipant\": true,\n    \"quarterlyTocParticipant\": true,\n    \"chop\": 11000\n}"
 								},
 								"url": {
-									"raw": "{{url}}/api/v2/games/{{gameId}}/players/{{gamePlayerId}}",
+									"raw": "{{url}}/api/v3/games/{{gameId}}/players/{{gamePlayerId}}",
 									"host": [
 										"{{url}}"
 									],
 									"path": [
 										"api",
-										"v2",
+										"v3",
 										"games",
 										"{{gameId}}",
 										"players",
@@ -601,13 +643,13 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{url}}/api/v2/games/{{gameId}}/players/{{gamePlayerId}}",
+									"raw": "{{url}}/api/v3/games/{{gameId}}/players/{{gamePlayerId}}",
 									"host": [
 										"{{url}}"
 									],
 									"path": [
 										"api",
-										"v2",
+										"v3",
 										"games",
 										"{{gameId}}",
 										"players",
@@ -643,13 +685,13 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{url}}/api/v2/games/{{gameId}}/players/{{gamePlayerId}}",
+									"raw": "{{url}}/api/v3/games/{{gameId}}/players/{{gamePlayerId}}",
 									"host": [
 										"{{url}}"
 									],
 									"path": [
 										"api",
-										"v2",
+										"v3",
 										"games",
 										"{{gameId}}",
 										"players",
@@ -686,13 +728,13 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{url}}/api/v2/games/{{gameId}}/players/{{gamePlayerId}}",
+									"raw": "{{url}}/api/v3/games/{{gameId}}/players/{{gamePlayerId}}",
 									"host": [
 										"{{url}}"
 									],
 									"path": [
 										"api",
-										"v2",
+										"v3",
 										"games",
 										"{{gameId}}",
 										"players",
@@ -730,16 +772,16 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"numSeatsPerTable\": [3],\n    \"tableRequests\": [{\n        \"gamePlayerId\": {{gamePlayerId}},\n        \"playerName\": \"John Doe\",\n        \"tableNum\": 1\n    }]\n}"
+									"raw": "{\n    \"gameId\": {{gameId}},\n    \"seatsPerTables\": [\n        {\n            \"numSeats\": 6,\n            \"tableNum\": 1\n        }\n    ],\n    \"tableRequests\": [{\n        \"gamePlayerId\": {{gamePlayerId}},\n        \"playerName\": \"John Doe\",\n        \"tableNum\": 1\n    }]\n}"
 								},
 								"url": {
-									"raw": "{{url}}/api/v2/games/{{gameId}}/seats",
+									"raw": "{{url}}/api/v3/games/{{gameId}}/seats",
 									"host": [
 										"{{url}}"
 									],
 									"path": [
 										"api",
-										"v2",
+										"v3",
 										"games",
 										"{{gameId}}",
 										"seats"
@@ -766,7 +808,7 @@
 									{
 										"key": "Content-Type",
 										"type": "text",
-										"value": "application/vnd.texastoc.notify-seats+json"
+										"value": "application/vnd.texastoc.notify-seating+json"
 									}
 								],
 								"body": {
@@ -774,13 +816,13 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{url}}/api/v2/games/{{gameId}}/seats",
+									"raw": "{{url}}/api/v3/games/{{gameId}}/seats",
 									"host": [
 										"{{url}}"
 									],
 									"path": [
 										"api",
-										"v2",
+										"v3",
 										"games",
 										"{{gameId}}",
 										"seats"
@@ -793,6 +835,43 @@
 				},
 				{
 					"name": "create game",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData) {",
+									"    pm.environment.set(\"gameId\", jsonData.id);",
+									"    console.log('gameId set to created game id ' + jsonData.id)",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let now = new Date();",
+									"let month = '' + now.getMonth() + 1;",
+									"if (month.length === 1) {",
+									"    month = '0' + month;",
+									"}",
+									"let day = '' + now.getDate();",
+									"if (day.length === 1) {",
+									"    day = '0' + day;",
+									"}",
+									"",
+									"let todaysDate = now.getFullYear() + '-' + month + '-' + day;",
+									"console.log(\"today's date \" + todaysDate)",
+									"pm.environment.set(\"todaysDate\", todaysDate); "
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -814,16 +893,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"hostId\": 1,\n    \"date\": \"2020-12-28\",\n    \"doubleBuyIn\": false,\n    \"transportRequired\": false\n}"
+							"raw": "{\n    \"hostId\": 1,\n    \"date\": \"2021-07-01\",\n    \"transportRequired\": false\n}"
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/games",
+							"raw": "{{url}}/api/v3/games",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"games"
 							]
 						}
@@ -838,8 +917,11 @@
 							"script": {
 								"exec": [
 									"var jsonData = pm.response.json();",
-									"pm.environment.set(\"gameId\", jsonData[0].id);",
-									"console.log('gameId set to ' + jsonData[0].id)"
+									"if (jsonData.length > 0) {",
+									"    pm.environment.set(\"gameId\", jsonData[jsonData.length-1].id);",
+									"    console.log('gameId set to ' + jsonData[jsonData.length-1].id)",
+									"}",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -873,19 +955,20 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/games?seasonId={{seasonId}}",
+							"raw": "{{url}}/api/v3/games",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"games"
 							],
 							"query": [
 								{
 									"key": "seasonId",
-									"value": "{{seasonId}}"
+									"value": "{{seasonId}}",
+									"disabled": true
 								}
 							]
 						}
@@ -922,13 +1005,13 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/games/{{gameId}}",
+							"raw": "{{url}}/api/v3/games/{{gameId}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"games",
 								"{{gameId}}"
 							]
@@ -982,13 +1065,13 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/games",
+							"raw": "{{url}}/api/v3/games",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"games"
 							]
 						}
@@ -1008,7 +1091,7 @@
 								}
 							]
 						},
-						"method": "PUT",
+						"method": "PATCH",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -1018,16 +1101,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"hostId\": 9,\n    \"date\": \"2020-12-17\",\n    \"transportRequired\": false\n}"
+							"raw": "{\n    \"hostId\": 2,\n    \"date\": \"2021-07-02\",\n    \"transportRequired\": true\n}"
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/games/{{gameId}}",
+							"raw": "{{url}}/api/v3/games/{{gameId}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"games",
 								"{{gameId}}"
 							]
@@ -1061,13 +1144,13 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/games/{{gameId}}",
+							"raw": "{{url}}/api/v3/games/{{gameId}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"games",
 								"{{gameId}}"
 							]
@@ -1101,13 +1184,13 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/games/{{gameId}}",
+							"raw": "{{url}}/api/v3/games/{{gameId}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"games",
 								"{{gameId}}"
 							]
@@ -1128,8 +1211,11 @@
 							"script": {
 								"exec": [
 									"var jsonData = pm.response.json();",
-									"pm.environment.set(\"playerId\", jsonData.id);",
-									"console.log('playerId set to ' + jsonData.id)"
+									"if (jsonData) {",
+									"    pm.environment.set(\"playerId\", jsonData.id);",
+									"    console.log('playerId set to ' + jsonData.id)",
+									"}",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -1150,6 +1236,7 @@
 						"header": [
 							{
 								"key": "Content-Type",
+								"type": "text",
 								"value": "application/json"
 							}
 						],
@@ -1158,164 +1245,18 @@
 							"raw": "{\n    \"#email\": \"<string>\",\n    \"firstName\": \"first-{{$timestamp}}\",\n    \"lastName\": \"last-{{$timestamp}}\",\n    \"#password\": \"<string>\",\n    \"#phone\": \"<string>\"\n}"
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/players",
+							"raw": "{{url}}/api/v3/players",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"players"
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "Unauthorized",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/v2/players",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"v2",
-										"players"
-									]
-								}
-							},
-							"status": "Unauthorized",
-							"code": 401,
-							"_postman_previewlanguage": "text",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "text/plain"
-								}
-							],
-							"cookie": [],
-							"body": ""
-						},
-						{
-							"name": "Forbidden",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/v2/players",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"v2",
-										"players"
-									]
-								}
-							},
-							"status": "Forbidden",
-							"code": 403,
-							"_postman_previewlanguage": "text",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "text/plain"
-								}
-							],
-							"cookie": [],
-							"body": ""
-						},
-						{
-							"name": "Created",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/v2/players",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"v2",
-										"players"
-									]
-								}
-							},
-							"status": "Created",
-							"code": 201,
-							"_postman_previewlanguage": "text",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "text/plain"
-								}
-							],
-							"cookie": [],
-							"body": ""
-						},
-						{
-							"name": "OK",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/v2/players",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"v2",
-										"players"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "text",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "*/*"
-								}
-							],
-							"cookie": [],
-							"body": ""
-						},
-						{
-							"name": "Not Found",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/v2/players",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"v2",
-										"players"
-									]
-								}
-							},
-							"status": "Not Found",
-							"code": 404,
-							"_postman_previewlanguage": "text",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "text/plain"
-								}
-							],
-							"cookie": [],
-							"body": ""
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "get players",
@@ -1353,13 +1294,13 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/players",
+							"raw": "{{url}}/api/v3/players",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"players"
 							]
 						}
@@ -1389,13 +1330,13 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/players/{{playerId}}",
+							"raw": "{{url}}/api/v3/players/{{playerId}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"players",
 								"{{playerId}}"
 							]
@@ -1420,203 +1361,28 @@
 						"header": [
 							{
 								"key": "Content-Type",
+								"type": "text",
 								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"firstName\": \"first-updated\",\n    \"lastName\": \"last-updated\",\n    \"phone\": \"updated\",\n    \"email\": \"email-updated@abc.com\",\n    \"password\": \"passwordupdated\"\n}"
+							"raw": " {\n   \"firstName\":\"first-updated\",\n   \"lastName\":\"last-updated\",\n   \"phone\":\"updated\",\n   \"email\":\"email-updated@abc.com\"\n}"
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/players/{{playerId}}",
+							"raw": "{{url}}/api/v3/players/{{playerId}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"players",
 								"{{playerId}}"
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "Created",
-							"originalRequest": {
-								"method": "PUT",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/v2/players/:id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"v2",
-										"players",
-										":id"
-									],
-									"variable": [
-										{
-											"key": "id"
-										}
-									]
-								}
-							},
-							"status": "Created",
-							"code": 201,
-							"_postman_previewlanguage": "text",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "text/plain"
-								}
-							],
-							"cookie": [],
-							"body": ""
-						},
-						{
-							"name": "Forbidden",
-							"originalRequest": {
-								"method": "PUT",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/v2/players/:id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"v2",
-										"players",
-										":id"
-									],
-									"variable": [
-										{
-											"key": "id"
-										}
-									]
-								}
-							},
-							"status": "Forbidden",
-							"code": 403,
-							"_postman_previewlanguage": "text",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "text/plain"
-								}
-							],
-							"cookie": [],
-							"body": ""
-						},
-						{
-							"name": "Unauthorized",
-							"originalRequest": {
-								"method": "PUT",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/v2/players/:id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"v2",
-										"players",
-										":id"
-									],
-									"variable": [
-										{
-											"key": "id"
-										}
-									]
-								}
-							},
-							"status": "Unauthorized",
-							"code": 401,
-							"_postman_previewlanguage": "text",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "text/plain"
-								}
-							],
-							"cookie": [],
-							"body": ""
-						},
-						{
-							"name": "Not Found",
-							"originalRequest": {
-								"method": "PUT",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/v2/players/:id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"v2",
-										"players",
-										":id"
-									],
-									"variable": [
-										{
-											"key": "id"
-										}
-									]
-								}
-							},
-							"status": "Not Found",
-							"code": 404,
-							"_postman_previewlanguage": "text",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "text/plain"
-								}
-							],
-							"cookie": [],
-							"body": ""
-						},
-						{
-							"name": "OK",
-							"originalRequest": {
-								"method": "PUT",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/v2/players/:id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"v2",
-										"players",
-										":id"
-									],
-									"variable": [
-										{
-											"key": "id"
-										}
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "text",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "text/plain"
-								}
-							],
-							"cookie": [],
-							"body": ""
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "delete player",
@@ -1638,13 +1404,13 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/players/{{playerId}}",
+							"raw": "{{url}}/api/v3/players/{{playerId}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"players",
 								"{{playerId}}"
 							]
@@ -1700,13 +1466,13 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/v2/settings",
+							"raw": "{{url}}/api/v3/settings",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"v2",
+								"v3",
 								"settings"
 							]
 						}

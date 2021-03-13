@@ -66,10 +66,7 @@ public class PlayerService implements PlayerModule {
             .build()))
         .build();
 
-    int id = playerRepository.save(playerToCreate).getId();
-
-    player.setId(id);
-    return player;
+    return playerRepository.save(playerToCreate);
   }
 
   @Override
