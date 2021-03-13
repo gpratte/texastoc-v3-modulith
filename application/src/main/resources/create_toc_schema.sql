@@ -13,8 +13,8 @@ DROP TABLE IF EXISTS seat;
 DROP TABLE IF EXISTS game_table;
 DROP TABLE IF EXISTS game_player;
 DROP TABLE IF EXISTS game_payout;
-DROP TABLE IF EXISTS game;
 DROP TABLE IF EXISTS seating;
+DROP TABLE IF EXISTS game;
 DROP TABLE IF EXISTS season_estimated_payout;
 DROP TABLE IF EXISTS season_payout_settings;
 DROP TABLE IF EXISTS toc_config;
@@ -136,61 +136,49 @@ CREATE TABLE role
 alter table role
     add constraint fk_role_player foreign key (player) references player (id);
 
-CREATE TABLE seating
-(
-    id      int NOT NULL AUTO_INCREMENT,
-    game_id int NOT NULL,
-    PRIMARY KEY (id)
-);
-ALTER TABLE seating
-    ADD UNIQUE (game_id);
-
 CREATE TABLE game
 (
-    id                                      int       NOT NULL AUTO_INCREMENT,
-    host_id                                 int            DEFAULT NULL,
-    game_date                               date      NOT NULL,
-    transport_required                      boolean        DEFAULT FALSE,
+    id                                      int  NOT NULL AUTO_INCREMENT,
+    host_id                                 int         DEFAULT NULL,
+    game_date                               date NOT NULL,
+    transport_required                      boolean     DEFAULT FALSE,
 
-    host_name                               varchar(64)    DEFAULT NULL,
-    season_id                               int       NOT NULL,
-    q_season_id                             int       NOT NULL,
-    quarter                                 varchar(16)    DEFAULT NULL,
-    season_game_num                         int            DEFAULT NULL,
-    quarterly_game_num                      int            DEFAULT NULL,
+    host_name                               varchar(64) DEFAULT NULL,
+    season_id                               int  NOT NULL,
+    q_season_id                             int  NOT NULL,
+    quarter                                 varchar(16) DEFAULT NULL,
+    season_game_num                         int         DEFAULT NULL,
+    quarterly_game_num                      int         DEFAULT NULL,
 
-    kitty_cost                              int            DEFAULT 0,
-    buy_in_cost                             int            DEFAULT 0,
-    rebuy_add_on_cost                       int            DEFAULT 0,
-    rebuy_add_on_toc_debit_cost             int            DEFAULT 0,
-    annual_toc_cost                         int            DEFAULT 0,
-    quarterly_toc_cost                      int            DEFAULT 0,
+    kitty_cost                              int         DEFAULT 0,
+    buy_in_cost                             int         DEFAULT 0,
+    rebuy_add_on_cost                       int         DEFAULT 0,
+    rebuy_add_on_toc_debit_cost             int         DEFAULT 0,
+    annual_toc_cost                         int         DEFAULT 0,
+    quarterly_toc_cost                      int         DEFAULT 0,
 
-    buy_in_collected                        int            DEFAULT 0,
-    rebuy_add_on_collected                  int            DEFAULT 0,
-    annual_toc_collected                    int            DEFAULT 0,
-    quarterly_toc_collected                 int            DEFAULT 0,
-    total_collected                         int            DEFAULT 0,
+    buy_in_collected                        int         DEFAULT 0,
+    rebuy_add_on_collected                  int         DEFAULT 0,
+    annual_toc_collected                    int         DEFAULT 0,
+    quarterly_toc_collected                 int         DEFAULT 0,
+    total_collected                         int         DEFAULT 0,
 
-    annual_toc_from_rebuy_add_on_calculated int            DEFAULT 0,
-    rebuy_add_on_less_annual_toc_calculated int            DEFAULT 0,
-    total_combined_toc_calculated           int            DEFAULT 0,
-    kitty_calculated                        int            DEFAULT 0,
-    prize_pot_calculated                    int            DEFAULT 0,
+    annual_toc_from_rebuy_add_on_calculated int         DEFAULT 0,
+    rebuy_add_on_less_annual_toc_calculated int         DEFAULT 0,
+    total_combined_toc_calculated           int         DEFAULT 0,
+    kitty_calculated                        int         DEFAULT 0,
+    prize_pot_calculated                    int         DEFAULT 0,
 
-    num_players                             int            DEFAULT 0,
-    num_paid_players                        int            DEFAULT 0,
+    num_players                             int         DEFAULT 0,
+    num_paid_players                        int         DEFAULT 0,
     started                                 timestamp NULL DEFAULT NULL,
-    last_calculated                         timestamp      DEFAULT NULL,
-    chopped                                 boolean        DEFAULT TRUE,
-    can_rebuy                               boolean        DEFAULT TRUE,
-    finalized                               boolean        DEFAULT FALSE,
-    payout_delta                            int            DEFAULT NULL,
-    seating_id                              int,
+    last_calculated                         timestamp   DEFAULT NULL,
+    chopped                                 boolean     DEFAULT TRUE,
+    can_rebuy                               boolean     DEFAULT TRUE,
+    finalized                               boolean     DEFAULT FALSE,
+    payout_delta                            int         DEFAULT NULL,
     PRIMARY KEY (id)
 );
-alter table game
-    add constraint fk_game_seating foreign key (seating_id) references seating (id);
 
 CREATE TABLE game_player
 (
@@ -244,6 +232,15 @@ CREATE TABLE game_payout
 );
 alter table game_payout
     add constraint fk_game_payout_game foreign key (game) references game (id);
+
+CREATE TABLE seating
+(
+    id      int NOT NULL AUTO_INCREMENT,
+    game_id int NOT NULL,
+    PRIMARY KEY (id)
+);
+alter table seating
+    add constraint fk_seating_game foreign key (game_id) references game (id);
 
 CREATE TABLE seats_per_table
 (
@@ -378,7 +375,6 @@ CREATE TABLE historical_season
 CREATE TABLE historical_season_player
 (
     id                    int NOT NULL AUTO_INCREMENT,
-    season_id             int NOT NULL,
     name                  varchar(64),
     points                int,
     entries               int,

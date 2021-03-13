@@ -132,7 +132,9 @@ public class SeasonCalculator {
         seasonPlayerMap.put(gamePlayer.getPlayerId(), seasonPlayer);
       }
 
-      if (gamePlayer.getTocPoints() != null && gamePlayer.getTocPoints() > 0) {
+      if (gamePlayer.getTocChopPoints() != null && gamePlayer.getTocChopPoints() > 0) {
+        seasonPlayer.setPoints(seasonPlayer.getPoints() + gamePlayer.getTocChopPoints());
+      } else if (gamePlayer.getTocPoints() != null && gamePlayer.getTocPoints() > 0) {
         seasonPlayer.setPoints(seasonPlayer.getPoints() + gamePlayer.getTocPoints());
       }
 

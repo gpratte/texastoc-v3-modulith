@@ -7,13 +7,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.texastoc.TestConstants;
+import com.texastoc.common.PointsGenerator;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.repository.GameRepository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,15 +23,16 @@ import org.mockito.Mockito;
 public class PointsCalculatorTest implements TestConstants {
 
   private PointsCalculator pointsCalculator;
-  private Random random = new Random(System.currentTimeMillis());
-
   private GameRepository gameRepository;
+  private PointsGenerator pointsGenerator;
 
   @Before
   public void before() {
     gameRepository = mock(GameRepository.class);
-    pointsCalculator = new PointsCalculator(CHOP_TENTH_PLACE_INCR, CHOP_TENTH_PLACE_POINTS,
-        CHOP_MULTIPLIER, gameRepository);
+    pointsGenerator = new PointsGenerator(CHOP_TENTH_PLACE_INCR,
+        CHOP_TENTH_PLACE_POINTS,
+        CHOP_MULTIPLIER);
+    pointsCalculator = new PointsCalculator(pointsGenerator, gameRepository);
   }
 
   @Test
@@ -43,7 +44,7 @@ public class PointsCalculatorTest implements TestConstants {
         .build();
 
     pointsCalculator.calculate(game);
-    verify(gameRepository, times(0)).save(any());
+    verify(gameRepository, times(1)).save(any());
   }
 
   @Test
@@ -59,7 +60,7 @@ public class PointsCalculatorTest implements TestConstants {
         .build();
 
     pointsCalculator.calculate(game);
-    verify(gameRepository, times(0)).save(any());
+    verify(gameRepository, times(1)).save(any());
   }
 
   /*
@@ -81,15 +82,15 @@ public class PointsCalculatorTest implements TestConstants {
     // first place both toc and qtoc
     gamePlayers.get(0).setAnnualTocParticipant(true);
     gamePlayers.get(0).setQuarterlyTocParticipant(true);
-    int expectedFirstPlacePoints = pointsCalculator.calculatePlacePoints(7).get(1);
+    int expectedFirstPlacePoints = pointsGenerator.generatePlacePoints(7).get(1);
 
     // third place toc
     gamePlayers.get(2).setAnnualTocParticipant(true);
-    int expectedThirdPlacePoints = pointsCalculator.calculatePlacePoints(7).get(3);
+    int expectedThirdPlacePoints = pointsGenerator.generatePlacePoints(7).get(3);
 
     // fifth place qtoc
     gamePlayers.get(4).setQuarterlyTocParticipant(true);
-    int expectedFifthPlacePoints = pointsCalculator.calculatePlacePoints(7).get(5);
+    int expectedFifthPlacePoints = pointsGenerator.generatePlacePoints(7).get(5);
 
     Game game = Game.builder()
         .id(1)
@@ -184,13 +185,13 @@ public class PointsCalculatorTest implements TestConstants {
       boolean isMultipleOf3 = isMultipleOf3(place);
       if (isTopTen) {
         if (isOdd || place == 2) {
-          assertEquals(pointsCalculator.calculatePlacePoints(numPlayers).get(i + 1),
+          assertEquals(pointsGenerator.generatePlacePoints(numPlayers).get(i + 1),
               actual.getTocPoints());
         } else {
           Assert.assertNull(actual.getTocPoints());
         }
         if (isMultipleOf3) {
-          assertEquals(pointsCalculator.calculatePlacePoints(numPlayers).get(i + 1),
+          assertEquals(pointsGenerator.generatePlacePoints(numPlayers).get(i + 1),
               actual.getQTocPoints());
         } else {
           Assert.assertNull(actual.getQTocPoints());

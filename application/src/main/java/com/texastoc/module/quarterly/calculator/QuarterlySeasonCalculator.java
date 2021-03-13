@@ -81,7 +81,9 @@ public class QuarterlySeasonCalculator {
         playerMap.put(gamePlayer.getPlayerId(), qSeasonPlayer);
       }
 
-      if (gamePlayer.getQTocPoints() != null && gamePlayer.getQTocPoints() > 0) {
+      if (gamePlayer.getQTocChopPoints() != null && gamePlayer.getQTocChopPoints() > 0) {
+        qSeasonPlayer.setPoints(qSeasonPlayer.getPoints() + gamePlayer.getQTocChopPoints());
+      } else if (gamePlayer.getQTocPoints() != null && gamePlayer.getQTocPoints() > 0) {
         qSeasonPlayer.setPoints(qSeasonPlayer.getPoints() + gamePlayer.getQTocPoints());
       }
 

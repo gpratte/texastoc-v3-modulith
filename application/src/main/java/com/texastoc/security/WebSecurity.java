@@ -39,14 +39,14 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         .headers().frameOptions().sameOrigin().and()
         .authorizeRequests()
         .antMatchers(HttpMethod.POST, "/login").permitAll()
-        .antMatchers(HttpMethod.GET, "/api/v2/settings").permitAll()
+        .antMatchers(HttpMethod.GET, "/api/v3/settings").permitAll()
         .antMatchers(HttpMethod.POST, "/password/reset").permitAll()
         .antMatchers("/socket").permitAll()
         .antMatchers("/socket/**").permitAll()
         .antMatchers("/h2-console").permitAll()
         .antMatchers("/h2-console/*").permitAll()
         .antMatchers("/actuator/*").permitAll()
-        .antMatchers("/v2/api-docs").permitAll()
+        .antMatchers("/v3/api-docs").permitAll()
         .anyRequest().authenticated().and()
         .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider))
         .addFilter(new JwtAuthorizationFilter(authenticationManager(), jwtTokenProvider,
@@ -67,6 +67,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
     corsConfiguration.addAllowedMethod(HttpMethod.PUT.name());
     corsConfiguration.addAllowedMethod(HttpMethod.DELETE.name());
+    corsConfiguration.addAllowedMethod(HttpMethod.PATCH.name());
     corsConfiguration.setAllowCredentials(true);
     corsConfiguration.setAllowedOriginPatterns(ImmutableList.of("*"));
     source.registerCorsConfiguration("/**", corsConfiguration);

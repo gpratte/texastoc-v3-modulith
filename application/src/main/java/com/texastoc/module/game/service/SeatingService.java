@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SeatingService {
@@ -33,6 +34,7 @@ public class SeatingService {
     this.gameRepository = gameRepository;
   }
 
+  @Transactional
   public Seating seatGamePlayers(Seating seating) {
     Optional<Game> optionalGame = gameRepository.findById(seating.getGameId());
     if (!optionalGame.isPresent()) {
@@ -47,6 +49,18 @@ public class SeatingService {
     if (seating.getTableRequests() == null) {
       seating.setTableRequests(Collections.emptyList());
     }
+
+    // Set the name of the player requesting a table
+    seating.getTableRequests().forEach(tableRequest -> {
+      if (tableRequest.getGamePlayerName() == null) {
+        for (GamePlayer gp : game.getPlayers()) {
+          if (tableRequest.getGamePlayerId() == gp.getId()) {
+            tableRequest.setGamePlayerName(gp.getName());
+            break;
+          }
+        }
+      }
+    });
 
     int numTables = seating.getSeatsPerTables().size();
     List<GameTable> gameTables = new ArrayList<>(numTables);

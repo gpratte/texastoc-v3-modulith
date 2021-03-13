@@ -1,5 +1,6 @@
 package com.texastoc.module.game.calculator;
 
+import com.texastoc.common.PointsGenerator;
 import com.texastoc.module.game.calculator.icm.ICMCalculator;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
@@ -9,49 +10,36 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PointsCalculator {
 
-  private final Double tenthPlaceIncr;
-  private final Integer tenthPlacePoints;
-  private final Double multiplier;
+  private final PointsGenerator pointsGenerator;
   private final GameRepository gameRepository;
 
   private final Map<Integer, Map<Integer, Integer>> POINT_SYSTEM = new HashMap<>();
 
-  public PointsCalculator(@Value("${points.tenthPlaceIncr}") Double tenthPlaceIncr,
-      @Value("${points.tenthPlacePoints}") Integer tenthPlacePoints,
-      @Value("${points.multiplier}") Double multiplier, GameRepository gameRepository) {
-    this.tenthPlaceIncr = tenthPlaceIncr;
-    this.tenthPlacePoints = tenthPlacePoints;
-    this.multiplier = multiplier;
+  public PointsCalculator(PointsGenerator pointsGenerator, GameRepository gameRepository) {
+    this.pointsGenerator = pointsGenerator;
     this.gameRepository = gameRepository;
   }
 
   public void calculate(Game game) {
-    boolean calculationRequired = false;
-    for (GamePlayer gamePlayer : game.getPlayers()) {
-      if (gamePlayer.getPlace() != null && gamePlayer.getPlace() < 11) {
-        calculationRequired = true;
-        break;
-      }
-    }
-
-    if (!calculationRequired) {
-      return;
-    }
-
     // Get the points for a game with given number of players
-    Map<Integer, Integer> placePoints = calculatePlacePoints(game.getNumPlayers());
+    Map<Integer, Integer> placePoints = pointsGenerator.generatePlacePoints(game.getNumPlayers());
 
     // Apply the chop
     Map<Integer, Integer> placeChopPoints = chopPoints(game.getPlayers(), placePoints);
 
     // Apply the points to players that participate in either annual or quarterly toc
     for (GamePlayer gamePlayer : game.getPlayers()) {
+      // Remove points
+      gamePlayer.setTocPoints(null);
+      gamePlayer.setTocChopPoints(null);
+      gamePlayer.setQTocPoints(null);
+      gamePlayer.setQTocChopPoints(null);
+      
       if (gamePlayer.getPlace() != null && gamePlayer.getPlace() < 11) {
         if (gamePlayer.isAnnualTocParticipant()) {
           gamePlayer.setTocPoints(placePoints.get(gamePlayer.getPlace()));
@@ -69,47 +57,6 @@ public class PointsCalculator {
     }
 
     gameRepository.save(game);
-  }
-
-  /**
-   * If the place/points Set is in the cache for the number of players return it.
-   * <p>
-   * Otherwise calculate the Set of place/points for the number of players, add it to the cache and
-   * return it.
-   */
-  public Map<Integer, Integer> calculatePlacePoints(int numPlayers) {
-    if (POINT_SYSTEM.get(numPlayers) != null) {
-      return POINT_SYSTEM.get(numPlayers);
-    }
-
-    Map<Integer, Integer> placePoints = new HashMap<>();
-
-    double value = tenthPlacePoints;
-
-    for (int i = 2; i < numPlayers; ++i) {
-      value += tenthPlaceIncr;
-    }
-
-    int players = Math.min(numPlayers, 10);
-
-    if (players == 10) {
-      placePoints.put(10, Long.valueOf(Math.round(value)).intValue());
-    } else {
-      placePoints.put(10, 0);
-    }
-
-    for (int i = 9; i > 0; --i) {
-      value *= multiplier;
-      if (players >= i) {
-        placePoints.put(i, Long.valueOf(Math.round(value))
-            .intValue());
-      } else {
-        placePoints.put(i, 0);
-      }
-    }
-
-    POINT_SYSTEM.put(numPlayers, placePoints);
-    return placePoints;
   }
 
   private Map<Integer, Integer> chopPoints(List<GamePlayer> gamePlayers,

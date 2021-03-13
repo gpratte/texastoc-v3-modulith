@@ -3,6 +3,7 @@ package com.texastoc.module.game.service;
 import com.texastoc.module.game.event.GameEventProducer;
 import com.texastoc.module.game.exception.GameInProgressException;
 import com.texastoc.module.game.model.Game;
+import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.repository.GameRepository;
 import com.texastoc.module.player.PlayerModule;
 import com.texastoc.module.player.PlayerModuleFactory;
@@ -13,6 +14,7 @@ import com.texastoc.module.quarterly.model.QuarterlySeason;
 import com.texastoc.module.season.SeasonModule;
 import com.texastoc.module.season.SeasonModuleFactory;
 import com.texastoc.module.season.model.Season;
+import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -92,6 +94,9 @@ public class GameService {
     currentGame.setDate(game.getDate());
     currentGame.setTransportRequired(game.isTransportRequired());
     gameRepository.save(currentGame);
+    if (currentGame.getPlayers() != null) {
+      Collections.sort(currentGame.getPlayers());
+    }
     gameHelper.sendUpdatedGame();
     return currentGame;
   }
@@ -103,18 +108,29 @@ public class GameService {
     Game game = get(id);
     game.setCanRebuy(value);
     gameRepository.save(game);
+    if (game.getPlayers() != null) {
+      Collections.sort(game.getPlayers());
+    }
     return game;
   }
 
   @Transactional(readOnly = true)
   public Game get(int id) {
-    return gameHelper.get(id);
+    Game game = gameHelper.get(id);
+    if (game.getPlayers() != null) {
+      Collections.sort(game.getPlayers());
+    }
+    return game;
   }
 
   @Transactional(readOnly = true)
   //@Cacheable("currentGame")
   public Game getCurrent() {
-    return gameHelper.getCurrent();
+    Game game = gameHelper.getCurrent();
+    if (game.getPlayers() != null) {
+      Collections.sort(game.getPlayers());
+    }
+    return game;
   }
 
 
@@ -128,17 +144,41 @@ public class GameService {
       seasonId = getSeasonModule().getCurrentId();
     }
 
-    return gameRepository.findBySeasonId(seasonId);
+    List<Game> games = gameRepository.findBySeasonId(seasonId);
+    games.forEach(game -> {
+      List<GamePlayer> gamePlayers = game.getPlayers();
+      if (gamePlayers != null) {
+        Collections.sort(gamePlayers);
+        game.setPlayers(gamePlayers);
+      }
+    });
+    return games;
   }
 
   @Transactional(readOnly = true)
   public List<Game> getByPlayerId(int playerId) {
-    return gameRepository.findByPlayerId(playerId);
+    List<Game> games = gameRepository.findByPlayerId(playerId);
+    games.forEach(game -> {
+      List<GamePlayer> gamePlayers = game.getPlayers();
+      if (gamePlayers != null) {
+        Collections.sort(gamePlayers);
+        game.setPlayers(gamePlayers);
+      }
+    });
+    return games;
   }
 
   @Transactional(readOnly = true)
   public List<Game> getByQuarterlySeasonId(Integer qSeasonId) {
-    return gameRepository.findByQuarterlySeasonId(qSeasonId);
+    List<Game> games = gameRepository.findByQuarterlySeasonId(qSeasonId);
+    games.forEach(game -> {
+      List<GamePlayer> gamePlayers = game.getPlayers();
+      if (gamePlayers != null) {
+        Collections.sort(gamePlayers);
+        game.setPlayers(gamePlayers);
+      }
+    });
+    return games;
   }
 
   //  @CacheEvict(value = {"currentGame", "currentSeason",
@@ -149,6 +189,9 @@ public class GameService {
     Game game = get(id);
 
     if (game.isFinalized()) {
+      if (game.getPlayers() != null) {
+        Collections.sort(game.getPlayers());
+      }
       return game;
     }
 
@@ -157,6 +200,9 @@ public class GameService {
     game.setFinalized(true);
     game.setSeating(null);
     gameRepository.save(game);
+    if (game.getPlayers() != null) {
+      Collections.sort(game.getPlayers());
+    }
     gameEventProducer.notifyGameFinalized(id, game.getSeasonId(), game.getQSeasonId(), true);
     gameHelper.sendUpdatedGame();
     // TODO message clock to end
@@ -170,6 +216,9 @@ public class GameService {
     Game gameToOpen = get(id);
 
     if (!gameToOpen.isFinalized()) {
+      if (gameToOpen.getPlayers() != null) {
+        Collections.sort(gameToOpen.getPlayers());
+      }
       return gameToOpen;
     }
 
@@ -192,6 +241,9 @@ public class GameService {
 
     gameToOpen.setFinalized(false);
     gameRepository.save(gameToOpen);
+    if (gameToOpen.getPlayers() != null) {
+      Collections.sort(gameToOpen.getPlayers());
+    }
     gameHelper.sendUpdatedGame();
     return gameToOpen;
   }

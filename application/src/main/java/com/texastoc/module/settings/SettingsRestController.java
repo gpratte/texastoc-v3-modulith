@@ -6,16 +6,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class SettingsController implements SettingsModule {
+public class SettingsRestController implements SettingsModule {
 
   private final SettingsService settingsService;
 
-  public SettingsController(SettingsService settingsService) {
+  public SettingsRestController(SettingsService settingsService) {
     this.settingsService = settingsService;
   }
 
   @Override
-  @GetMapping("/api/v2/settings")
+  @GetMapping("/api/v3/settings")
   public SystemSettings get() {
     return settingsService.get();
   }

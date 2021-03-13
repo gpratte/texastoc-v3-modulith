@@ -2,6 +2,7 @@ package com.texastoc.module.settings.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.texastoc.common.PointsGenerator;
 import com.texastoc.module.settings.SettingsModule;
 import com.texastoc.module.settings.model.Payout;
 import com.texastoc.module.settings.model.Settings;
@@ -26,12 +27,15 @@ import org.springframework.stereotype.Service;
 public class SettingsService implements SettingsModule {
 
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
   private final SettingsRepository settingsRepository;
   private final String payoutsFileName;
+
   private Map<Integer, List<Payout>> payouts;
+  private Map<Integer, Map<Integer, Integer>> points;
 
   public SettingsService(SettingsRepository settingsRepository, @Value("${payouts.fileName}")
-      String payoutsFileName) {
+      String payoutsFileName, PointsGenerator pointsGenerator) {
     this.settingsRepository = settingsRepository;
     this.payoutsFileName = payoutsFileName;
 
@@ -43,6 +47,11 @@ public class SettingsService implements SettingsModule {
       log.warn("Could not process payouts json", e);
       payouts = new HashMap<>();
     }
+
+    points = new HashMap<>();
+    for (int i = 2; i <= 50; i++) {
+      points.put(i, pointsGenerator.generatePlacePoints(i));
+    }
   }
 
   // TODO cache
@@ -50,7 +59,7 @@ public class SettingsService implements SettingsModule {
   public SystemSettings get() {
     Settings settings = settingsRepository.findById(1).get();
     return new SystemSettings(settings.getId(), settings.getVersion(), settings.getTocConfigs(),
-        payouts);
+        payouts, points);
   }
 
   private String getPayoutsAsJson() throws IOException {

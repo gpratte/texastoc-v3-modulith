@@ -65,14 +65,14 @@ public class GameHelper {
 
   public Game getCurrent() {
     int seasonId = getSeasonModule().getCurrentId();
-    List<Game> games = gameRepository.findUnfinalizedBySeasonId(seasonId);
-    if (games.size() > 0) {
-      return games.get(0);
+    List<Integer> gameIds = gameRepository.findUnfinalizedBySeasonId(seasonId);
+    if (gameIds.size() > 0) {
+      return get(gameIds.get(0));
     }
 
-    games = gameRepository.findMostRecentBySeasonId(seasonId);
-    if (games.size() > 0) {
-      return games.get(0);
+    gameIds = gameRepository.findMostRecentBySeasonId(seasonId);
+    if (gameIds.size() > 0) {
+      return get(gameIds.get(0));
     }
 
     throw new NotFoundException("Current game not found");
