@@ -162,5 +162,6 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 43-do-not-return-void
-Instead of returning void return the object acted on.
+## Current Branch: 44-changes-needed-by-UI
+A bunch of disparate changes for different things needed by the frontend.
+Most notably changing the url version from v2 to v3.
