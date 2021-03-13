@@ -26,18 +26,6 @@ public class PointsCalculator {
   }
 
   public void calculate(Game game) {
-    boolean calculationRequired = false;
-    for (GamePlayer gamePlayer : game.getPlayers()) {
-      if (gamePlayer.getPlace() != null && gamePlayer.getPlace() < 11) {
-        calculationRequired = true;
-        break;
-      }
-    }
-
-    if (!calculationRequired) {
-      return;
-    }
-
     // Get the points for a game with given number of players
     Map<Integer, Integer> placePoints = pointsGenerator.generatePlacePoints(game.getNumPlayers());
 
@@ -46,6 +34,12 @@ public class PointsCalculator {
 
     // Apply the points to players that participate in either annual or quarterly toc
     for (GamePlayer gamePlayer : game.getPlayers()) {
+      // Remove points
+      gamePlayer.setTocPoints(null);
+      gamePlayer.setTocChopPoints(null);
+      gamePlayer.setQTocPoints(null);
+      gamePlayer.setQTocChopPoints(null);
+      
       if (gamePlayer.getPlace() != null && gamePlayer.getPlace() < 11) {
         if (gamePlayer.isAnnualTocParticipant()) {
           gamePlayer.setTocPoints(placePoints.get(gamePlayer.getPlace()));

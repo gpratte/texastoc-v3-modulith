@@ -44,7 +44,7 @@ public class PointsCalculatorTest implements TestConstants {
         .build();
 
     pointsCalculator.calculate(game);
-    verify(gameRepository, times(0)).save(any());
+    verify(gameRepository, times(1)).save(any());
   }
 
   @Test
@@ -60,7 +60,7 @@ public class PointsCalculatorTest implements TestConstants {
         .build();
 
     pointsCalculator.calculate(game);
-    verify(gameRepository, times(0)).save(any());
+    verify(gameRepository, times(1)).save(any());
   }
 
   /*

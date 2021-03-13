@@ -94,7 +94,9 @@ public class GameService {
     currentGame.setDate(game.getDate());
     currentGame.setTransportRequired(game.isTransportRequired());
     gameRepository.save(currentGame);
-    Collections.sort(currentGame.getPlayers());
+    if (currentGame.getPlayers() != null) {
+      Collections.sort(currentGame.getPlayers());
+    }
     gameHelper.sendUpdatedGame();
     return currentGame;
   }
@@ -106,14 +108,18 @@ public class GameService {
     Game game = get(id);
     game.setCanRebuy(value);
     gameRepository.save(game);
-    Collections.sort(game.getPlayers());
+    if (game.getPlayers() != null) {
+      Collections.sort(game.getPlayers());
+    }
     return game;
   }
 
   @Transactional(readOnly = true)
   public Game get(int id) {
     Game game = gameHelper.get(id);
-    Collections.sort(game.getPlayers());
+    if (game.getPlayers() != null) {
+      Collections.sort(game.getPlayers());
+    }
     return game;
   }
 
@@ -121,7 +127,9 @@ public class GameService {
   //@Cacheable("currentGame")
   public Game getCurrent() {
     Game game = gameHelper.getCurrent();
-    Collections.sort(game.getPlayers());
+    if (game.getPlayers() != null) {
+      Collections.sort(game.getPlayers());
+    }
     return game;
   }
 
@@ -181,7 +189,9 @@ public class GameService {
     Game game = get(id);
 
     if (game.isFinalized()) {
-      Collections.sort(game.getPlayers());
+      if (game.getPlayers() != null) {
+        Collections.sort(game.getPlayers());
+      }
       return game;
     }
 
@@ -190,7 +200,9 @@ public class GameService {
     game.setFinalized(true);
     game.setSeating(null);
     gameRepository.save(game);
-    Collections.sort(game.getPlayers());
+    if (game.getPlayers() != null) {
+      Collections.sort(game.getPlayers());
+    }
     gameEventProducer.notifyGameFinalized(id, game.getSeasonId(), game.getQSeasonId(), true);
     gameHelper.sendUpdatedGame();
     // TODO message clock to end
@@ -204,7 +216,9 @@ public class GameService {
     Game gameToOpen = get(id);
 
     if (!gameToOpen.isFinalized()) {
-      Collections.sort(gameToOpen.getPlayers());
+      if (gameToOpen.getPlayers() != null) {
+        Collections.sort(gameToOpen.getPlayers());
+      }
       return gameToOpen;
     }
 
@@ -227,7 +241,9 @@ public class GameService {
 
     gameToOpen.setFinalized(false);
     gameRepository.save(gameToOpen);
-    Collections.sort(gameToOpen.getPlayers());
+    if (gameToOpen.getPlayers() != null) {
+      Collections.sort(gameToOpen.getPlayers());
+    }
     gameHelper.sendUpdatedGame();
     return gameToOpen;
   }

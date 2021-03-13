@@ -232,7 +232,9 @@ public class GameServiceTest implements TestConstants {
   @Test
   public void testGet() {
     // Arrange
-    when(gameHelper.get(123)).thenReturn(Game.builder().id(123).build());
+    when(gameHelper.get(123)).thenReturn(Game.builder()
+        .id(123)
+        .build());
 
     // Act
     Game game = gameService.get(123);
