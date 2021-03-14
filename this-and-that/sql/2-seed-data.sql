@@ -2,62 +2,126 @@
 -- Run this file from command line
 --   mysql -u <user> -p < 2-seed-data.sql
 
-insert into tocconfig (kittyDebit, annualTocCost, quarterlyTocCost, quarterlyNumPayouts, regularBuyInCost, regularRebuyCost, regularRebuyTocDebit, doubleBuyInCost, doubleRebuyCost, doubleRebuyTocDebit) values (10, 20, 20, 3, 40, 40, 20, 40, 40, 20);
-
-INSERT INTO role (id, description, name) VALUES (1, 'Admin role', 'ADMIN');
-INSERT INTO role (id, description, name) VALUES (2, 'User role', 'USER');
-
-insert into payout (numPayouts, place, percent) values (2, 1, 0.65);
-insert into payout (numPayouts, place, percent) values (2, 2, 0.35);
-insert into payout (numPayouts, place, percent) values (3, 1, 0.50);
-insert into payout (numPayouts, place, percent) values (3, 2, 0.30);
-insert into payout (numPayouts, place, percent) values (3, 3, 0.20);
-insert into payout (numPayouts, place, percent) values (4, 1, 0.45);
-insert into payout (numPayouts, place, percent) values (4, 2, 0.25);
-insert into payout (numPayouts, place, percent) values (4, 3, 0.18);
-insert into payout (numPayouts, place, percent) values (4, 4, 0.12);
-insert into payout (numPayouts, place, percent) values (5, 1, 0.40);
-insert into payout (numPayouts, place, percent) values (5, 2, 0.23);
-insert into payout (numPayouts, place, percent) values (5, 3, 0.16);
-insert into payout (numPayouts, place, percent) values (5, 4, 0.12);
-insert into payout (numPayouts, place, percent) values (5, 5, 0.09);
-insert into payout (numPayouts, place, percent) values (6, 1, 0.38);
-insert into payout (numPayouts, place, percent) values (6, 2, 0.22);
-insert into payout (numPayouts, place, percent) values (6, 3, 0.15);
-insert into payout (numPayouts, place, percent) values (6, 4, 0.11);
-insert into payout (numPayouts, place, percent) values (6, 5, 0.08);
-insert into payout (numPayouts, place, percent) values (6, 6, 0.06);
-insert into payout (numPayouts, place, percent) values (7, 1, 0.35);
-insert into payout (numPayouts, place, percent) values (7, 2, 0.21);
-insert into payout (numPayouts, place, percent) values (7, 3, 0.15);
-insert into payout (numPayouts, place, percent) values (7, 4, 0.11);
-insert into payout (numPayouts, place, percent) values (7, 5, 0.08);
-insert into payout (numPayouts, place, percent) values (7, 6, 0.06);
-insert into payout (numPayouts, place, percent) values (7, 7, 0.04);
-insert into payout (numPayouts, place, percent) values (8, 1, 0.335);
-insert into payout (numPayouts, place, percent) values (8, 2, 0.20);
-insert into payout (numPayouts, place, percent) values (8, 3, 0.145);
-insert into payout (numPayouts, place, percent) values (8, 4, 0.11);
-insert into payout (numPayouts, place, percent) values (8, 5, 0.08);
-insert into payout (numPayouts, place, percent) values (8, 6, 0.06);
-insert into payout (numPayouts, place, percent) values (8, 7, 0.04);
-insert into payout (numPayouts, place, percent) values (8, 8, 0.03);
-insert into payout (numPayouts, place, percent) values (9, 1, 0.32);
-insert into payout (numPayouts, place, percent) values (9, 2, 0.195);
-insert into payout (numPayouts, place, percent) values (9, 3, 0.14);
-insert into payout (numPayouts, place, percent) values (9, 4, 0.11);
-insert into payout (numPayouts, place, percent) values (9, 5, 0.08);
-insert into payout (numPayouts, place, percent) values (9, 6, 0.06);
-insert into payout (numPayouts, place, percent) values (9, 7, 0.04);
-insert into payout (numPayouts, place, percent) values (9, 8, 0.03);
-insert into payout (numPayouts, place, percent) values (9, 9, 0.025);
-insert into payout (numPayouts, place, percent) values (10, 1, 0.30);
-insert into payout (numPayouts, place, percent) values (10, 2, 0.19);
-insert into payout (numPayouts, place, percent) values (10, 3, 0.1325);
-insert into payout (numPayouts, place, percent) values (10, 4, 0.105);
-insert into payout (numPayouts, place, percent) values (10, 5, 0.075);
-insert into payout (numPayouts, place, percent) values (10, 6, 0.055);
-insert into payout (numPayouts, place, percent) values (10, 7, 0.0375);
-insert into payout (numPayouts, place, percent) values (10, 8, 0.03);
-insert into payout (numPayouts, place, percent) values (10, 9, 0.0225);
-insert into payout (numPayouts, place, percent) values (10, 10, 0.015);
+INSERT INTO season_payout_settings
+VALUES (1, 2021, '[
+  {
+    "lowRange":16000,
+    "highRange":20000,
+    "guaranteed":[
+      {
+        "place":1,
+        "amount":4400,
+        "percent":20
+      }
+    ],
+    "finalTable":[
+      {
+        "place":2,
+        "amount":4000,
+        "percent":20
+      },
+      {
+        "place":3,
+        "amount":3850,
+        "percent":16
+      },
+      {
+        "place":4,
+        "amount":3750,
+        "percent":14
+      },
+      {
+        "place":5,
+        "amount":0,
+        "percent":30
+      }
+    ]
+  },
+  {
+    "lowRange":20000,
+    "highRange":24000,
+    "guaranteed":[
+      {
+        "place":1,
+        "amount":5000,
+        "percent":15
+      },
+      {
+        "place":2,
+        "amount":4500,
+        "percent":8
+      }
+    ],
+    "finalTable":[
+      {
+        "place":3,
+        "amount":4000,
+        "percent":12
+      },
+      {
+        "place":4,
+        "amount":3500,
+        "percent":9
+      },
+      {
+        "place":5,
+        "amount":3000,
+        "percent":6
+      },
+      {
+        "place":6,
+        "amount":0,
+        "percent":50
+      }
+    ]
+  },
+  {
+    "lowRange":24000,
+    "highRange":28000,
+    "guaranteed":[
+      {
+        "place":1,
+        "amount":5500,
+        "percent":15
+      },
+      {
+        "place":2,
+        "amount":4800,
+        "percent":5
+      }
+    ],
+    "finalTable":[
+      {
+        "place":3,
+        "amount":4000,
+        "percent":14
+      },
+      {
+        "place":4,
+        "amount":3700,
+        "percent":10
+      },
+      {
+        "place":5,
+        "amount":3000,
+        "percent":6
+      },
+      {
+        "place":6,
+        "amount":3000,
+        "percent":0
+      },
+      {
+        "place":7,
+        "amount":0,
+        "percent":50
+      }
+    ]
+  }
+]');
+INSERT INTO version
+VALUES (1, '3.00');
+INSERT INTO settings
+VALUES (1, 1);
+INSERT INTO toc_config
+VALUES (1, 0, 20, 20, 3, 40, 40, 20, 2021, 1);
