@@ -162,6 +162,5 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 44-changes-needed-by-UI
-A bunch of disparate changes for different things needed by the frontend.
-Most notably changing the url version from v2 to v3.
+## Current Branch: 45-sql
+Get sql files read for the new 2021 season deployment.

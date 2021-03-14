@@ -8,48 +8,387 @@
 -- Run this file from command line
 --   mysql -u <user> -p toc < 1-create-mysql-schema.sql
 
-create table if not exists tocconfig (kittyDebit INT NOT NULL, annualTocCost INT NOT NULL, quarterlyTocCost INT NOT NULL, quarterlyNumPayouts INT NOT NULL, regularBuyInCost INT NOT NULL, regularRebuyCost INT NOT NULL, regularRebuyTocDebit INT NOT NULL, doubleBuyInCost INT NOT NULL, doubleRebuyCost INT NOT NULL, doubleRebuyTocDebit INT NOT NULL);
+DROP TABLE IF EXISTS role;
+DROP TABLE IF EXISTS player;
+DROP TABLE IF EXISTS season;
+DROP TABLE IF EXISTS season_player;
+DROP TABLE IF EXISTS season_payout;
+DROP TABLE IF EXISTS season_estimated_payout;
+DROP TABLE IF EXISTS quarterly_season;
+DROP TABLE IF EXISTS quarterly_season_player;
+DROP TABLE IF EXISTS quarterly_season_payout;
+DROP TABLE IF EXISTS seats_per_table;
+DROP TABLE IF EXISTS table_request;
+DROP TABLE IF EXISTS seat;
+DROP TABLE IF EXISTS game_table;
+DROP TABLE IF EXISTS game_player;
+DROP TABLE IF EXISTS game_payout;
+DROP TABLE IF EXISTS seating;
+DROP TABLE IF EXISTS game;
+DROP TABLE IF EXISTS season_estimated_payout;
+DROP TABLE IF EXISTS season_payout_settings;
+DROP TABLE IF EXISTS toc_config;
+DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS version;
+DROP TABLE IF EXISTS historical_season_player;
+DROP TABLE IF EXISTS historical_season;
 
-create table if not exists season (id INT auto_increment, startDate DATE, endDate DATE, kittyPerGame INT, tocPerGame INT, quarterlyTocPerGame INT, quarterlyTocPayouts INT, buyInCost INT, rebuyAddOnCost INT, rebuyAddOnTocDebit INT, doubleBuyInCost INT, doubleRebuyAddOnCost INT, doubleRebuyAddOnTocDebit INT, buyInCollected INT, rebuyAddOnCollected INT, annualTocCollected INT, totalCollected INT, annualTocFromRebuyAddOnCalculated INT, rebuyAddOnLessAnnualTocCalculated INT, totalCombinedAnnualTocCalculated INT, kittyCalculated INT, prizePotCalculated INT, numGames INT, numGamesPlayed INT, finalized BOOLEAN, lastCalculated DATE, primary key(id));
+CREATE TABLE season
+(
+    id                                      int NOT NULL AUTO_INCREMENT,
+    start                                   date      DEFAULT NULL,
+    end                                     date      DEFAULT NULL,
+    kitty_per_game_cost                     int       DEFAULT NULL,
+    toc_per_game_cost                       int       DEFAULT NULL,
+    quarterly_toc_per_game_cost             int       DEFAULT NULL,
+    buy_in_cost                             int       DEFAULT NULL,
+    rebuy_add_on_cost                       int       DEFAULT NULL,
+    rebuy_add_on_toc_debit_cost             int       DEFAULT NULL,
+    buy_in_collected                        int       DEFAULT NULL,
+    rebuy_add_on_collected                  int       DEFAULT NULL,
+    annual_toc_collected                    int       DEFAULT NULL,
+    total_collected                         int       DEFAULT NULL,
+    annual_toc_from_rebuy_add_on_calculated int       DEFAULT NULL,
+    rebuy_add_on_less_annual_toc_calculated int       DEFAULT NULL,
+    total_combined_annual_toc_calculated    int       DEFAULT NULL,
+    kitty_calculated                        int       DEFAULT NULL,
+    prize_pot_calculated                    int       DEFAULT NULL,
+    quarterly_num_payouts                   int       DEFAULT NULL,
+    num_games                               int       DEFAULT NULL,
+    num_games_played                        int       DEFAULT NULL,
+    finalized                               boolean   DEFAULT NULL,
+    last_calculated                         timestamp DEFAULT NULL,
+    PRIMARY KEY (id)
+);
 
-create table if not exists quarterlyseason (id INT auto_increment, seasonId INT NOT NULL, startDate DATE, endDate DATE, finalized BOOLEAN, quarter INT NOT NULL, numGames INT, numGamesPlayed INT, qTocCollected INT, qTocPerGame INT, numPayouts INT NOT NULL, lastCalculated DATE, primary key(id));
+CREATE TABLE season_player
+(
+    id         int NOT NULL AUTO_INCREMENT,
+    player_id  int NOT NULL,
+    season_id  int NOT NULL,
+    name       varchar(64) DEFAULT NULL,
+    entries    int         DEFAULT 0,
+    points     int         DEFAULT 0,
+    place      int         DEFAULT 0,
+    forfeit    boolean     DEFAULT FALSE,
+    season     int NOT NULL,
+    season_key int NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY Season_Player_Unique (player_id, season_id)
+);
 
-create table if not exists seasonplayer (id INT auto_increment, playerId INT NOT NULL, seasonId INT NOT NULL, name varchar(64) DEFAULT NULL, entries INT DEFAULT 0, points INT DEFAULT 0, place INT DEFAULT 0, forfeit BOOLEAN DEFAULT false, primary key(id));
+CREATE TABLE quarterly_season
+(
+    id                  int         NOT NULL AUTO_INCREMENT,
+    season_id           int         NOT NULL,
+    start               date      DEFAULT NULL,
+    end                 date      DEFAULT NULL,
+    finalized           boolean   DEFAULT NULL,
+    quarter             varchar(16) NOT NULL,
+    num_games           int       DEFAULT 0,
+    num_games_played    int       DEFAULT 0,
+    q_toc_collected     int       DEFAULT 0,
+    q_toc_per_game_cost int       DEFAULT 0,
+    num_payouts         int       DEFAULT 0,
+    last_calculated     timestamp DEFAULT NULL,
+    PRIMARY KEY (id)
+);
 
-ALTER TABLE seasonplayer ADD CONSTRAINT SPlayer_Unique UNIQUE (playerId, seasonId);
+CREATE TABLE quarterly_season_player
+(
+    id                   int NOT NULL AUTO_INCREMENT,
+    player_id            int NOT NULL,
+    season_id            int NOT NULL,
+    q_season_id          int NOT NULL,
+    name                 varchar(64) DEFAULT NULL,
+    entries              int         DEFAULT 0,
+    points               int         DEFAULT 0,
+    place                int         DEFAULT NULL,
+    quarterly_season     int NOT NULL,
+    quarterly_season_key int NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY QSPlayer_Unique (player_id, season_id, q_season_id)
+);
 
-create table if not exists quarterlyseasonplayer (id INT auto_increment, playerId INT NOT NULL, seasonId INT NOT NULL, qSeasonId INT NOT NULL, name varchar(64) DEFAULT NULL, entries INT DEFAULT 0, points INT DEFAULT 0, place INT, primary key(id));
+CREATE TABLE quarterly_season_payout
+(
+    id                   int NOT NULL AUTO_INCREMENT,
+    season_id            int NOT NULL,
+    q_season_id          int NOT NULL,
+    place                int NOT NULL,
+    amount               int DEFAULT NULL,
+    quarterly_season     int NOT NULL,
+    quarterly_season_key int NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY QQSPayout_Unique (season_id, q_season_id, place)
+);
 
-ALTER TABLE quarterlyseasonplayer ADD CONSTRAINT QSPlayer_Unique UNIQUE (playerId, seasonId, qSeasonId);
+CREATE TABLE player
+(
+    id         int NOT NULL AUTO_INCREMENT,
+    first_name varchar(32)  DEFAULT NULL,
+    last_name  varchar(32)  DEFAULT NULL,
+    phone      varchar(32)  DEFAULT NULL,
+    email      varchar(64)  DEFAULT NULL,
+    password   varchar(255) DEFAULT NULL,
+    PRIMARY KEY (id)
+);
+ALTER TABLE player
+    ADD UNIQUE (email);
 
-create table if not exists supply (id INT auto_increment, amount INT NOT NULL, date DATE NOT NULL, type varchar(16) NOT NULL, description varchar(64), primary key(id));
+CREATE TABLE role
+(
+    id     int NOT NULL AUTO_INCREMENT,
+    type   varchar(255) DEFAULT NULL,
+    player int,
+    PRIMARY KEY (id)
+);
+alter table role
+    add constraint fk_role_player foreign key (player) references player (id);
 
-create table if not exists player (id INT auto_increment, firstName varchar(32) DEFAULT NULL, lastName varchar(32) DEFAULT NULL, phone varchar(32) DEFAULT NULL, email varchar(64) DEFAULT NULL, password varchar(255) DEFAULT NULL, primary key (id));
+CREATE TABLE game
+(
+    id                                      int       NOT NULL AUTO_INCREMENT,
+    host_id                                 int            DEFAULT NULL,
+    game_date                               date      NOT NULL,
+    transport_required                      boolean        DEFAULT FALSE,
 
-create table game (id INT AUTO_INCREMENT, seasonId INT NOT NULL, qSeasonId INT NOT NULL, hostId INT DEFAULT NULL, gameDate DATE NOT NULL, hostName varchar(64) DEFAULT NULL, quarter INT DEFAULT NULL, doubleBuyIn BOOLEAN DEFAULT FALSE, transportRequired BOOLEAN DEFAULT FALSE, kittyCost INT DEFAULT 0, buyInCost INT DEFAULT 0, rebuyAddOnCost INT DEFAULT 0, rebuyAddOnTocDebit INT DEFAULT 0, annualTocCost INT DEFAULT 0, quarterlyTocCost INT DEFAULT 0, started TIMESTAMP DEFAULT NULL, numPlayers INT DEFAULT 0, buyInCollected INT DEFAULT 0, rebuyAddOnCollected INT DEFAULT 0, annualTocCollected INT DEFAULT 0, quarterlyTocCollected INT DEFAULT 0, totalCollected INT DEFAULT 0, kittyCalculated INT DEFAULT 0, annualTocFromRebuyAddOnCalculated INT DEFAULT 0, rebuyAddOnLessAnnualTocCalculated INT DEFAULT 0, totalCombinedTocCalculated INT DEFAULT 0, prizePotCalculated INT DEFAULT 0, payoutDelta INT DEFAULT NULL, seasonGameNum INT, quarterlyGameNum INT, finalized BOOLEAN DEFAULT FALSE, lastCalculated DATE DEFAULT NULL, PRIMARY KEY (id));
+    host_name                               varchar(64)    DEFAULT NULL,
+    season_id                               int       NOT NULL,
+    q_season_id                             int       NOT NULL,
+    quarter                                 varchar(16)    DEFAULT NULL,
+    season_game_num                         int            DEFAULT NULL,
+    quarterly_game_num                      int            DEFAULT NULL,
 
-create table if not exists gameplayer (id INT auto_increment, playerId INT NOT NULL, gameId INT NOT NULL, qSeasonId INT NOT NULL, seasonId INT NOT NULL, name varchar(64) NOT NULL, place INT DEFAULT NULL, points INT DEFAULT NULL, knockedOut BOOLEAN DEFAULT FALSE, roundUpdates BOOLEAN DEFAULT FALSE, buyInCollected INT DEFAULT NULL, rebuyAddOnCollected INT DEFAULT NULL, annualTocCollected INT DEFAULT NULL, quarterlyTocCollected INT DEFAULT NULL, chop INT DEFAULT NULL, primary key (id));
+    kitty_cost                              int            DEFAULT 0,
+    buy_in_cost                             int            DEFAULT 0,
+    rebuy_add_on_cost                       int            DEFAULT 0,
+    rebuy_add_on_toc_debit_cost             int            DEFAULT 0,
+    annual_toc_cost                         int            DEFAULT 0,
+    quarterly_toc_cost                      int            DEFAULT 0,
 
-create table if not exists gamepayout (id INT auto_increment, gameId INT NOT NULL, place INT NOT NULL, amount INT DEFAULT NULL, chopAmount INT DEFAULT NULL, chopPercent DOUBLE DEFAULT NULL, PRIMARY KEY (id));
+    buy_in_collected                        int            DEFAULT 0,
+    rebuy_add_on_collected                  int            DEFAULT 0,
+    annual_toc_collected                    int            DEFAULT 0,
+    quarterly_toc_collected                 int            DEFAULT 0,
+    total_collected                         int            DEFAULT 0,
 
-ALTER TABLE gamepayout ADD CONSTRAINT GPayout_Unique UNIQUE (gameId, place);
+    annual_toc_from_rebuy_add_on_calculated int            DEFAULT 0,
+    rebuy_add_on_less_annual_toc_calculated int            DEFAULT 0,
+    total_combined_toc_calculated           int            DEFAULT 0,
+    kitty_calculated                        int            DEFAULT 0,
+    prize_pot_calculated                    int            DEFAULT 0,
 
-create table if not exists seasonpayout (id INT auto_increment, seasonId INT NOT NULL, place INT NOT NULL, amount INT DEFAULT NULL, PRIMARY KEY (id));
+    num_players                             int            DEFAULT 0,
+    num_paid_players                        int            DEFAULT 0,
+    started                                 timestamp NULL DEFAULT NULL,
+    last_calculated                         timestamp      DEFAULT NULL,
+    chopped                                 boolean        DEFAULT TRUE,
+    can_rebuy                               boolean        DEFAULT TRUE,
+    finalized                               boolean        DEFAULT FALSE,
+    payout_delta                            int            DEFAULT NULL,
+    PRIMARY KEY (id)
+);
 
-ALTER TABLE seasonpayout ADD CONSTRAINT SPayout_Unique UNIQUE (seasonId, place);
+CREATE TABLE game_player
+(
+    id                        int NOT NULL AUTO_INCREMENT,
+    player_id                 int NOT NULL,
+    game_id                   int NOT NULL,
+    bought_in                 boolean     DEFAULT NULL,
+    rebought                  boolean     DEFAULT NULL,
+    annual_toc_participant    boolean     DEFAULT NULL,
+    quarterly_toc_participant boolean     DEFAULT NULL,
+    round_updates             boolean     DEFAULT FALSE,
+    place                     int         DEFAULT NULL,
+    knocked_out               boolean     DEFAULT FALSE,
+    chop                      int         DEFAULT NULL,
 
-create table if not exists quarterlyseasonpayout (id INT auto_increment, seasonId INT NOT NULL, qSeasonId INT NOT NULL, place INT NOT NULL, amount INT DEFAULT NULL, PRIMARY KEY (id));
+    season_id                 int NOT NULL,
+    q_season_id               int NOT NULL,
+    first_name                varchar(64) DEFAULT NULL,
+    last_name                 varchar(64) DEFAULT NULL,
+    email                     varchar(64) DEFAULT NULL,
+    phone                     varchar(64) DEFAULT NULL,
+    toc_points                int         DEFAULT NULL,
+    toc_chop_points           int         DEFAULT NULL,
+    q_toc_points              int         DEFAULT NULL,
+    q_toc_chop_points         int         DEFAULT NULL,
 
-ALTER TABLE quarterlyseasonpayout ADD CONSTRAINT QSPayout_Unique UNIQUE (seasonId, qSeasonId, place);
+    buy_in_collected          boolean     DEFAULT NULL,
+    rebuy_add_on_collected    boolean     DEFAULT NULL,
+    annual_toc_collected      boolean     DEFAULT NULL,
+    quarterly_toc_collected   boolean     DEFAULT NULL,
 
-create table if not exists seating (gameId INT NOT NULL, settings varchar(8192) NOT NULL, PRIMARY KEY (gameId));
+    game                      int NOT NULL,
+    game_key                  int NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY game_player_unique (game_id, player_id)
+);
+alter table game_player
+    add constraint fk_game_player_game foreign key (game) references game (id);
 
-create table if not exists role (id int auto_increment, description varchar(255), name varchar(255), primary key (id));
+CREATE TABLE game_payout
+(
+    id          int NOT NULL AUTO_INCREMENT,
+    game_id     int NOT NULL,
+    place       int NOT NULL,
+    amount      int DEFAULT NULL,
+    chop_amount int DEFAULT NULL,
+    game        int NOT NULL,
+    game_key    int NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY game_payout_unique (game_id, place)
+);
+alter table game_payout
+    add constraint fk_game_payout_game foreign key (game) references game (id);
 
-create table if not exists player_roles (playerId int not null, roleId int not null, primary key (playerId, roleId));
+CREATE TABLE seating
+(
+    id      int NOT NULL AUTO_INCREMENT,
+    game_id int NOT NULL,
+    PRIMARY KEY (id)
+);
+alter table seating
+    add constraint fk_seating_game foreign key (game_id) references game (id);
 
-alter table player_roles add constraint fk_role_id foreign key (roleId) references role (id);
+CREATE TABLE seats_per_table
+(
+    id          int NOT NULL AUTO_INCREMENT,
+    num_seats   int NOT NULL,
+    table_num   int NOT NULL,
+    seating     int NOT NULL,
+    seating_key int NOT NULL,
+    PRIMARY KEY (id)
+);
+alter table seats_per_table
+    add constraint fk_seats_per_table_seating foreign key (seating) references seating (id);
 
-alter table player_roles add constraint fk_player_id foreign key (playerId) references player (id);
+CREATE TABLE table_request
+(
+    id               int          NOT NULL AUTO_INCREMENT,
+    game_player_id   int          NOT NULL,
+    game_player_name varchar(128) NOT NULL,
+    table_num        int          NOT NULL,
+    seating          int          NOT NULL,
+    seating_key      int          NOT NULL,
+    PRIMARY KEY (id)
+);
+alter table table_request
+    add constraint fk_table_request_seating foreign key (seating) references seating (id);
 
-create table if not exists payout (numPayouts INT NOT NULL, place INT NOT NULL, percent DOUBLE DEFAULT NULL, PRIMARY KEY (numPayouts, place));
+CREATE TABLE game_table
+(
+    id          int NOT NULL AUTO_INCREMENT,
+    table_num   int NOT NULL,
+    seating     int NOT NULL,
+    seating_key int NOT NULL,
+    PRIMARY KEY (id)
+);
+alter table game_table
+    add constraint fk_game_table_seating foreign key (seating) references seating (id);
+
+CREATE TABLE seat
+(
+    id               int NOT NULL AUTO_INCREMENT,
+    seat_num         int NOT NULL,
+    table_num        int NOT NULL,
+    game_player_id   int          DEFAULT NULL,
+    game_player_name varchar(128) DEFAULT NULL,
+    game_table       int NOT NULL,
+    game_table_key   int NOT NULL,
+    PRIMARY KEY (id)
+);
+alter table seat
+    add constraint fk_seat_game_table foreign key (game_table) references game_table (id);
+
+CREATE TABLE season_payout
+(
+    id         int NOT NULL AUTO_INCREMENT,
+    season_id  int NOT NULL,
+    place      int NOT NULL,
+    amount     int     DEFAULT NULL,
+    guaranteed boolean DEFAULT false,
+    estimated  boolean DEFAULT false,
+    cash       boolean DEFAULT false,
+    season     int NOT NULL,
+    season_key int NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY Season_Payout_Unique (season_id, place, estimated)
+);
+
+CREATE TABLE season_estimated_payout
+(
+    id         int NOT NULL AUTO_INCREMENT,
+    season_id  int NOT NULL,
+    place      int NOT NULL,
+    amount     int     DEFAULT NULL,
+    guaranteed boolean DEFAULT false,
+    estimated  boolean DEFAULT false,
+    cash       boolean DEFAULT false,
+    season     int NOT NULL,
+    season_key int NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY Season_Estimated_Payout_Unique (season_id, place, estimated)
+);
+
+CREATE TABLE season_payout_settings
+(
+    id         int           NOT NULL AUTO_INCREMENT,
+    start_year int           NOT NULL,
+    settings   varchar(8192) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE version
+(
+    id      int        NOT NULL AUTO_INCREMENT,
+    version varchar(8) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE settings
+(
+    id      int NOT NULL AUTO_INCREMENT,
+    version int,
+    PRIMARY KEY (id)
+);
+alter table settings
+    add constraint fk_settings_version foreign key (version) references version (id);
+
+CREATE TABLE toc_config
+(
+    id                      int NOT NULL AUTO_INCREMENT,
+    kitty_debit             int NOT NULL,
+    annual_toc_cost         int NOT NULL,
+    quarterly_toc_cost      int NOT NULL,
+    quarterly_num_payouts   int NOT NULL,
+    regular_buy_in_cost     int NOT NULL,
+    regular_rebuy_cost      int NOT NULL,
+    regular_rebuy_toc_debit int NOT NULL,
+    year                    int NOT NULL,
+    settings                int NOT NULL,
+    PRIMARY KEY (id)
+);
+alter table toc_config
+    add constraint fk_toc_config_settings foreign key (settings) references settings (id);
+
+CREATE TABLE historical_season
+(
+    id         int NOT NULL AUTO_INCREMENT,
+    season_id  int NOT NULL,
+    start_year int DEFAULT NULL,
+    end_year   int DEFAULT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE historical_season_player
+(
+    id                    int NOT NULL AUTO_INCREMENT,
+    name                  varchar(64),
+    points                int,
+    entries               int,
+    historical_season     int NOT NULL,
+    historical_season_key int NOT NULL,
+    PRIMARY KEY (id)
+);
