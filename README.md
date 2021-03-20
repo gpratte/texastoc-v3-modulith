@@ -209,6 +209,6 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 45-sql
+## Current Branch: 46-in-memory-caching
 
-Get sql files read for the new 2021 season deployment.
+Resurrect cache of the current game, current season and by season Id. Also cache all seasons.
