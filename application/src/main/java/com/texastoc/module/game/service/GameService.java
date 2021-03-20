@@ -17,6 +17,8 @@ import com.texastoc.module.season.model.Season;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,8 +41,7 @@ public class GameService {
     this.gameEventProducer = gameEventProducer;
   }
 
-  // TODO cache
-  //@CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
+  @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
   @Transactional
   public Game create(Game game) {
     // TODO bean validation https://www.baeldung.com/javax-validation
@@ -84,7 +85,7 @@ public class GameService {
     return game;
   }
 
-  //@CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
+  @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
   @Transactional
   public Game update(Game game) {
     // TODO bean validation https://www.baeldung.com/javax-validation
@@ -102,7 +103,7 @@ public class GameService {
   }
 
 
-  //@CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
+  @CacheEvict(value = "currentGame", allEntries = true, beforeInvocation = false)
   @Transactional
   public Game updateCanRebuy(int id, boolean value) {
     Game game = get(id);
@@ -123,8 +124,8 @@ public class GameService {
     return game;
   }
 
+  @Cacheable("currentGame")
   @Transactional(readOnly = true)
-  //@Cacheable("currentGame")
   public Game getCurrent() {
     Game game = gameHelper.getCurrent();
     if (game.getPlayers() != null) {
@@ -134,7 +135,7 @@ public class GameService {
   }
 
 
-  //@CacheEvict(value = "currentGame", allEntries = true)
+  @CacheEvict(value = "currentGame", allEntries = true)
   public void clearCacheGame() {
   }
 
@@ -181,8 +182,8 @@ public class GameService {
     return games;
   }
 
-  //  @CacheEvict(value = {"currentGame", "currentSeason",
-//      "currentSeasonById"}, allEntries = true, beforeInvocation = false)
+  @CacheEvict(value = {"currentGame", "currentSeason",
+      "seasonById", "allSeasons"}, allEntries = true, beforeInvocation = false)
   @Transactional
   public Game finalize(int id) {
     // TODO check that the game has the appropriate finishes (e.g. 1st, 2nd, ...)
@@ -210,8 +211,8 @@ public class GameService {
     return game;
   }
 
-  //  @CacheEvict(value = {"currentGame", "currentSeason",
-//      "currentSeasonById"}, allEntries = true, beforeInvocation = false)
+  @CacheEvict(value = {"currentGame", "currentSeason",
+      "seasonById", "allSeasons"}, allEntries = true, beforeInvocation = false)
   public Game unfinalize(int id) {
     Game gameToOpen = get(id);
 

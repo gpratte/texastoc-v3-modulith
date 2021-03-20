@@ -1,6 +1,8 @@
 package com.texastoc.config.job;
 
 import com.google.common.collect.ImmutableList;
+import com.texastoc.config.H2DatabaseConfig;
+import com.texastoc.module.game.GameModuleFactory;
 import com.texastoc.module.game.model.Game;
 import com.texastoc.module.game.model.GamePlayer;
 import com.texastoc.module.game.model.Seating;
@@ -9,9 +11,12 @@ import com.texastoc.module.game.model.TableRequest;
 import com.texastoc.module.game.service.GamePlayerService;
 import com.texastoc.module.game.service.GameService;
 import com.texastoc.module.game.service.SeatingService;
+import com.texastoc.module.notification.NotificationModuleFactory;
 import com.texastoc.module.player.PlayerModule;
 import com.texastoc.module.player.PlayerModuleFactory;
 import com.texastoc.module.player.model.Player;
+import com.texastoc.module.quarterly.QuarterlySeasonModuleFactory;
+import com.texastoc.module.season.SeasonModuleFactory;
 import com.texastoc.module.season.model.Season;
 import com.texastoc.module.season.service.SeasonService;
 import com.texastoc.module.settings.SettingsModule;
@@ -55,18 +60,27 @@ public class PopulationScheduler {
   public void populate() {
     while (true) {
       // Wait for the modules to be ready
-      try {
-        getPlayerModule();
-        getSettingsModule();
-        break;
-      } catch (Exception e) {
+      if (H2DatabaseConfig.initialized) {
         try {
-          log.info("#");
-          Thread.sleep(1000l);
-        } catch (Exception e2) {
+          GameModuleFactory.getGameModule();
+          SeasonModuleFactory.getSeasonModule();
+          PlayerModuleFactory.getPlayerModule();
+          SettingsModuleFactory.getSettingsModule();
+          NotificationModuleFactory.getNotificationModule();
+          QuarterlySeasonModuleFactory.getQuarterlySeasonModule();
+          break;
+        } catch (Exception e) {
           // do nothing
+          log.info("#");
         }
       }
+
+      try {
+        Thread.sleep(1000l);
+      } catch (Exception e) {
+        // do nothing
+      }
+
     }
     createSeason();
   }
@@ -280,6 +294,7 @@ public class PopulationScheduler {
     }
     return date;
   }
+
 
   private PlayerModule getPlayerModule() {
     if (playerModule == null) {
