@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,8 +54,8 @@ public class SeasonService {
     this.seasonHistoryRepository = seasonHistoryRepository;
   }
 
-  // TODO caching
-  //  @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
+  @CacheEvict(value = {"currentSeason",
+      "seasonById", "allSeasons"}, allEntries = true, beforeInvocation = false)
   @Transactional
   public Season create(int startYear) {
     LocalDate start = LocalDate.of(startYear, Month.MAY.getValue(), 1);
@@ -109,7 +111,7 @@ public class SeasonService {
     return season;
   }
 
-  //  @Cacheable("currentSeasonById")
+  @Cacheable("seasonById")
   @Transactional(readOnly = true)
   public Season get(int id) {
     Optional<Season> optionalSeason = seasonRepository.findById(id);
@@ -120,7 +122,7 @@ public class SeasonService {
 
   }
 
-  //  @Cacheable("currentSeason")
+  @Cacheable("currentSeason")
   @Transactional(readOnly = true)
   public Season getCurrent() {
     Season season = null;
@@ -146,12 +148,14 @@ public class SeasonService {
     return getCurrent().getId();
   }
 
+  @Cacheable("allSeasons")
   public List<Season> getAll() {
     return StreamSupport.stream(seasonRepository.findAll().spliterator(), false)
         .collect(Collectors.toList());
   }
 
-  //  @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
+  @CacheEvict(value = {"currentSeason",
+      "seasonById", "allSeasons"}, allEntries = true, beforeInvocation = false)
   @Transactional
   public Season end(int seasonId) {
     Season season = get(seasonId);
@@ -187,7 +191,8 @@ public class SeasonService {
     return season;
   }
 
-  //  @CacheEvict(value = {"currentSeason", "currentSeasonById"}, allEntries = true, beforeInvocation = false)
+  @CacheEvict(value = {"currentSeason",
+      "seasonById", "allSeasons"}, allEntries = true, beforeInvocation = false)
   @Transactional
   public Season open(int seasonId) {
     Season season = get(seasonId);

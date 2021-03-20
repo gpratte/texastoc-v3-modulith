@@ -42,7 +42,7 @@ public class PlayerService implements PlayerModule {
   private NotificationModule notificationModule;
   private GameModule gameModule;
 
-  // Only one server so cache the forgot password codes here
+  // Only one server so save the forgot password codes here
   private Map<String, String> forgotPasswordCodes = new HashMap<>();
 
   public PlayerService(PlayerRepository playerRepository,

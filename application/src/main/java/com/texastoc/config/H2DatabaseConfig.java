@@ -20,6 +20,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @Configuration
 public class H2DatabaseConfig {
 
+  public static boolean initialized = false;
+
   @Bean
   public DataSource dataSource() {
     DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
@@ -78,6 +80,7 @@ public class H2DatabaseConfig {
           }
         }
       }
+      initialized = true;
     };
   }
 }

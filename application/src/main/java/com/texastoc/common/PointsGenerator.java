@@ -23,9 +23,9 @@ public class PointsGenerator {
   }
 
   /**
-   * If the place/points Set is in the cache for the number of players return it.
+   * If the place/points Set is in a map for the number of players return it.
    * <p>
-   * Otherwise calculate the Set of place/points for the number of players, add it to the cache and
+   * Otherwise calculate the Set of place/points for the number of players, add it to the map and
    * return it.
    */
   public Map<Integer, Integer> generatePlacePoints(int numPlayers) {
