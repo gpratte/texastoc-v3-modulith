@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class MysqlDatabaseConfig {
 
-  @Value("${mysql.url:jdbc:mysql://localhost/toc?useTimezone=true&serverTimezone=CST}")
+  @Value("${mysql.url:jdbc:mysql://localhost/toc?useTimezone=true&serverTimezone=America/Chicago}")
   private String url;
   @Value("${mysql.username:tocuser}")
   private String username;
@@ -27,7 +27,6 @@ public class MysqlDatabaseConfig {
     dataSourceBuilder.url(url);
     dataSourceBuilder.username(username);
     dataSourceBuilder.password(password);
-    dataSourceBuilder.driverClassName("com.mysql.jdbc.Driver");
     return dataSourceBuilder.build();
   }
 }
