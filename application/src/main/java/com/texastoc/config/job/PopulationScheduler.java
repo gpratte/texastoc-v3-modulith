@@ -28,16 +28,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
  * When running with an embedded H2 database populate the current season with games.
  */
-@Profile({"!mysql & !integration-testing"})
 @Slf4j
 @Component
+@ConditionalOnProperty(prefix = "populate", name = "season")
 public class PopulationScheduler {
 
   private final SeasonService seasonService;

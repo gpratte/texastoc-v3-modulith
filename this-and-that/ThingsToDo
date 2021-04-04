@@ -1,4 +1,13 @@
 
+Configure using spring profile and application-<profile>.yml
+Configure beans from the properties set in the application-<profile>
+
+Move rounds into a json file
+
+Java 11?
+
+Remove spring fox?
+
 Travis CICD
-  Heroku deploy
+  Heroku deploy - rest calls instead of messaging?
 

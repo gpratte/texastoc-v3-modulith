@@ -5,7 +5,7 @@ import com.texastoc.module.quarterly.calculator.QuarterlySeasonCalculator;
 
 public class GameFinalizedHandler {
 
-  private QuarterlySeasonCalculator quarterlySeasonCalculator;
+  private final QuarterlySeasonCalculator quarterlySeasonCalculator;
 
   public GameFinalizedHandler(
       QuarterlySeasonCalculator quarterlySeasonCalculator) {

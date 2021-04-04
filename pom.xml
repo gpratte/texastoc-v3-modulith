@@ -54,10 +54,10 @@
 
   <profiles>
     <profile>
-      <id>dev</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
+      <id>h2-embedded-tomcat</id>
+      <properties>
+        <spring-boot.run.profiles>h2</spring-boot.run.profiles>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.springframework.boot</groupId>
@@ -72,7 +72,10 @@
     </profile>
 
     <profile>
-      <id>dev-mysql</id>
+      <id>mysql-embedded-tomcat</id>
+      <properties>
+        <spring-boot.run.profiles>mysql</spring-boot.run.profiles>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.springframework.boot</groupId>
@@ -87,7 +90,10 @@
     </profile>
 
     <profile>
-      <id>prod</id>
+      <id>mysql-provided-tomcat</id>
+      <properties>
+        <spring-boot.run.profiles>mysql</spring-boot.run.profiles>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.springframework.boot</groupId>
