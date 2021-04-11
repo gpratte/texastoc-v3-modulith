@@ -1,5 +1,6 @@
 package com.texastoc.module.season;
 
+import com.texastoc.common.GameFinalizedEvent;
 import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.season.exception.GameInProgressException;
 import com.texastoc.module.season.model.HistoricalSeason;
@@ -67,5 +68,13 @@ public interface SeasonModule {
    * @return the past seasons
    */
   List<HistoricalSeason> getPastSeasons();
+
+  /**
+   * Used as a alternative to event messaging. Hopefully temporary until Heroku fixed the webrunner
+   * hosing with Spring Integration
+   *
+   * @param gameFinalizedEvent
+   */
+  void gameFinalized(GameFinalizedEvent gameFinalizedEvent);
 
 }

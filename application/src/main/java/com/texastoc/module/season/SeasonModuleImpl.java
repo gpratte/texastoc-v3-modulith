@@ -1,5 +1,7 @@
 package com.texastoc.module.season;
 
+import com.texastoc.common.GameFinalizedEvent;
+import com.texastoc.module.season.calculator.SeasonCalculator;
 import com.texastoc.module.season.model.HistoricalSeason;
 import com.texastoc.module.season.model.Season;
 import com.texastoc.module.season.service.HistoricalSeasonService;
@@ -12,11 +14,13 @@ public class SeasonModuleImpl implements SeasonModule {
 
   private final SeasonService seasonService;
   private final HistoricalSeasonService historicalSeasonService;
+  private final SeasonCalculator seasonCalculator;
 
   public SeasonModuleImpl(SeasonService seasonService,
-      HistoricalSeasonService historicalSeasonService) {
+      HistoricalSeasonService historicalSeasonService, SeasonCalculator seasonCalculator) {
     this.seasonService = seasonService;
     this.historicalSeasonService = historicalSeasonService;
+    this.seasonCalculator = seasonCalculator;
   }
 
   @Override
@@ -52,5 +56,10 @@ public class SeasonModuleImpl implements SeasonModule {
   @Override
   public List<HistoricalSeason> getPastSeasons() {
     return historicalSeasonService.getPastSeasons();
+  }
+
+  @Override
+  public void gameFinalized(GameFinalizedEvent event) {
+    seasonCalculator.calculate(event.getSeasonId());
   }
 }

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import com.texastoc.TestConstants;
 import com.texastoc.exception.NotFoundException;
+import com.texastoc.module.quarterly.calculator.QuarterlySeasonCalculator;
 import com.texastoc.module.quarterly.model.Quarter;
 import com.texastoc.module.quarterly.model.QuarterlySeason;
 import com.texastoc.module.quarterly.repository.QuarterlySeasonRepository;
@@ -42,8 +43,9 @@ public class QuarterlySeasonServiceTest implements TestConstants {
 
   @Before
   public void setUp() {
-    qSeasonRepository = Mockito.mock(QuarterlySeasonRepository.class);
-    qSeasonService = new QuarterlySeasonService(qSeasonRepository);
+    qSeasonRepository = mock(QuarterlySeasonRepository.class);
+    QuarterlySeasonCalculator qSeasonCalculator = mock(QuarterlySeasonCalculator.class);
+    qSeasonService = new QuarterlySeasonService(qSeasonRepository, qSeasonCalculator);
     settingsModule = mock(SettingsModule.class);
     ReflectionTestUtils.setField(qSeasonService, "settingsModule", settingsModule);
   }

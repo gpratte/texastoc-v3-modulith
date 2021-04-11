@@ -212,3 +212,21 @@ To see the code for a branch compare the branch to the previous branch.
 ## Current Branch: 46-in-memory-caching
 
 Resurrect cache of the current game, current season and by season Id. Also cache all seasons.
+
+alias sbrpop=
+'mvn -P h2-embedded-tomcat-spring-integration -pl application spring-boot:run
+-Dspring-boot.run.profiles=h2,populate,message-events'
+
+alias sbrit=
+'mvn -P h2-embedded-tomcat-spring-integration -pl application spring-boot:run
+-Dspring-boot.run.profiles=h2,message-events'
+
+alias sbrrestpop='mvn -P h2-embedded-tomcat -pl application spring-boot:run
+-Dspring-boot.run.profiles=h2,populate,message-rest'
+
+mvn -P h2-embedded-tomcat -pl application clean package
+
+java -Dspring.profiles.active=h2,populate,message-rest -jar
+application/target/dependency/webapp-runner.jar application/target/texastoc-v3-application-1.0.war
+
+
