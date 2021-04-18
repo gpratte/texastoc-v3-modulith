@@ -6,10 +6,10 @@ cache:
     - "$HOME/.m2"
 script:
   - mvn clean
-  - mvn -P h2-embedded-tomcat -pl application test
+  - mvn -pl application test
 install:
   - mvn -N io.takari:maven:wrapper
-  - "./mvnw -P h2-embedded-tomcat install -DskipTests=true -Dmaven.javadoc.skip=true -B -V"
+  - "./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V"
 deploy:
   provider: heroku
   api_key:
