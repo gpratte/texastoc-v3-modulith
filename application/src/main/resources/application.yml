@@ -1,16 +1,11 @@
-spring:
-  h2:
-    console:
-      enabled: true
-
-#logging:
-#  level:
-#    org.springframework.jdbc.core: TRACE
-
 server:
   error:
     include-message: always
     include-binding-errors: always
+
+#logging:
+#  level:
+#    org.springframework.jdbc.core: TRACE
 
 payouts:
   fileName: payouts-percentages.json

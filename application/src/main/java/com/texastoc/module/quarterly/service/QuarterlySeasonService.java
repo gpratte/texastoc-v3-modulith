@@ -1,8 +1,10 @@
 package com.texastoc.module.quarterly.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.texastoc.common.GameFinalizedEvent;
 import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.quarterly.QuarterlySeasonModule;
+import com.texastoc.module.quarterly.calculator.QuarterlySeasonCalculator;
 import com.texastoc.module.quarterly.model.Quarter;
 import com.texastoc.module.quarterly.model.QuarterlySeason;
 import com.texastoc.module.quarterly.repository.QuarterlySeasonRepository;
@@ -26,12 +28,15 @@ public class QuarterlySeasonService implements QuarterlySeasonModule {
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   private final QuarterlySeasonRepository qSeasonRepository;
+  private final QuarterlySeasonCalculator qSeasonCalculator;
 
   private SettingsModule settingsModule;
 
   @Autowired
-  public QuarterlySeasonService(QuarterlySeasonRepository qSeasonRepository) {
+  public QuarterlySeasonService(QuarterlySeasonRepository qSeasonRepository,
+      QuarterlySeasonCalculator quarterlySeasonCalculator) {
     this.qSeasonRepository = qSeasonRepository;
+    this.qSeasonCalculator = quarterlySeasonCalculator;
   }
 
   @Override
@@ -126,4 +131,8 @@ public class QuarterlySeasonService implements QuarterlySeasonModule {
     return settingsModule;
   }
 
+  @Override
+  public void gameFinalized(GameFinalizedEvent event) {
+    qSeasonCalculator.calculate(event.getQSeasonId());
+  }
 }

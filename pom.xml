@@ -54,10 +54,10 @@
 
   <profiles>
     <profile>
-      <id>dev</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
+      <id>h2-embedded-tomcat</id>
+      <properties>
+        <spring-boot.run.profiles>h2</spring-boot.run.profiles>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.springframework.boot</groupId>
@@ -72,7 +72,32 @@
     </profile>
 
     <profile>
-      <id>dev-mysql</id>
+      <id>h2-embedded-tomcat-spring-integration</id>
+      <properties>
+        <spring-boot.run.profiles>h2</spring-boot.run.profiles>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-tomcat</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-integration</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>mysql-embedded-tomcat-spring-integration</id>
+      <properties>
+        <spring-boot.run.profiles>mysql</spring-boot.run.profiles>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.springframework.boot</groupId>
@@ -83,11 +108,18 @@
           <artifactId>mysql-connector-java</artifactId>
           <scope>runtime</scope>
         </dependency>
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-integration</artifactId>
+        </dependency>
       </dependencies>
     </profile>
 
     <profile>
-      <id>prod</id>
+      <id>mysql-provided-tomcat-spring-integration</id>
+      <properties>
+        <spring-boot.run.profiles>mysql</spring-boot.run.profiles>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.springframework.boot</groupId>
@@ -98,6 +130,10 @@
           <groupId>mysql</groupId>
           <artifactId>mysql-connector-java</artifactId>
           <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-integration</artifactId>
         </dependency>
       </dependencies>
     </profile>

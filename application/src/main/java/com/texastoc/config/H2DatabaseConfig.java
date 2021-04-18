@@ -6,18 +6,18 @@ import java.io.InputStreamReader;
 import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Only run when the mysql spring profile is not present
  */
-@Profile("!mysql")
 @Configuration
+@ConditionalOnProperty(prefix = "use", name = "h2")
 public class H2DatabaseConfig {
 
   public static boolean initialized = false;

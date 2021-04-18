@@ -28,16 +28,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
  * When running with an embedded H2 database populate the current season with games.
  */
-@Profile({"!mysql & !integration-testing"})
 @Slf4j
 @Component
+@ConditionalOnProperty(prefix = "populate", name = "season")
 public class PopulationScheduler {
 
   private final SeasonService seasonService;
@@ -108,8 +108,7 @@ public class PopulationScheduler {
       }
       Season season = seasonService.create(year);
       createGames(season);
-      System.out.println();
-      log.info("Done populating");
+      log.info("\nDone populating");
     } catch (Exception e) {
       log.error("Problem populating", e);
     }
@@ -132,7 +131,7 @@ public class PopulationScheduler {
         player = players.get(random.nextInt(numPlayers));
       }
 
-      System.out.print(".");
+      log.info(".");
       Game game = gameService.create(Game.builder()
           .hostId(player.getId())
           .date(gameDate)
