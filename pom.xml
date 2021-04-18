@@ -94,7 +94,7 @@
     </profile>
 
     <profile>
-      <id>mysql-embedded-tomcat</id>
+      <id>mysql-embedded-tomcat-spring-integration</id>
       <properties>
         <spring-boot.run.profiles>mysql</spring-boot.run.profiles>
       </properties>
@@ -108,11 +108,15 @@
           <artifactId>mysql-connector-java</artifactId>
           <scope>runtime</scope>
         </dependency>
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-integration</artifactId>
+        </dependency>
       </dependencies>
     </profile>
 
     <profile>
-      <id>mysql-provided-tomcat</id>
+      <id>mysql-provided-tomcat-spring-integration</id>
       <properties>
         <spring-boot.run.profiles>mysql</spring-boot.run.profiles>
       </properties>
@@ -126,6 +130,10 @@
           <groupId>mysql</groupId>
           <artifactId>mysql-connector-java</artifactId>
           <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-integration</artifactId>
         </dependency>
       </dependencies>
     </profile>

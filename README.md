@@ -17,140 +17,116 @@ Break the code into modules by
 
 The spring boot application can be run
 
-* in IntelliJ (embedded tomcat)
-* maven command line (embedded tomcat)
-* as a war deployed to an installed tomcat (not embedded)
-* as a jar using the webapp-runner.jar which is similar to an installed tomcat (not embedded)
+* in an IDE (this README only covers IntelliJ)
+* maven command line
+* as a war and run using the webapp-runner.jar
+* as a war deployed to an installed tomcat
 
-There are two profile settings for building and running the Spring Boot Server: a the maven profile
-setting and a spring profile setting. To make things confusing they
-
-* often have the same name.
-* the absence of a maven profile will fallback to a default profile
-* the absence of a spring profile can cause a runtime configuration change
+There are multiple profile settings for building and running the Spring Boot Server: a the maven profile setting and spring profile(s) setting.
 
 ### Maven Profile
 
-Maven profiles are defined in the <profiles> section in the pom.xml. There are three profiles
-defined: dev, dev-msql and prod.
+Maven profiles are defined in the <profiles> section in the top level pom.xml. The maven profile is used to bring in libraries (i.e. dependencies). The following profiles are defined:
 
-The dev profile is set as the default and hence is used if no profile is specified (or if the dev
-profile is specified). A profile can be specified on the command line by using the "-P" flag (e.g.
--P dev). A profile can be specified in IntelliJ by selecting a profile from the list of Profiles in
-the maven tool window.
+* h2-embedded-tomcat
+* h2-embedded-tomcat-spring-integration
+* mysql-embedded-tomcat-spring-integration
+* mysql-provided-tomcat-spring-integration
 
-The maven dev profile
+A maven profile is specified on the command line by using the "-P" flag (e.g. -P dev). A maven profile can be specified in IntelliJ by selecting a profile from the list of Profiles in the maven tool window.
 
-1. brings in H2 as a dependency
-2. brings in tomcat as a dependency (i.e. embedded)
-3. All database tables will be created and seeded. The tables and seed data can be found in the *
-   create_toc_schema.sql* file.
+The maven h2-embedded-tomcat profile
 
-The maven dev-msql profile
+1. brings in H2
+2. brings in an embedded tomcat (i.e. tomcat runs in the same JVM as the application)
 
-1. brings in MySQL as a dependency
-2. brings in tomcat as a dependency (i.e. embedded)
+The maven h2-embedded-tomcat-spring-integration profile
 
-The maven prod profile
+1. brings in H2
+2. brings in an embedded tomcat (i.e. tomcat runs in the same JVM as the application)
+3. brings in spring integration (used for messaging)
 
-1. brings in MySQL as a dependency
-2. brings in tomcat as a runtime dependency (i.e. not embedded)
+The maven mysql-embedded-tomcat-spring-integration profile
 
-### Spring Profile
+1. brings in MySQL
+2. brings in an embedded tomcat (i.e. tomcat runs in the same JVM as the application)
+3. brings in spring integration (used for messaging)
 
-A spring profile, if set, can be used to conditionally include spring configuration, beans, ... .
-The same is true for the absence of a spring profile.
+### Spring Profiles
 
-When running the mvn command line tool the active spring profile can be set using the
--Dspring-boot.run.profiles=abc command line argument.
+Spring profiles, if set, can be used to conditionally include spring configuration, beans, ... at **runtime**.
 
-To set the spring runtime profile in IntelliJ use the "VM options" with the value "
--Dspring.profiles.active=abc" (without the double quotes).
+When running the mvn command line tool the active spring profile can be set using the *-Dspring-boot.run.profiles=foo,bar* command line argument.
 
-### Running the dev server
+To set the spring runtime profile in IntelliJ use the "VM options" with the value *-Dspring.profiles.active=foo*.
 
-Running the maven dev profile uses an embedded, in-memory H2 database and an embedded tomcat server.
-For this to work the maven profile must be 'dev' and no spring profile is required.
+To set the spring runtime profile in when running the war file set *-Dspring.profiles.active=foo,bar*.
 
-To run in IntelliJ select dev from the maven profiles in the maven tool window. Right click on the
-Application class and select Run from the popup window.
+when the Spring application starts up if the default *application.yml* file is found the properites in that file are configured as runtime properties. For each Spring profile (e.g. foo) if an corresponding properties file is found (e.g. application-foo.yml) then the properties in that file will also be configured as runtime properties.
 
-To run with `mvn` all you have to do is type `mvn -pl application spring-boot:run`
+You will see the following property files
 
-The `-pl application` part of the command instructs maven to run the application module which is
-where the server code is. There is another module called integration which, when run, runs the
-integration tests.
+* application-h2.yml
+* application-message-events.yml
+* application-message-rest.yml
+* application-mysql.yml
+* application-populate.yml
 
-The war can be run in webapp-runner. This is how the server is deployed to Heroku.
+Note that to run the server the profile for the database and the profile for the messaging MUST be defined.
 
-* Build a dev war file by typing `mvn -pl application clean package`
-* Run the server by
-  typing `java -jar application/target/dependency/webapp-runner.jar application/target/texastoc-v3-application-1.0.war`
+The application-h2.yml is used to connect to the H2 database and also to initialize the database schema and seed the data. The file to create the database tables (schema) can be found in the *create_toc_schema.sql* file. The file to seed the tables can be found in the *seed_toc.sql* file.
 
-The dev server is just that - it is meant for development. There is really not reason to run it in
-an installed tomcat.
+The application-message-events.yml properties enables the Spring configuration to use messaging.
 
-### Running the dev-mysql server
+The application-message-rest.yml properties causes the application to make REST calls in lieu of messaging. Why you ask? Because Heroku has a bug and will not start the application when this application is configure to use spring integration for messaging. I hope to remove this work around when Heroku fixes the problem.
 
-Running the maven dev-mysql profile which uses a MySQL database as an embedded tomcat server. For
-this to work the maven profile must be 'dev-mysql' and the spring profile must be 'mysql'.
+The application-mysql.yml properties are used connect to an external MySQL database.
 
-Remember to have a running MySQL database for the server to use.
+The application-populate.yml properties cause a population job to run to load up the application with multiple games for a season.
 
-To run in IntelliJ select dev-mysql from the maven profiles in the maven tool window. Set the VM
-options with the value "-Dspring.profiles.active=mysql" (without the double quotes). Right click on
-the Application class and select Run from the popup window.
+### Running the server
 
-To run with `mvn`
-type `mvn -Dspring-boot.run.profiles=mysql -P dev-mysql -pl application spring-boot:run`
+#### IntelliJ
 
-There is really no reason to run the dev-mysql server in an installed tomcat.
+To run in IntelliJ select one maven profile in the maven tool window. Right click on the Application class and select Run from the popup window. Remember to set which Spring profiles are to be active in the "VM options" of the run configuration.
 
-### Running the prod server
+#### maven command line
 
-Running the maven prod profile uses a MySQL database and runs as a war file deployed to an
-installed (i.e. not embedded) tomcat. For this to work the maven profile must be 'prod' and the
-spring profile must be 'mysql'.
+To run with `mvn` again defined the maven profile on the command line with "-P" and which Spring profiles are to be active with "-Dspring-boot.run.profiles" all followed by "-pl application spring-boot:run".
 
-Remember to have a running MySQL database for the server to use.
+Example of building/running with H2, embedded tomcat, populate data and use spring integration for messaging:
 
-Running the prod server should not be done with IntelliJ or from mvn.
+* *mvn -P h2-embedded-tomcat-spring-integration -Dspring-boot.run.profiles=h2,populate,message-events -pl application spring-boot:run*
 
-A war file must be built by typing `mvn -P prod -pl application clean package`
+Note that the `-pl application` part of the command instructs maven to run the application module which is where the server code is. There is another module called integration which, when run, runs the integration tests.
 
-The war can be run in webapp-runner by
-typing `java -jar -Dspring.profiles.active=mysql application/target/dependency/webapp-runner.jar application/target/texastoc-v3-application-1.0.war`
+#### webapp-runner
 
-For production deploy the war to a tomcat installation and remember to set "
--Dspring.profiles.active=mysql" (without the double quotes). The variable can be set in the
-setenv.sh file as follows:
+The war can be run in webapp-runner. This is how the server is run when deployed to Heroku.
 
-* JAVA_OPTS="-Dspring.profiles.active=mysql"
+* Build a war file by typing `mvn -P h2-embedded-tomcat -pl application clean package`. In this example the war is built the same way it is built when running on Heroku (i.e. H2 and embedded tomcat).
+* Run the server by typing `java -Dspring.profiles.active=h2,populate,message-rest -jar application/target/dependency/webapp-runner.jar application/target/texastoc-v3-application-1.0.war`. In this example the war is run the same way it is run on Heroku (i.e. H2, populate the data and user REST for messaging).
 
-### Build and Run commands
+#### war deployed to Heroku
 
-Run the dev server: `mvn -pl application spring-boot:run`
-
-Run the dev server in debug
-mode: `mvn -pl application spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8787"`
-
-Run the dev-mysql
-server: `mvn -P dev-mysql -Dspring-boot.run.profiles=mysql -pl application spring-boot:run`
-
-For the dev war
-
-* Build a dev war: `mvn -pl application clean package`
-* Run the dev
-  war: `java -jar application/target/dependency/webapp-runner.jar application/target/texastoc-v3-application-1.0.war`
-* Deploy the dev war to Heroku: `mvn -pl application clean heroku:deploy-war`
+* Build and deploy the war file by typing `mvn -P h2-embedded-tomcat -pl application clean heroku:deploy-war`
 * Tail the Heroku logs: `heroku logs --app texastoc-server --tail`
 
-For the prod war
+Note that the active spring profiles have to be configured in the Heroku config JAVA_OPTS variable as *-Dspring.profiles.active=h2,populate,message-rest*
 
-* Build a prod war: `mvn -P prod -pl application clean package`
-* Run the prod
-  war: `java -jar -Dspring.profiles.active=mysql application/target/dependency/webapp-runner.jar application/target/texastoc-v3-application-1.0.war`
-* Deploying the prod war instruction are still a TODO
+#### war deployed to an external tomcat
+
+Remember to have a running MySQL database for the server to use. Obviously must also have tomcat installed.
+
+* Build the war A war file by typing `mvn -P mysql-provided-tomcat-spring-integration -pl application clean package`
+
+For production deploy the war to a tomcat installation and remember to set the active spring profiles. The JAVA_OPTS variable can be set in tomcat's setenv.sh file as follows:
+
+* JAVA_OPTS="-Dspring.profiles.active=mysql,message-events"
+
+#### Debugging
+
+To run the dev server in debug mode from the maven command line: `mvn -P h2-embedded-tomcat-spring-integration -Dspring-boot.run.profiles=h2,populate,message-events -pl application spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8787"`
 
 # Connect to the H2 server
 
@@ -162,9 +138,13 @@ When running the dev server the H2 database can be access as follows:
 * Leave the password empty
 * Click Connect
 
-# Run tests
+# Testing
 
-You can run the tests in IntelliJ or from the command line.
+There are unit tests and integration tests.
+
+### Unit tests
+
+You can run the unit tests in IntelliJ or from the command line.
 
 To run in IntelliJ right click on the java folder and choose _Run 'All Tests'_
 
@@ -174,10 +154,19 @@ To run all the tests from the command line type
 
 * mvn test
 
+### Integration tests
+
+To run the one or more integration tests the application first has to be started. For example (with debugging)
+
+* *mvn -P h2-embedded-tomcat-spring-integration -Dspring-boot.run.profiles=h2,message-events -pl application spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8787"*
+
+To run in IntelliJ right click on the java folder and choose _Run 'All Tests'_
+
+* integration -> src -> test -> java
+
 # WebSocket
 
-On branch 54-clock-web-socket added a websocket to the server. In the future this websocket will be
-used to communicate a running clock to the client.
+On branch 54-clock-web-socket added a websocket to the server. In the future this websocket will be used to communicate a running clock to the client.
 
 The client is going to first use polling so the websocket requirement has be put on hold.
 
@@ -209,24 +198,10 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 46-in-memory-caching
+## Current Branch: 47-conditionally-message-or-rest
 
-Resurrect cache of the current game, current season and by season Id. Also cache all seasons.
+Can now conditionally use spring integration or REST for messaging. Messaging with event (i.e. using spring integration) still works as it did before. Messaging with REST will now make a API call (when a game is finalized to the quarterly season module and the season module).
 
-alias sbrpop=
-'mvn -P h2-embedded-tomcat-spring-integration -pl application spring-boot:run
--Dspring-boot.run.profiles=h2,populate,message-events'
+The application can now be built and run in such a way to include the spring integration dependency OR use REST.
 
-alias sbrit=
-'mvn -P h2-embedded-tomcat-spring-integration -pl application spring-boot:run
--Dspring-boot.run.profiles=h2,message-events'
-
-alias sbrrestpop='mvn -P h2-embedded-tomcat -pl application spring-boot:run
--Dspring-boot.run.profiles=h2,populate,message-rest'
-
-mvn -P h2-embedded-tomcat -pl application clean package
-
-java -Dspring.profiles.active=h2,populate,message-rest -jar
-application/target/dependency/webapp-runner.jar application/target/texastoc-v3-application-1.0.war
-
-
+The motivation for this is because Heroku has a bug and will not start the application when this application is configure to use spring integration for messaging. I hope to remove this work around when Heroku fixes the problem.
