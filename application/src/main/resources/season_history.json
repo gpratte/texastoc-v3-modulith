@@ -1,5 +1,76 @@
 [
   {
+    "startYear": 2020,
+    "endYear": 2021,
+    "players": [
+      {
+        "name": "Freddy Murphy",
+        "points": 1728,
+        "entries": 52
+      },
+      {
+        "name": "Clint Evans",
+        "points": 1609,
+        "entries": 51
+      },
+      {
+        "name": "Paulie Schuman",
+        "points": 1523,
+        "entries": 52
+      },
+      {
+        "name": "Beau Edge",
+        "points": 1493,
+        "entries": 52
+      },
+      {
+        "name": "Kyle Stein",
+        "points": 1347,
+        "entries": 50
+      },
+      {
+        "name": "Nat Tucker",
+        "points": 1276,
+        "entries": 52
+      },
+      {
+        "name": "Antero Rivero",
+        "points": 929,
+        "entries": 43
+      },
+      {
+        "name": "Ray Avery",
+        "points": 793,
+        "entries": 44
+      },
+      {
+        "name": "Chad Shields",
+        "points": 653,
+        "entries": 23
+      },
+      {
+        "name": "Fred Murphy Sr.",
+        "points": 402,
+        "entries": 15
+      },
+      {
+        "name": "Dave Benavidez",
+        "points": 334,
+        "entries": 9
+      },
+      {
+        "name": "Frank Bevka",
+        "points": 181,
+        "entries": 10
+      },
+      {
+        "name": "Brad Bresnehan",
+        "points": 128,
+        "entries": 4
+      }
+    ]
+  },
+  {
     "startYear": 2019,
     "endYear": 2020,
     "players": [
