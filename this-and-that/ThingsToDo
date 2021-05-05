@@ -5,6 +5,7 @@ Move past season history out of json file
 Create a game save off the season settings with the game. When reoopen a game optional to use the new season settings.
 
 Java 11?
+Gradle?
 
 Remove spring fox?
 
