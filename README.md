@@ -198,10 +198,11 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 47-conditionally-message-or-rest
+## Current Branch: 48-mirror-participant-with-collected
+Set 'collected' fields of a game player to match the 'participated' fields. Also change the columns in the table to be int.
 
-Can now conditionally use spring integration or REST for messaging. Messaging with event (i.e. using spring integration) still works as it did before. Messaging with REST will now make a API call (when a game is finalized to the quarterly season module and the season module).
-
-The application can now be built and run in such a way to include the spring integration dependency OR use REST.
-
-The motivation for this is because Heroku has a bug and will not start the application when this application is configure to use spring integration for messaging. I hope to remove this work around when Heroku fixes the problem.
+* ALTER TABLE game_player MODIFY COLUMN buy_in_collected int;
+* ALTER TABLE game_player
+    MODIFY COLUMN rebuy_add_on_collected int;
+* ALTER TABLE game_player MODIFY COLUMN annual_toc_collected int;
+* ALTER TABLE game_player MODIFY COLUMN quarterly_toc_collected int;
