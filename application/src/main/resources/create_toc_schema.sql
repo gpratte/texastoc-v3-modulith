@@ -205,10 +205,10 @@ CREATE TABLE game_player
     q_toc_points              int         DEFAULT NULL,
     q_toc_chop_points         int         DEFAULT NULL,
 
-    buy_in_collected          boolean     DEFAULT NULL,
-    rebuy_add_on_collected    boolean     DEFAULT NULL,
-    annual_toc_collected      boolean     DEFAULT NULL,
-    quarterly_toc_collected   boolean     DEFAULT NULL,
+    buy_in_collected          int         DEFAULT NULL,
+    rebuy_add_on_collected    int         DEFAULT NULL,
+    annual_toc_collected      int         DEFAULT NULL,
+    quarterly_toc_collected   int         DEFAULT NULL,
 
     game                      int NOT NULL,
     game_key                  int NOT NULL,
