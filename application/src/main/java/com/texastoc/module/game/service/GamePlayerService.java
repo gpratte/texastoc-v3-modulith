@@ -82,10 +82,39 @@ public class GamePlayerService {
 
     existingGamePlayer.setPlace(gamePlayer.getPlace());
     existingGamePlayer.setRoundUpdates(gamePlayer.isRoundUpdates());
-    existingGamePlayer.setBoughtIn(gamePlayer.isBoughtIn());
-    existingGamePlayer.setRebought(gamePlayer.isRebought());
-    existingGamePlayer.setAnnualTocParticipant(gamePlayer.isAnnualTocParticipant());
-    existingGamePlayer.setQuarterlyTocParticipant(gamePlayer.isQuarterlyTocParticipant());
+
+    if (gamePlayer.isBoughtIn()) {
+      existingGamePlayer.setBoughtIn(true);
+      existingGamePlayer.setBuyInCollected(game.getBuyInCost());
+    } else {
+      existingGamePlayer.setBoughtIn(false);
+      existingGamePlayer.setBuyInCollected(null);
+    }
+
+    if (gamePlayer.isRebought()) {
+      existingGamePlayer.setRebought(true);
+      existingGamePlayer.setRebuyAddOnCollected(game.getRebuyAddOnCost());
+    } else {
+      existingGamePlayer.setRebought(false);
+      existingGamePlayer.setRebuyAddOnCollected(null);
+    }
+
+    if (gamePlayer.isAnnualTocParticipant()) {
+      existingGamePlayer.setAnnualTocParticipant(true);
+      existingGamePlayer.setAnnualTocCollected(game.getAnnualTocCost());
+    } else {
+      existingGamePlayer.setAnnualTocParticipant(false);
+      existingGamePlayer.setAnnualTocCollected(null);
+    }
+
+    if (gamePlayer.isQuarterlyTocParticipant()) {
+      existingGamePlayer.setQuarterlyTocParticipant(true);
+      existingGamePlayer.setQuarterlyTocCollected(game.getQuarterlyTocCost());
+    } else {
+      existingGamePlayer.setQuarterlyTocParticipant(false);
+      existingGamePlayer.setQuarterlyTocCollected(null);
+    }
+
     existingGamePlayer.setChop(gamePlayer.getChop());
 
     if (gamePlayer.getPlace() != null && gamePlayer.getPlace() <= 10) {
@@ -168,6 +197,22 @@ public class GamePlayerService {
     }
     gamePlayer.setQSeasonId(game.getQSeasonId());
     gamePlayer.setSeasonId(game.getSeasonId());
+
+    if (gamePlayer.isBoughtIn()) {
+      gamePlayer.setBuyInCollected(game.getBuyInCost());
+    }
+
+    if (gamePlayer.isRebought()) {
+      gamePlayer.setRebuyAddOnCollected(game.getRebuyAddOnCost());
+    }
+
+    if (gamePlayer.isAnnualTocParticipant()) {
+      gamePlayer.setAnnualTocCollected(game.getAnnualTocCost());
+    }
+
+    if (gamePlayer.isQuarterlyTocParticipant()) {
+      gamePlayer.setQuarterlyTocCollected(game.getQuarterlyTocCost());
+    }
 
     if (game.getPlayers() == null) {
       game.setPlayers(new ArrayList<>(1));

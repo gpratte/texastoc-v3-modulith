@@ -1,6 +1,7 @@
 
 Move rounds into a json file
 Move past season history out of json file
+Refactor cucumber tests into JUnit tests.
 
 Create a game save off the season settings with the game. When reoopen a game optional to use the new season settings.
 
