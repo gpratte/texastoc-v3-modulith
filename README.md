@@ -198,11 +198,5 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 48-mirror-participant-with-collected
-Set 'collected' fields of a game player to match the 'participated' fields. Also change the columns in the table to be int.
-
-* ALTER TABLE game_player MODIFY COLUMN buy_in_collected int;
-* ALTER TABLE game_player
-    MODIFY COLUMN rebuy_add_on_collected int;
-* ALTER TABLE game_player MODIFY COLUMN annual_toc_collected int;
-* ALTER TABLE game_player MODIFY COLUMN quarterly_toc_collected int;
+## Current Branch: 49-wire-up-sms
+Inject the sms connector into the notification module and pass through to the method to text.
