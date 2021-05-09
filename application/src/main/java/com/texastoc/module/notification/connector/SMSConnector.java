@@ -42,8 +42,8 @@ public class SMSConnector {
 
   class SendSMS implements Callable<Void> {
 
-    private String phone;
-    private String body;
+    private final String phone;
+    private final String body;
 
     public SendSMS(String phone, String body) {
       this.phone = phone;
