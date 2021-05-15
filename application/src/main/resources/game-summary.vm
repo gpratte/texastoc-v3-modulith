@@ -86,7 +86,13 @@
   <tr>
     <td align="center">$!player.place</td>
     <td>$player.name</td>
-    <td align="center">$!player.tocPoints</td>
+#if($player.tocPoints)
+    <td align="center">$player.tocPoints</td>
+#elseif($player.qTocPoints)
+    <td align="center">$player.qTocPoints</td>
+#else
+    <td align="center"> </td>
+#end
 #if($game.chopped)
     <td align="center">$!player.chop</td>
 #end
