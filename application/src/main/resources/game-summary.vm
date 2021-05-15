@@ -91,7 +91,7 @@
 #elseif($player.qTocPoints)
     <td align="center">$player.qTocPoints</td>
 #else
-    <td align="center"> </td>
+    <td align="center"></td>
 #end
 #if($game.chopped)
     <td align="center">$!player.chop</td>
