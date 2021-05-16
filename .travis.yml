@@ -9,7 +9,7 @@ script:
   - mvn -pl application test package
 install:
   - mvn -N io.takari:maven:wrapper
-  - "./mvnw package install -DskipTests=true -Dmaven.javadoc.skip=true -B -V"
+  - "./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V"
 deploy:
   provider: heroku
   api_key:
