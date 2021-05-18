@@ -1,5 +1,6 @@
 
 Refactor cucumber tests into JUnit tests.
+Remove update password in UI (have to use the forgot password flow)
 Move past season history out of json file
 Get rid of the season estimated payouts
 
