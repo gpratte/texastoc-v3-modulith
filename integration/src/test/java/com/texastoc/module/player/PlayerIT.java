@@ -11,17 +11,17 @@ import com.texastoc.BaseIntegrationTest;
 import com.texastoc.module.player.model.Player;
 import com.texastoc.module.player.model.Role;
 import io.cucumber.java.Before;
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
-public class PlayerStepdefs extends BaseIntegrationTest {
+public class PlayerIT extends BaseIntegrationTest {
 
   Player playerToCreate;
   Player anotherPlayerToCreate;
@@ -34,7 +34,6 @@ public class PlayerStepdefs extends BaseIntegrationTest {
 
   @Before
   public void before() {
-    super.before();
     playerToCreate = null;
     anotherPlayerToCreate = null;
     playerCreated = null;
@@ -45,8 +44,86 @@ public class PlayerStepdefs extends BaseIntegrationTest {
     exception = null;
   }
 
-  @Given("^a new player$")
-  public void a_new_player() throws Exception {
+  @Test
+  public void createAndGet() throws Exception {
+    newPlayer();
+    getPlayer();
+    thePlayerMatches();
+  }
+
+  @Test
+  public void createMultipleAndGet() throws Exception {
+    newPlayer();
+    anotherNewPlayer();
+    getPlayers();
+    thePlayersMatch();
+  }
+
+  @Test
+  public void updatePlayerAsAdmin() throws Exception {
+    // An admin updates another player
+    newPlayer();
+    updatePlayer("admin");
+    getPlayer();
+    theUpdatePlayerMatches();
+  }
+
+  @Test
+  public void updateAnotherPlayerAsNonAdmin() throws Exception {
+    //  A non-admin attempts to update another player
+    newPlayer();
+    updatePlayer("non-admin");
+    checkForbidden();
+  }
+
+  @Test
+  public void deletePlayerAsAdmin() throws Exception {
+    //  An admin deletes a player
+    newPlayer();
+    playerDeleted("admin");
+    getPlayer();
+    checkNotFound();
+  }
+
+  //  Scenario: Delete player as non-admin
+//  A non-admin attempts to delete a player
+//  Given a new player
+//  When the non-admin deletes the player
+//  Then a forbidden error happens
+//
+//  Scenario: Add role as admin
+//  An admin adds a role
+//  Given a new player
+//  When the admin adds a role
+//  And the player is retrieved
+//  Then the player has two roles
+//
+//  Scenario: Add role as non-admin
+//  A non-admin attempts to add a role
+//  Given a new player
+//  When the non-admin adds a role
+//  Then a forbidden error happens
+//
+//  Scenario: Remove role as admin
+//  An admin adds and then removes a role
+//  Given a new player
+//  When the admin adds a role
+//  And the player is retrieved
+//  And the admin removes a role
+//  And the player is retrieved
+//  Then the player has one role
+//
+//  Scenario: Remove role as non-admin
+//  A non-admin attempts to remove a role
+//  Given a new player
+//  When the admin adds a role
+//  And the player is retrieved
+//  And the non-admin removes a role
+//  Then a forbidden error happens
+
+
+  //@Given("^a new player$")
+  public void newPlayer() throws Exception {
     playerToCreate = Player.builder()
         .firstName("John")
         .lastName("Luther")
@@ -58,7 +135,7 @@ public class PlayerStepdefs extends BaseIntegrationTest {
     playerCreated = createPlayer(playerToCreate, login(ADMIN_EMAIL, ADMIN_PASSWORD));
   }
 
-  @Given("^another new player$")
+  //@Given("^another new player$")
   public void anotherNewPlayer() throws Exception {
     anotherPlayerToCreate = Player.builder()
         .firstName("Jane")
@@ -67,7 +144,7 @@ public class PlayerStepdefs extends BaseIntegrationTest {
     anotherPlayerCreated = createPlayer(anotherPlayerToCreate, login(ADMIN_EMAIL, ADMIN_PASSWORD));
   }
 
-  @When("^the (admin|non-admin) updates the player$")
+  //@When("^the (admin|non-admin) updates the player$")
   public void updatePlayer(String who) throws Exception {
     updatePlayer = Player.builder()
         .id(playerCreated.getId())
@@ -87,7 +164,7 @@ public class PlayerStepdefs extends BaseIntegrationTest {
     }
   }
 
-  @When("^the (admin|non-admin) deletes the player$")
+  //@When("^the (admin|non-admin) deletes the player$")
   public void playerDeleted(String who) throws Exception {
     String token = getToken(who);
     try {
@@ -97,7 +174,7 @@ public class PlayerStepdefs extends BaseIntegrationTest {
     }
   }
 
-  @When("^the player is retrieved$")
+  //@When("^the player is retrieved$")
   public void getPlayer() throws Exception {
     String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
     try {
@@ -134,18 +211,18 @@ public class PlayerStepdefs extends BaseIntegrationTest {
     }
   }
 
-  @When("^the players are retrieved$")
+  //@When("^the players are retrieved$")
   public void getPlayers() throws Exception {
     String token = login(ADMIN_EMAIL, ADMIN_PASSWORD);
     playersRetrieved = getPlayers(token);
   }
 
-  @Then("^the player matches$")
+  //@Then("^the player matches$")
   public void thePlayerMatches() throws Exception {
     playerMatches(playerToCreate, playerRetrieved);
   }
 
-  @Then("^the updated player matches$")
+  //@Then("^the updated player matches$")
   public void theUpdatePlayerMatches() throws Exception {
     playerMatches(updatePlayer, playerRetrieved);
   }
@@ -168,7 +245,7 @@ public class PlayerStepdefs extends BaseIntegrationTest {
   }
 
 
-  @Then("^a forbidden error happens$")
+  //@Then("^a forbidden error happens$")
   public void checkForbidden() throws Exception {
     assertTrue("exception should be HttpClientErrorException",
         (exception instanceof HttpClientErrorException));
@@ -176,7 +253,7 @@ public class PlayerStepdefs extends BaseIntegrationTest {
     assertEquals("status should be forbidden", HttpStatus.FORBIDDEN, e.getStatusCode());
   }
 
-  @Then("^a not found error happens$")
+  //@Then("^a not found error happens$")
   public void checkNotFound() throws Exception {
     assertTrue("exception should be HttpClientErrorException",
         (exception instanceof HttpClientErrorException));
@@ -198,7 +275,7 @@ public class PlayerStepdefs extends BaseIntegrationTest {
     assertEquals("should be USER role", Role.Type.USER, roles.get(0).getType());
   }
 
-  @Then("^the players match$")
+  //@Then("^the players match$")
   public void thePlayersMatch() throws Exception {
     boolean firstMatch = false;
     for (Player player : playersRetrieved) {
