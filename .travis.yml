@@ -6,7 +6,7 @@ cache:
     - "$HOME/.m2"
 script:
   - mvn clean
-  - mvn -pl application test package
+  - mvn -pl application test
 install:
   - mvn -N io.takari:maven:wrapper
   - "./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V"
