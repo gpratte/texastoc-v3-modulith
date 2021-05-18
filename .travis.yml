@@ -7,15 +7,3 @@ cache:
 script:
   - mvn clean
   - mvn -pl application test
-install:
-  - mvn -N io.takari:maven:wrapper
-  - "./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V"
-deploy:
-  provider: heroku
-  api_key:
-    secure: XBAbbkQh7JvFcflvmcNYhpbKD+t5fL70rRQ95D89i4519m8Jh3WV9Tea/LDZJ1K0Uvr9cq73/mCnqCPIlnOzn+Rm8rTQyMvsfrym/X8/PDlhWfoZyfePajMDPJBkZEjrrgozXhpaKmD7qdVf7ESmEK9Wr6eM0gBzNOs6UQdpTbYGjcONpXlVS86Sj9Ova2SH0SQpr0wVH3w54PMaBMgw8ohYq8uR7T0FAb6V3Pq07WVB80tm/eLFokFA3aJA9y9lQKk+/cJ9FG0+CzQ+kMrYVcp+2stbCTfnvkdN6MW74RZPHck2LVGp3r2A4g/OsKVQLBfFjH/yDDT1OJ8pLNOW01sIYBcghsXY9DoCLcYZQqKAp2jH5WBQd7pamL3j8hgpW6M5Fn7XPKzCv0eUkxWrDHTYC2Ve283WwNyHlQ6fdHV0cIGmH4JgbinTIPnHT+CBRX8tsO6/RL9GBBQUmqOj23FbvuZk13OGC9jAAvYeJgPNq02PKBdcuefU6qjsATAgONnuqjrAwuj30mlCWrBeiDEX3f9ll7vxe1TiNWWvBi0Ful169RRCwiyvbxkSZomAlTCKo8sL7b9QsTsCK0NoqWcJDNAFRK4YuZmzoG/VyaBvy25Z6YIMLBxsrdQgpCrKR69WiVcHqktMBTTOTADeZYadeaqiP8tazjb/2Vf7n9k=
-  app:
-    master: texastoc-server
-  skip_cleanup: true
-  run:
-    - restart
