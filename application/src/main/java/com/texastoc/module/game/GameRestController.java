@@ -27,8 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class GameRestController {
 
-  public static final String CONTENT_TYPE_CURRENT_GAME = "application/vnd.texastoc.current+json";
-  public static final String CONTENT_TYPE_CLEAR_CACHE = "application/vnd.texastoc.clear-cache+json";
   public static final String CONTENT_TYPE_FINALIZE = "application/vnd.texastoc.finalize+json";
   public static final String CONTENT_TYPE_UNFINALIZE = "application/vnd.texastoc.unfinalize+json";
   public static final String CONTENT_TYPE_NEW_GAME_PLAYER = "application/vnd.texastoc.first-time+json";
@@ -46,9 +44,9 @@ public class GameRestController {
   }
 
   // TODO need season path for all these endpoints
-  @PostMapping(value = "/api/v3/games", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public Game createGame(@RequestBody Game game) {
-    return gameModule.create(game);
+  @PostMapping(value = "/api/v3/{seasonId}/games", consumes = MediaType.APPLICATION_JSON_VALUE)
+  public Game createGame(@PathVariable("id") int seasonId, @RequestBody Game game) {
+    return gameModule.create(game, seasonId);
   }
 
   @PatchMapping(value = "/api/v3/games/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -60,18 +58,6 @@ public class GameRestController {
   @GetMapping("/api/v3/games/{id}")
   public Game getGame(@PathVariable("id") int id) {
     return gameModule.get(id);
-  }
-
-  @GetMapping(value = "/api/v3/games", consumes = CONTENT_TYPE_CURRENT_GAME)
-  public Game getCurrentGame() {
-    return gameModule.getCurrent();
-  }
-
-  // TODO this needs to go away
-  @GetMapping(value = "/api/v3/games", consumes = CONTENT_TYPE_CLEAR_CACHE)
-  public String getCurrentNoCacheGame() {
-    gameService.clearCacheGame();
-    return "done";
   }
 
   @GetMapping("/api/v3/games")

@@ -58,24 +58,19 @@ public class SeasonService {
     this.integrationTestingConfig = integrationTestingConfig;
   }
 
-  @CacheEvict(value = {"currentSeason",
-      "seasonById", "allSeasons"}, allEntries = true, beforeInvocation = false)
+  @CacheEvict(value = {"seasonById", "allSeasons"}, allEntries = true, beforeInvocation = false)
   @Transactional
   public Season create(int startYear) {
     LocalDate start = LocalDate.of(startYear, Month.MAY.getValue(), 1);
 
     // Make sure not overlapping with another season
     if (!integrationTestingConfig.isAllowMultipleSeasons()) {
-      try {
-        Season currentSeason = getCurrentWorker();
-        if (!currentSeason.isFinalized()) {
+      List<Season> seasons = getAll();
+      seasons.forEach(season -> {
+        if (!season.isFinalized()) {
           throw new SeasonInProgressException(startYear);
         }
-      } catch (NotFoundException e) {
-        // do nothing
-      }
-
-      List<Season> seasons = getAll();
+      });
       seasons.forEach(season -> {
         if (season.getStart().getYear() == startYear) {
           throw new DuplicateSeasonException(startYear);
@@ -129,25 +124,13 @@ public class SeasonService {
 
   }
 
-  @Cacheable("currentSeason")
-  @Transactional(readOnly = true)
-  public Season getCurrent() {
-    return getCurrentWorker();
-  }
-
-  @Transactional(readOnly = true)
-  public int getCurrentId() {
-    return getCurrent().getId();
-  }
-
   @Cacheable("allSeasons")
   public List<Season> getAll() {
     return StreamSupport.stream(seasonRepository.findAll().spliterator(), false)
         .collect(Collectors.toList());
   }
 
-  @CacheEvict(value = {"currentSeason",
-      "seasonById", "allSeasons"}, allEntries = true, beforeInvocation = false)
+  @CacheEvict(value = {"seasonById", "allSeasons"}, allEntries = true, beforeInvocation = false)
   @Transactional
   public Season end(int seasonId) {
     Season season = get(seasonId);
@@ -183,8 +166,7 @@ public class SeasonService {
     return season;
   }
 
-  @CacheEvict(value = {"currentSeason",
-      "seasonById", "allSeasons"}, allEntries = true, beforeInvocation = false)
+  @CacheEvict(value = {"seasonById", "allSeasons"}, allEntries = true, beforeInvocation = false)
   @Transactional
   public Season open(int seasonId) {
     Season season = get(seasonId);
@@ -198,25 +180,6 @@ public class SeasonService {
 
     // Clear out the historical season
     seasonHistoryRepository.deleteById(seasonId);
-
-    return season;
-  }
-
-  private Season getCurrentWorker() {
-    Season season = null;
-    List<Season> seasons = seasonRepository.findUnfinalized();
-    if (seasons.size() > 0) {
-      season = seasons.get(0);
-    } else {
-      seasons = seasonRepository.findMostRecent();
-      if (seasons.size() > 0) {
-        season = seasons.get(0);
-      }
-    }
-
-    if (season == null) {
-      throw new NotFoundException("Current season not found");
-    }
 
     return season;
   }

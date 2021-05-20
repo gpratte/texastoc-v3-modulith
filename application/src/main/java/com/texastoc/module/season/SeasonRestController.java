@@ -47,13 +47,6 @@ public class SeasonRestController {
     return seasonService.getAll();
   }
 
-  // TODO get rid of this endpoint
-  @GetMapping("/api/v3/seasons/current")
-  public Season getCurrentSeason() {
-    int id = seasonService.getCurrent().getId();
-    return seasonService.get(id);
-  }
-
   @PreAuthorize("hasRole('ADMIN')")
   @PutMapping(value = "/api/v3/seasons/{id}", consumes = "application/vnd.texastoc.finalize+json")
   public Season finalizeSeason(@PathVariable("id") int id) {
