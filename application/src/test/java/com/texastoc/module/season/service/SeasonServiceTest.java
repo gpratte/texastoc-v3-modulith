@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.texastoc.TestConstants;
+import com.texastoc.config.IntegrationTestingConfig;
 import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.game.GameModule;
 import com.texastoc.module.game.model.Game;
@@ -57,7 +58,9 @@ public class SeasonServiceTest implements TestConstants {
   public void before() {
     seasonRepository = mock(SeasonRepository.class);
     seasonHistoryRepository = mock(SeasonHistoryRepository.class);
-    seasonService = new SeasonService(seasonRepository, seasonHistoryRepository);
+    IntegrationTestingConfig integrationTestingConfig = new IntegrationTestingConfig(false);
+    seasonService = new SeasonService(seasonRepository, seasonHistoryRepository,
+        integrationTestingConfig);
     settingsModule = mock(SettingsModule.class);
     ReflectionTestUtils.setField(seasonService, "settingsModule", settingsModule);
     quarterlySeasonModule = mock(QuarterlySeasonModule.class);

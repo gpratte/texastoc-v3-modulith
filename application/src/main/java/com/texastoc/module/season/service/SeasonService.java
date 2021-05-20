@@ -1,6 +1,7 @@
 package com.texastoc.module.season.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.texastoc.config.IntegrationTestingConfig;
 import com.texastoc.exception.NotFoundException;
 import com.texastoc.module.game.GameModule;
 import com.texastoc.module.game.GameModuleFactory;
@@ -42,6 +43,7 @@ public class SeasonService {
 
   private final SeasonRepository seasonRepository;
   private final SeasonHistoryRepository seasonHistoryRepository;
+  private final IntegrationTestingConfig integrationTestingConfig;
 
   private GameModule gameModule;
   private SettingsModule settingsModule;
@@ -49,9 +51,11 @@ public class SeasonService {
 
   @Autowired
   public SeasonService(SeasonRepository seasonRepository,
-      SeasonHistoryRepository seasonHistoryRepository) {
+      SeasonHistoryRepository seasonHistoryRepository,
+      IntegrationTestingConfig integrationTestingConfig) {
     this.seasonRepository = seasonRepository;
     this.seasonHistoryRepository = seasonHistoryRepository;
+    this.integrationTestingConfig = integrationTestingConfig;
   }
 
   @CacheEvict(value = {"currentSeason",
@@ -59,22 +63,25 @@ public class SeasonService {
   @Transactional
   public Season create(int startYear) {
     LocalDate start = LocalDate.of(startYear, Month.MAY.getValue(), 1);
-    try {
-      Season currentSeason = getCurrent();
-      if (!currentSeason.isFinalized()) {
-        throw new SeasonInProgressException(startYear);
-      }
-    } catch (NotFoundException e) {
-      // do nothing
-    }
 
     // Make sure not overlapping with another season
-    List<Season> seasons = getAll();
-    seasons.forEach(season -> {
-      if (season.getStart().getYear() == startYear) {
-        throw new DuplicateSeasonException(startYear);
+    if (!integrationTestingConfig.isAllowMultipleSeasons()) {
+      try {
+        Season currentSeason = getCurrentWorker();
+        if (!currentSeason.isFinalized()) {
+          throw new SeasonInProgressException(startYear);
+        }
+      } catch (NotFoundException e) {
+        // do nothing
       }
-    });
+
+      List<Season> seasons = getAll();
+      seasons.forEach(season -> {
+        if (season.getStart().getYear() == startYear) {
+          throw new DuplicateSeasonException(startYear);
+        }
+      });
+    }
 
     // The end will be the day before the start date next year
     LocalDate end = start.plusYears(1).minusDays(1);
@@ -125,22 +132,7 @@ public class SeasonService {
   @Cacheable("currentSeason")
   @Transactional(readOnly = true)
   public Season getCurrent() {
-    Season season = null;
-    List<Season> seasons = seasonRepository.findUnfinalized();
-    if (seasons.size() > 0) {
-      season = seasons.get(0);
-    } else {
-      seasons = seasonRepository.findMostRecent();
-      if (seasons.size() > 0) {
-        season = seasons.get(0);
-      }
-    }
-
-    if (season == null) {
-      throw new NotFoundException("Current season not found");
-    }
-
-    return season;
+    return getCurrentWorker();
   }
 
   @Transactional(readOnly = true)
@@ -206,6 +198,25 @@ public class SeasonService {
 
     // Clear out the historical season
     seasonHistoryRepository.deleteById(seasonId);
+
+    return season;
+  }
+
+  private Season getCurrentWorker() {
+    Season season = null;
+    List<Season> seasons = seasonRepository.findUnfinalized();
+    if (seasons.size() > 0) {
+      season = seasons.get(0);
+    } else {
+      seasons = seasonRepository.findMostRecent();
+      if (seasons.size() > 0) {
+        season = seasons.get(0);
+      }
+    }
+
+    if (season == null) {
+      throw new NotFoundException("Current season not found");
+    }
 
     return season;
   }

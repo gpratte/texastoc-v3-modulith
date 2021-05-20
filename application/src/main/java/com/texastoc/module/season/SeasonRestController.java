@@ -47,6 +47,7 @@ public class SeasonRestController {
     return seasonService.getAll();
   }
 
+  // TODO get rid of this endpoint
   @GetMapping("/api/v3/seasons/current")
   public Season getCurrentSeason() {
     int id = seasonService.getCurrent().getId();

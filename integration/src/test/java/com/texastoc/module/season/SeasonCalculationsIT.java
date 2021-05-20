@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 
-public class SeasonCalculationsStepdefs extends BaseSeasonStepdefs {
+public class SeasonCalculationsIT extends BaseSeasonIT {
 
   static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
