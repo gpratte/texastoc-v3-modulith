@@ -156,7 +156,7 @@ public class PayoutCalculator {
       if (gamePayouts.size() >= i + 1) {
         gamePayouts.get(i).setChopAmount(chopAmountsRounded.get(i));
       } else {
-        // The chop added a new payout // TODO test
+        // The chop added a new payout
         GamePayout gp = new GamePayout();
         gp.setGameId(gameId);
         gp.setPlace(i + 1);
