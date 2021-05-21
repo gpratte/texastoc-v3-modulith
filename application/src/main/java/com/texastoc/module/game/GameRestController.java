@@ -44,7 +44,7 @@ public class GameRestController {
   }
 
   // TODO need season path for all these endpoints
-  @PostMapping(value = "/api/v3/{seasonId}/games", consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(value = "/api/v3/seasons/{seasonId}/games", consumes = MediaType.APPLICATION_JSON_VALUE)
   public Game createGame(@PathVariable("id") int seasonId, @RequestBody Game game) {
     return gameModule.create(game, seasonId);
   }
