@@ -64,7 +64,11 @@
 #foreach($payout in $game.payouts)
   <tr>
     <td align="center">$payout.place</td>
+#if($payout.chopAmount)
+    <td align="center">${d}$payout.chopAmount</td>
+#else
     <td align="center">${d}$payout.amount</td>
+#end
   </tr>
 #end
 </table>

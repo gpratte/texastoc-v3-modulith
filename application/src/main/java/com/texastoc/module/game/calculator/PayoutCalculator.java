@@ -80,7 +80,7 @@ public class PayoutCalculator {
     adjustPayouts(totalPayout, prizePot, gamePayouts);
 
     // Apply the chop
-    chopPayouts(game.getPlayers(), gamePayouts);
+    chopPayouts(game.getId(), game.getPlayers(), gamePayouts);
 
     // TODO only persist if the game payouts are not the same as the current payouts
     persistPayouts(gamePayouts, game.getId());
@@ -116,7 +116,7 @@ public class PayoutCalculator {
     }
   }
 
-  private void chopPayouts(List<GamePlayer> gamePlayers, List<GamePayout> gamePayouts) {
+  private void chopPayouts(int gameId, List<GamePlayer> gamePlayers, List<GamePayout> gamePayouts) {
     List<Integer> chips = new LinkedList<>();
     outer:
     for (int i = 1; i <= 10; i++) {
@@ -136,8 +136,7 @@ public class PayoutCalculator {
 
     int sumOriginal = 0;
     List<Integer> originalPayoutAmounts = new ArrayList<>(chips.size());
-    for (int i = 0; i < chips.size(); i++) {
-      GamePayout gamePayout = gamePayouts.get(i);
+    for (GamePayout gamePayout : gamePayouts) {
       originalPayoutAmounts.add(gamePayout.getAmount());
       sumOriginal += gamePayout.getAmount();
     }
@@ -154,7 +153,18 @@ public class PayoutCalculator {
     ChopUtils.adjustTotal(sumOriginal, chopAmountsRounded);
 
     for (int i = 0; i < chips.size(); i++) {
-      gamePayouts.get(i).setChopAmount(chopAmountsRounded.get(i));
+      if (gamePayouts.size() >= i + 1) {
+        gamePayouts.get(i).setChopAmount(chopAmountsRounded.get(i));
+      } else {
+        // The chop added a new payout
+        GamePayout gp = new GamePayout();
+        gp.setGameId(gameId);
+        gp.setPlace(i + 1);
+        double percent = 0.0;
+        gp.setAmount(0);
+        gp.setChopAmount(chopAmountsRounded.get(i));
+        gamePayouts.add(gp);
+      }
     }
   }
 

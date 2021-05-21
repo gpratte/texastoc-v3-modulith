@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -192,6 +193,71 @@ public class PayoutCalculatorTest implements TestConstants {
         prizePot, totalPaidOutWithChop);
   }
 
+  @Test
+  public void test10Players2PayoutsWith3Chop() {
+    int numPlayers = 10;
+    List<GamePlayer> gamePlayers = new ArrayList<>(numPlayers);
+    for (int i = 0; i < numPlayers; i++) {
+      GamePlayer gamePlayer = GamePlayer.builder()
+          .id(i + 1)
+          .place(i + 1)
+          .boughtIn(true)
+          .build();
+      gamePlayers.add(gamePlayer);
+    }
+    gamePlayers.get(0).setChop(100_000);
+    gamePlayers.get(1).setChop(50_000);
+    gamePlayers.get(2).setChop(25_000);
+
+    int prizePot = GAME_BUY_IN * numPlayers;
+    Game gameToCalculate = Game.builder()
+        .id(1)
+        .numPlayers(numPlayers)
+        .players(gamePlayers)
+        .prizePotCalculated(prizePot)
+        .build();
+
+    when(gameRepository.findById(1)).thenReturn(Optional.of(gameToCalculate));
+
+    List<GamePayout> gamePayouts = payoutCalculator.calculate(gameToCalculate);
+
+    verify(gameRepository, Mockito.times(1)).findById(1);
+    verify(gameRepository, Mockito.times(1)).save(any());
+
+    assertNotNull("list of game payouts should not be null", gamePayouts);
+    assertEquals("list of game payouts should be size 3", 3, gamePayouts.size());
+
+    // From https://www.primedope.com/icm-deal-calculator/
+    List<Integer> amountsWithChop = new ArrayList<>(3);
+    int firstPlaceWithChop = 29;
+    int secondPlaceWithChop = 20;
+    int thirdPlaceWithChop = 11;
+    amountsWithChop.add(firstPlaceWithChop);
+    amountsWithChop.add(secondPlaceWithChop);
+    amountsWithChop.add(thirdPlaceWithChop);
+
+    int totalPaidOutWithoutChop = 0;
+    int totalPaidOutWithChop = 0;
+
+    for (int i = 0; i < gamePayouts.size(); ++i) {
+      GamePayout gamePayout = gamePayouts.get(i);
+      int amountWithChop = amountsWithChop.get(i);
+      int place = i + 1;
+
+      assertEquals("place should be " + place, place, gamePayout.getPlace());
+      assertEquals(amountWithChop, gamePayout.getChopAmount().intValue());
+      totalPaidOutWithoutChop += gamePayout.getAmount();
+      totalPaidOutWithChop += gamePayout.getChopAmount();
+    }
+
+    assertEquals("sum of payouts without chop for " + numPlayers + " players should be " + prizePot,
+        prizePot, totalPaidOutWithoutChop);
+    assertEquals("sum of payouts with chop for " + numPlayers + " players should be " + prizePot,
+        prizePot, totalPaidOutWithChop);
+  }
+
+  // TODO
+  @Ignore
   @Test
   public void test50Players10PayoutsWith3Chop() {
     int numPlayers = 50;

@@ -198,5 +198,6 @@ Choose the branch from the github list of branches to see the readme for that br
 
 To see the code for a branch compare the branch to the previous branch.
 
-## Current Branch: 49-wire-up-sms
-Inject the sms connector into the notification module and pass through to the method to text.
+## Current Branch: 50-chop-adds-a-payout
+More players chopping than payouts adds payout(s).
+For example when there are 2 payouts but 3 players chop then there are 3 payouts.
