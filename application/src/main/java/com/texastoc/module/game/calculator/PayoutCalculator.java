@@ -136,9 +136,12 @@ public class PayoutCalculator {
 
     int sumOriginal = 0;
     List<Integer> originalPayoutAmounts = new ArrayList<>(chips.size());
-    for (GamePayout gamePayout : gamePayouts) {
-      originalPayoutAmounts.add(gamePayout.getAmount());
-      sumOriginal += gamePayout.getAmount();
+    for (int i = 0; i < chips.size(); i++) {
+      if (gamePayouts.size() >= i + 1) {
+        GamePayout gamePayout = gamePayouts.get(i);
+        originalPayoutAmounts.add(gamePayout.getAmount());
+        sumOriginal += gamePayout.getAmount();
+      }
     }
     List<Double> chopAmountsWithDecmials = ICMCalculator.calculate(originalPayoutAmounts, chips);
 

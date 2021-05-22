@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -256,8 +255,6 @@ public class PayoutCalculatorTest implements TestConstants {
         prizePot, totalPaidOutWithChop);
   }
 
-  // TODO
-  @Ignore
   @Test
   public void test50Players10PayoutsWith3Chop() {
     int numPlayers = 50;
