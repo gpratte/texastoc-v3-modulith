@@ -65,7 +65,7 @@
   <tr>
     <td align="center">$payout.place</td>
 #if($payout.chopAmount)
-    <td align="center">${d}$payout.chopAmount</td>
+    <td align="center"><del>${d}$payout.amount</del> ${d}$payout.chopAmount</td>
 #else
     <td align="center">${d}$payout.amount</td>
 #end
@@ -90,7 +90,11 @@
   <tr>
     <td align="center">$!player.place</td>
     <td>$player.name</td>
-#if($player.tocPoints)
+#if($player.tocChopPoints)
+    <td align="center"><del>$player.tocPoints</del> $player.tocChopPoints</td>
+#elseif($player.qTocChopPoints)
+    <td align="center"><del>$player.qTocPoints</del> $player.qTocChopPoints</td>
+#elseif($player.tocPoints)
     <td align="center">$player.tocPoints</td>
 #elseif($player.qTocPoints)
     <td align="center">$player.qTocPoints</td>
